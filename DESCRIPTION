@@ -1,6 +1,6 @@
 Package: WASP
 Title: WAvelet System Prediction
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: 
     person(given = "Ze",
            family = "Jiang",
@@ -12,8 +12,7 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Suggests: 
-    testthat,
-    NPRED
+    testthat
 RoxygenNote: 7.0.2
 Imports: 
     zoo,

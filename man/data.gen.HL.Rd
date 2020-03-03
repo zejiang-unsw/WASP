@@ -34,6 +34,8 @@ The Hysteresis is a common nonlinear phenomenon in natural systems and it can be
 The default selection for the system parameters (\emph{a} = 0.8, \emph{b} = 0.6, \emph{c} = -0.2, \emph{n} = 3, \emph{m} = 5) is known to generate a classical hysteresis loop.
 }
 \examples{
+###synthetic example - Hysteresis loop
+#frequency, sampled from a given range
 fd <- c(3,5,10,15,25,30,55,70,95)
 
 data.HL <- data.gen.HL(n=3,m=5,nobs=512,fp=25,fd=fd)

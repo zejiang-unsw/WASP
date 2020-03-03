@@ -4,12 +4,14 @@
 \alias{at.vt}
 \title{Variance Transformation Operation - AT(a trous)}
 \usage{
-at.vt(data, wf, pad, boundary, cov.opt = c("auto", "pos", "neg"))
+at.vt(data, wf, J, pad, boundary, cov.opt = c("auto", "pos", "neg"))
 }
 \arguments{
 \item{data}{A list of response x and dependent variables dp.}
 
 \item{wf}{Name of the wavelet filter to use in the decomposition.}
+
+\item{J}{Specifies the depth of the decomposition. This must be a number less than or equal to log(length(x),2).}
 
 \item{pad}{The method used for extend data to dyadic size. Use "per", "zero", or "sym".}
 

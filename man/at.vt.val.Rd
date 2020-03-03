@@ -4,10 +4,12 @@
 \alias{at.vt.val}
 \title{Variance Transformation Operation for Validation}
 \usage{
-at.vt.val(data, dwt)
+at.vt.val(data, J, dwt)
 }
 \arguments{
 \item{data}{A list of response x and dependent variables dp.}
+
+\item{J}{Specifies the depth of the decomposition. This must be a number less than or equal to log(length(x),2).}
 
 \item{dwt}{A class of "at" data. Output from at.vt().}
 }

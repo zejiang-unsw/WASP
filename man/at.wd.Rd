@@ -4,7 +4,7 @@
 \alias{at.wd}
 \title{a trous (AT) based additive decompostion using Daubechies family wavelet}
 \usage{
-at.wd(xx, v, ...)
+at.wd(xx, v, nthresh, boundary, ...)
 }
 \arguments{
 \item{xx}{The input time series with dyadic number size.}
