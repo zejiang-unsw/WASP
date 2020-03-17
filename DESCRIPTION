@@ -15,7 +15,6 @@ Suggests:
     testthat
 RoxygenNote: 7.0.2
 Imports: 
-    zoo,
     fitdistrplus,
     waveslim,
     wavethresh
