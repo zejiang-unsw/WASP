@@ -15,6 +15,15 @@ NULL
 #'@usage data(obs.mon)
 NULL
 
+#'@title Sample data: Australia map
+#'@description A dataset containing the Austrlia map.
+#'
+#'@docType data
+#'@keywords datasets
+#'@name Aus_map
+#'@usage data(Aus_map)
+NULL
+
 #'@title Sample data: AWAP rainfall data over Australia
 #'@description A dataset containing 1320 rows (data length) and 252 columns (grids).
 #'
