@@ -271,14 +271,24 @@ at.wd <- function(xx, v, nthresh, boundary,...){
     #DaubLeAsymm for Daubechies' “least-asymmetric” wavelets
     at.x <- wavethresh::wd(xx, type="station", filter.number=v, family="DaubExPhase", bc=boundary,...)
 
-    #nthresh = nlevelsWT(at.x)-1
-    Dj <- matrix(NA, nrow=length(xx), ncol=nthresh)
-    for (j in 1:(nthresh)) {
-      Dj[,j] <- accessC(at.x,j) - accessC(at.x,j-1)
+    # #nthresh = nlevelsWT(at.x)-1
+    # Dj <- matrix(NA, nrow=length(xx), ncol=nthresh)
+    # for (j in 1:(nthresh)) {
+    #   Dj[,j] <- accessC(at.x,j) - accessC(at.x,j-1)
+    # }
+    #
+    # at.wd <- cbind(accessC(at.x,0),Dj)
+    # output <- at.wd[,ncol(at.wd):1]    #reverse the order
+
+    max = nlevelsWT(at.x)
+    Dj <- NULL
+    for (j in (max-nthresh+1):max) {
+      Dj <- cbind(Dj, accessC(at.x,j) - accessC(at.x,j-1))
     }
 
-    at.wd <- cbind(accessC(at.x,0),Dj)
+    at.wd <- cbind(accessC(at.x,max-nthresh),Dj)
     output <- at.wd[,ncol(at.wd):1]    #reverse the order
+
     return(output)
 }
 

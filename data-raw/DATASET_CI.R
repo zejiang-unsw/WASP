@@ -5,6 +5,8 @@
 library(zoo)
 library(R.matlab)
 library(tidyverse)
+
+setwd("~/OneDrive - UNSW/R_Package/WASP/")
 #-----------------------------------------------------------------
 ###Nino3.4, SOI, PDO, and DMI: 1900-2010 monthly data, 1332 data points
 CI.obs <- readMat("./data-raw/Climate_Indices_1900_2010.mat")
@@ -53,5 +55,8 @@ TPI <- window(tpi.ts, start=c(1900,1),end=c(2010,12))
 data.CI <- do.call("cbind", data.frame(CI.obs.ts,SAM,TPI))
 summary(data.CI)
 start(data.CI); end(data.CI)
+plot.ts(data.CI)
+
+
 use_data(data.CI, overwrite = TRUE)
 
