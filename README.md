@@ -4,13 +4,13 @@ An open-source wavelet tool for improving prediction accuracy for natural system
 
 ## Requirements
 <pre>
-Dependencies:\
-  waveslim,\
+Dependencies:
+  waveslim,
   wavethresh
 
-Suggest:\
-  zoo,\
-  fitdistrplus,\
+Suggest:
+  zoo,
+  fitdistrplus,
   NPRED (https://github.com/zejiang-unsw/NPRED_1.0.2)
 </pre>
 
