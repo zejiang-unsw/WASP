@@ -12,9 +12,10 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Suggests: 
-    testthat
+    zoo,
+    testthat,
+    fitdistrplus
 RoxygenNote: 7.0.2
 Imports: 
-    fitdistrplus,
     waveslim,
     wavethresh
