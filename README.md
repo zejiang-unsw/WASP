@@ -23,6 +23,4 @@ devtools::install_github("zejiang-unsw/WASP", dependencies = TRUE)
 ```
 
 ## Citation
-Jiang, Z., Sharma, A., & Johnson, F. (2020). Refining predictor spectral representation using wavelet theory for improved natural system modelling. Water Resources Research, n/a(n/a), e2019WR026962. doi:10.1029/2019wr026962
-
-
+Jiang, Z., Sharma, A., & Johnson, F. (2020). Refining Predictor Spectral Representation Using Wavelet Theory for Improved Natural System Modeling. Water Resources Research, 56(3), e2019WR026962. doi:10.1029/2019wr026962
