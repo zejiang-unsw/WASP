@@ -11,7 +11,7 @@ Dependencies:
 Suggest:
   zoo,
   fitdistrplus,
-  NPRED (https://github.com/zejiang-unsw/NPRED_1.0.2)
+  NPRED (https://github.com/zejiang-unsw/NPRED)
 </pre>
 
 ## Installation
