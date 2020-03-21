@@ -41,7 +41,7 @@ for(id in 1:ncol(SPI.cal)){
 }
 
 ## variance transformation
-dwt.list<- lapply(data.list, function(x) at.vt(x, wf="d4", pad="zero", boundary="periodic"))
+dwt.list<- lapply(data.list, function(x) at.vt(x, wf="d4", J=7, pad="zero", boundary="periodic"))
 
 ## plot original and reconstrcuted predictors for each station
 for(i in 1:length(dwt.list)){

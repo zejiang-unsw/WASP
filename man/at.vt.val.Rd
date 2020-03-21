@@ -35,7 +35,7 @@ for(id in 1:ncol(SPI.cal)){
 }
 
 ## variance transformation - calibration
-dwt.list<- lapply(data.list, function(x) at.vt(x, wf="d4", pad="zero", boundary="periodic"))
+dwt.list<- lapply(data.list, function(x) at.vt(x, wf="d4", J=7, pad="zero", boundary="periodic"))
 
 ##response SPI - validation
 SPI.val <- SPI.calc(window(rain.mon, start=c(1979,1), end=c(2009,12)),sc=12)
@@ -49,7 +49,7 @@ for(id in 1:ncol(SPI.val)){
 }
 
 #variance transformation - validation
-dwt.list.val<- lapply(1:length(data.list), function(i) at.vt.val(data.list[[i]], dwt.list[[i]]))
+dwt.list.val<- lapply(1:length(data.list), function(i) at.vt.val(data.list[[i]], J=7, dwt.list[[i]]))
 
 ## plot original and reconstrcuted predictors for each station
 for(i in 1:length(dwt.list.val)){
@@ -58,10 +58,10 @@ for(i in 1:length(dwt.list.val)){
   x <- dwt$x  			        # response
   dp <- dwt$dp			        # original predictors
   dp.n <- dwt$dp.n         # variance transformed predictors
-
+  
   plot.ts(cbind(x,dp))
   plot.ts(cbind(x,dp.n))
-
+  
 }
 }
 \references{
