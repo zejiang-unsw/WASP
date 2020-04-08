@@ -4,7 +4,7 @@
 \alias{mra.plot}
 \title{Plot function: Plot origianl time series and decomposed frequency components}
 \usage{
-mra.plot(y, y.mra, limits.x, limits.y, ...)
+mra.plot(y, y.mra, limits.x, limits.y, type = c("details", "coefs"), ...)
 }
 \arguments{
 \item{y}{Original time series (Y).}

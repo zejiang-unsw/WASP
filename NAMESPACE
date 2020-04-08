@@ -3,7 +3,6 @@
 export(at.vt)
 export(at.vt.val)
 export(at.wd)
-export(class.modwt)
 export(data.gen.HL)
 export(data.gen.Rossler)
 export(data.gen.SW)
