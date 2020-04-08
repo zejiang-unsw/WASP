@@ -49,7 +49,7 @@
 dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","neg")){
 
   # initialization
-  x= data$x; dp= data$dp
+  x= data$x; dp= as.matrix(data$dp)
   mu.dp <- apply(dp,2,mean)
 
   # variance transfrom
@@ -132,7 +132,7 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","n
 #' data(obs.mon)
 #'
 #' ##response SPI - calibration
-#' SPI.cal <- SPI_empi(window(rain.mon, start=c(1949,1), end=c(1979,12)),sc=12)
+#' SPI.cal <- SPI.calc(window(rain.mon, start=c(1949,1), end=c(1979,12)),sc=12)
 #'
 #' ## create paired response and predictors dataset for each station
 #' data.list <- list()
@@ -146,7 +146,7 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","n
 #' dwt.list<- lapply(data.list, function(x) dwt.vt(x, wf="d4", J=7, method="dwt", pad="zero", boundary="periodic"))
 #'
 #' ##response SPI - validation
-#' SPI.val <- SPI_empi(window(rain.mon, start=c(1979,1), end=c(2009,12)),sc=12)
+#' SPI.val <- SPI.calc(window(rain.mon, start=c(1979,1), end=c(2009,12)),sc=12)
 #'
 #' ## create paired response and predictors dataset for each station
 #' data.list <- list()
@@ -175,7 +175,7 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","n
 dwt.vt.val <- function(data, J, dwt){
 
   # initialization
-  x= data$x; dp= data$dp
+  x= data$x; dp= as.matrix(data$dp)
   wf <- dwt$wavelet; method <- dwt$method; boundary <- dwt$boundary; pad=dwt$pad
   mu.dp <- apply(dp,2,mean)
 
