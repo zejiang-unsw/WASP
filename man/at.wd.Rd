@@ -28,10 +28,10 @@ at.atm <- vector("list", ncol(obs.mon))
 for(i in 1:ncol(obs.mon)){
   tmp <- padding(scale(obs.mon[,i],scale=F), pad="zero")
   at.atm <- at.wd(tmp, v=2, nthresh = J, boundary = "periodic")
-  
+
   plot.ts(cbind(obs.mon[1:n,i],at.atm[1:n,1:9]), main=names[i])
   print(sum(abs(scale(obs.mon[1:n,i],scale=F)-rowSums(at.atm[1:n,]))))
-  
+
 }
 }
 \references{

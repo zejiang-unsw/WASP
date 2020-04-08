@@ -58,10 +58,10 @@ for(i in 1:length(dwt.list.val)){
   x <- dwt$x  			        # response
   dp <- dwt$dp			        # original predictors
   dp.n <- dwt$dp.n         # variance transformed predictors
-  
+
   plot.ts(cbind(x,dp))
   plot.ts(cbind(x,dp.n))
-  
+
 }
 }
 \references{

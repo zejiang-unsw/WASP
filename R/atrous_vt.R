@@ -17,10 +17,10 @@
 #' @examples
 #' data(rain.mon)
 #' data(obs.mon)
-#' 
+#'
 #' ##response SPI - calibration
 #' SPI.cal <- SPI.calc(window(rain.mon, start=c(1949,1), end=c(1979,12)),sc=12)
-#' 
+#'
 #' ## create paired response and predictors dataset for each station
 #' data.list <- list()
 #' for(id in 1:ncol(SPI.cal)){
@@ -28,10 +28,10 @@
 #'   dp <- window(obs.mon, start=c(1950,1), end=c(1979,12))
 #'   data.list[[id]] <- list(x=as.numeric(x), dp=matrix(dp, nrow=nrow(dp)))
 #' }
-#' 
+#'
 #' ## variance transformation
 #' dwt.list<- lapply(data.list, function(x) at.vt(x, wf="d4", J=7, pad="zero", boundary="periodic"))
-#' 
+#'
 #' ## plot original and reconstrcuted predictors for each station
 #' for(i in 1:length(dwt.list)){
 #'   # extract data
@@ -39,21 +39,21 @@
 #'   x <- dwt$x  			      # response
 #'   dp <- dwt$dp			      # original predictors
 #'   dp.n <- dwt$dp.n        # variance transformed predictors
-#' 
+#'
 #'   plot.ts(cbind(x,dp))
 #'   plot.ts(cbind(x,dp.n))
-#' 
+#'
 #' }
 
 at.vt <- function(data, wf, J, pad, boundary, cov.opt=c("auto","pos","neg")){
 
   # initialization
-  x= data$x; dp= data$dp
+  x= data$x; dp= as.matrix(data$dp)
   mu.dp <- apply(dp,2,mean)
   if(wf!="haar") v <- as.integer(as.numeric(substr(wf,2,3))/2) else v <- 1
 
   # variance transfrom
-  ndim=ncol(dp); n=nrow(dp); #J <- ceiling(log2(n))
+  ndim=ncol(dp); n=nrow(dp);
   S <- matrix(nrow=J+1, ncol=ndim)
   dp.n <- matrix(nrow=n,ncol=ndim)
 
@@ -130,10 +130,10 @@ at.vt <- function(data, wf, J, pad, boundary, cov.opt=c("auto","pos","neg")){
 #' @examples
 #' data(rain.mon)
 #' data(obs.mon)
-#' 
+#'
 #' ##response SPI - calibration
 #' SPI.cal <- SPI.calc(window(rain.mon, start=c(1949,1), end=c(1979,12)),sc=12)
-#' 
+#'
 #' ## create paired response and predictors dataset for each station
 #' data.list <- list()
 #' for(id in 1:ncol(SPI.cal)){
@@ -141,13 +141,13 @@ at.vt <- function(data, wf, J, pad, boundary, cov.opt=c("auto","pos","neg")){
 #'   dp <- window(obs.mon, start=c(1950,1), end=c(1979,12))
 #'   data.list[[id]] <- list(x=as.numeric(x), dp=matrix(dp, nrow=nrow(dp)))
 #' }
-#' 
+#'
 #' ## variance transformation - calibration
 #' dwt.list<- lapply(data.list, function(x) at.vt(x, wf="d4", J=7, pad="zero", boundary="periodic"))
-#' 
+#'
 #' ##response SPI - validation
 #' SPI.val <- SPI.calc(window(rain.mon, start=c(1979,1), end=c(2009,12)),sc=12)
-#' 
+#'
 #' ## create paired response and predictors dataset for each station
 #' data.list <- list()
 #' for(id in 1:ncol(SPI.val)){
@@ -155,10 +155,10 @@ at.vt <- function(data, wf, J, pad, boundary, cov.opt=c("auto","pos","neg")){
 #'   dp <- window(obs.mon, start=c(1980,1), end=c(2009,12))
 #'   data.list[[id]] <- list(x=as.numeric(x), dp=matrix(dp, nrow=nrow(dp)))
 #' }
-#' 
+#'
 #' #variance transformation - validation
 #' dwt.list.val<- lapply(1:length(data.list), function(i) at.vt.val(data.list[[i]], J=7, dwt.list[[i]]))
-#' 
+#'
 #' ## plot original and reconstrcuted predictors for each station
 #' for(i in 1:length(dwt.list.val)){
 #'   # extract data
@@ -166,22 +166,22 @@ at.vt <- function(data, wf, J, pad, boundary, cov.opt=c("auto","pos","neg")){
 #'   x <- dwt$x  			        # response
 #'   dp <- dwt$dp			        # original predictors
 #'   dp.n <- dwt$dp.n         # variance transformed predictors
-#'   
+#'
 #'   plot.ts(cbind(x,dp))
 #'   plot.ts(cbind(x,dp.n))
-#'   
+#'
 #' }
 
 at.vt.val <- function(data, J, dwt){
 
   # initialization
-  x= data$x; dp= data$dp
+  x= data$x; dp= as.matrix(data$dp)
   wf <- dwt$wavelet; boundary <- dwt$boundary; pad=dwt$pad
   mu.dp <- apply(dp,2,mean)
   if(wf!="haar") v <- as.integer(as.numeric(substr(wf,2,3))/2) else v <- 1
 
   # variance transfrom
-  ndim=ncol(dp); n=nrow(dp); #J <- ceiling(log2(n))
+  ndim=ncol(dp); n=nrow(dp);
   dp.n <- matrix(nrow=n,ncol=ndim)
 
   for(i in 1:ndim){
@@ -245,19 +245,19 @@ at.vt.val <- function(data, J, dwt){
 #'
 #' @examples
 #' data(obs.mon)
-#' 
+#'
 #' n <- nrow(obs.mon);v=2
 #' J <- ceiling(log(n/(2*v-1))/log(2)) #(Kaiser, 1994)
-#' 
+#'
 #' names <- colnames(obs.mon)
 #' at.atm <- vector("list", ncol(obs.mon))
 #' for(i in 1:ncol(obs.mon)){
 #'   tmp <- padding(scale(obs.mon[,i],scale=F), pad="zero")
 #'   at.atm <- at.wd(tmp, v=2, nthresh = J, boundary = "periodic")
-#'   
+#'
 #'   plot.ts(cbind(obs.mon[1:n,i],at.atm[1:n,1:9]), main=names[i])
 #'   print(sum(abs(scale(obs.mon[1:n,i],scale=F)-rowSums(at.atm[1:n,]))))
-#'   
+#'
 #' }
 
 at.wd <- function(xx, v, nthresh, boundary,...){
@@ -271,7 +271,7 @@ at.wd <- function(xx, v, nthresh, boundary,...){
     for (j in (max-nthresh+1):max) {
       Dj <- cbind(Dj, accessC(at.x,j) - accessC(at.x,j-1))
     }
-    
+
     at.wd <- cbind(accessC(at.x,max-nthresh),Dj)
     output <- at.wd[,ncol(at.wd):1]    #reverse the order
     return(output)
