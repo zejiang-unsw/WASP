@@ -14,7 +14,7 @@ modwt.vt.val(data, J, dwt)
 \item{dwt}{A class of "dwt" data. Output from dwt.vt().}
 }
 \value{
-A list of 8 elements: wf, vt.opt, boundary, pad, x (data), dp (data), dp.n (variance trasnformed dp), and S (covariance matrix).
+A list of 8 elements: wf, J, boundary, pad, x (data), dp (data), dp.n (variance trasnformed dp), and S (covariance matrix).
 }
 \description{
 Variance Transformation Operation for Validation
@@ -35,7 +35,7 @@ for(id in 1:ncol(SPI.cal)){
 }
 
 ## variance transformation - calibration
-dwt.list<- lapply(data.list, function(x) modwt.vt(x, wf="d4", J=7, pad="zero", boundary="periodic"))
+dwt.list<- lapply(data.list, function(x) modwt.vt(x, wf="d4", J=7, boundary="periodic"))
 
 ##response SPI - validation
 SPI.val <- SPI.calc(window(rain.mon, start=c(1979,1), end=c(2009,12)),sc=12)

@@ -4,15 +4,7 @@
 \alias{modwt.vt}
 \title{Variance Transformation Operation - MODWT}
 \usage{
-modwt.vt(
-  data,
-  wf,
-  J,
-  pad,
-  boundary,
-  vt.opt = c("Sxx", "Cov"),
-  cov.opt = c("auto", "pos", "neg")
-)
+modwt.vt(data, wf, J, boundary, cov.opt = c("auto", "pos", "neg"))
 }
 \arguments{
 \item{data}{A list of response x and dependent variables dp.}
@@ -21,16 +13,12 @@ modwt.vt(
 
 \item{J}{Specifies the depth of the decomposition. This must be a number less than or equal to log(length(x),2).}
 
-\item{pad}{The method used for extend data to dyadic size. Use "per", "zero", or "sym".}
-
 \item{boundary}{Character string specifying the boundary condition. If boundary=="periodic" the default, then the vector you decompose is assumed to be periodic on its defined interval, if boundary=="reflection", the vector beyond its boundaries is assumed to be a symmetric reflection of itself.}
-
-\item{vt.opt}{Options of variance transformation matrix, either "Sxx" or "Cov".}
 
 \item{cov.opt}{Options of Covariance matrix sign. Use "pos", "neg", or "auto".}
 }
 \value{
-A list of 8 elements: wf, vt.opt, boundary, pad, x (data), dp (data), dp.n (variance trasnformed dp), and S (covariance matrix).
+A list of 8 elements: wf, J, boundary, pad, x (data), dp (data), dp.n (variance trasnformed dp), and S (covariance matrix).
 }
 \description{
 Variance Transformation Operation - MODWT
@@ -39,12 +27,11 @@ Variance Transformation Operation - MODWT
 ###real-world example
 x <- window(SPI.12,start=c(1950,1),end=c(2009,12))
 dp <- window(obs.mon,start=c(1950,1),end=c(2009,12))
-vt.opt = ifelse(0,"Sxx","Cov")
 
 for(id in 5){
 
   data <- list(x=x[,id],dp=dp)
-  dwt <- modwt.vt(data, wf="d4", J=7, pad="zero", boundary="periodic", vt.opt)
+  dwt <- modwt.vt(data, wf="d4", J=7, pad="zero", boundary="periodic")
 
   par(mfrow=c(ncol(dp),1),pty="m",mar=c(1,4,1,2))
   for(i in 1:ncol(dp))
@@ -55,7 +42,7 @@ for(id in 5){
 fd <- c(3,5,10,15,25,30,55,70,95)
 
 data.SW1 <- data.gen.SW(nobs=512,fp=25,fd=fd)
-dwt.SW1 <- modwt.vt(data.SW1, wf="d4", J=7, pad="zero", boundary="periodic",vt.opt)
+dwt.SW1 <- modwt.vt(data.SW1, wf="d4", J=7, boundary="periodic")
 
 x.modwt <- waveslim::modwt(dwt.SW1$x, wf = "d4", n.levels = 7,  boundary = "periodic")
 dp.modwt <- waveslim::modwt(dwt.SW1$dp[,1], wf = "d4", n.levels = 7,  boundary = "periodic")
