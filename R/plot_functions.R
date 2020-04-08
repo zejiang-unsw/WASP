@@ -37,7 +37,13 @@
 #' limits.x <- c(0,n); limits.y <- c(-3,3)
 #' mra.plot(x, x.mra.m, limits.x, limits.y)
 
-mra.plot <- function(y, y.mra, limits.x, limits.y,...){
+mra.plot <- function(y, y.mra, limits.x, limits.y, type=c("details","coefs"),...){
+
+  if(type=="details"){
+      ylab=c("d", "a")
+  } else {
+      ylab=c("D", "A")
+  }
 
   J <- ncol(y.mra)-1
   par(mfcol=c(J+2,1), mar=c(0,3,0.2,1),# margin of the plot
@@ -51,11 +57,11 @@ mra.plot <- function(y, y.mra, limits.x, limits.y,...){
 
   for(i in 1:J){
 
-    plot(y.mra[,i], type="l", axes=FALSE, xlab=NA, ylab=paste0("d",i), xaxs="i",
+    plot(y.mra[,i], type="l", axes=FALSE, xlab=NA, ylab=paste0(ylab[1],i), xaxs="i",
          xlim=limits.x, ylim=limits.y);box()
   }
 
-  plot(y.mra[,J+1], type="l", axes=FALSE, xlab=NA, ylab=paste0("a",J), xaxs="i",
+  plot(y.mra[,J+1], type="l", axes=FALSE, xlab=NA, ylab=paste0(ylab[2],J), xaxs="i",
        xlim=limits.x, ylim=limits.y);box()
   axis(side=1, at=seq(limits.x[1],limits.x[2],by = 50), labels=seq(limits.x[1],limits.x[2],by = 50))
 
