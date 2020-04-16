@@ -18,7 +18,7 @@ modwt.vt(data, wf, J, boundary, cov.opt = c("auto", "pos", "neg"))
 \item{cov.opt}{Options of Covariance matrix sign. Use "pos", "neg", or "auto".}
 }
 \value{
-A list of 8 elements: wf, J, boundary, pad, x (data), dp (data), dp.n (variance trasnformed dp), and S (covariance matrix).
+A list of 8 elements: wf, J, boundary, x (data), dp (data), dp.n (variance trasnformed dp), and S (covariance matrix).
 }
 \description{
 Variance Transformation Operation - MODWT
@@ -31,7 +31,7 @@ dp <- window(obs.mon,start=c(1950,1),end=c(2009,12))
 for(id in 5){
 
   data <- list(x=x[,id],dp=dp)
-  dwt <- modwt.vt(data, wf="d4", J=7, pad="zero", boundary="periodic")
+  dwt <- modwt.vt(data, wf="d4", J=7, boundary="periodic")
 
   par(mfrow=c(ncol(dp),1),pty="m",mar=c(1,4,1,2))
   for(i in 1:ncol(dp))

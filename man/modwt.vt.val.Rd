@@ -14,7 +14,7 @@ modwt.vt.val(data, J, dwt)
 \item{dwt}{A class of "dwt" data. Output from dwt.vt().}
 }
 \value{
-A list of 8 elements: wf, J, boundary, pad, x (data), dp (data), dp.n (variance trasnformed dp), and S (covariance matrix).
+A list of 8 elements: wf, J, boundary, x (data), dp (data), dp.n (variance trasnformed dp), and S (covariance matrix).
 }
 \description{
 Variance Transformation Operation for Validation
