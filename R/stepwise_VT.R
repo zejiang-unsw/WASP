@@ -118,7 +118,7 @@ stepwise.VT.val <- function (data, J, dwt, mode){
   if(ncpy>1){
     for(i in 2:ncpy){
       Z=dp[,cpy[1:(i-1)]]
-      dp.n[,i] <- knnregl1cv(dp[,cpy[i]], Z)-dp[,cpy[i]]
+      dp.n[,i] <- dp[,cpy[i]]-knnregl1cv(dp[,cpy[i]], Z)
     }
   }
 
@@ -242,8 +242,8 @@ pic.calc <- function(X, Y, Z, mode, wf) {
     x.in <- X
     y.in <- Y
   } else {
-    x.in <- knnregl1cv(X, Z[1:length(X),])-X
-    y.in <- apply(Y, 2, function(i) knnregl1cv(i, Z)-i)
+    x.in <- X-knnregl1cv(X, Z[1:length(X),])
+    y.in <- apply(Y, 2, function(i) i-knnregl1cv(i, Z))
   }
 
   data.list <- list(x=x.in, dp=y.in)
