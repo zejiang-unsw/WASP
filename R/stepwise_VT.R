@@ -119,6 +119,8 @@ stepwise.VT.val <- function (data, J, dwt, mode){
     for(i in 2:ncpy){
       Z=dp[,cpy[1:(i-1)]]
       dp.n[,i] <- dp[,cpy[i]]-knnregl1cv(dp[,cpy[i]], Z)
+      #dp.n[,i] <- lm.fit(as.matrix(Z), dp[,cpy[i]])$residuals
+
     }
   }
 
@@ -244,6 +246,9 @@ pic.calc <- function(X, Y, Z, mode, wf) {
   } else {
     x.in <- X-knnregl1cv(X, Z[1:length(X),])
     y.in <- apply(Y, 2, function(i) i-knnregl1cv(i, Z))
+
+    # x.in <- lm.fit(as.matrix(Z[1:length(X),]), X)$residuals
+    # y.in <- apply(Y, 2, function(i) lm.fit(Z, i)$residuals)
   }
 
   data.list <- list(x=x.in, dp=y.in)
