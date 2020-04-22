@@ -2,14 +2,12 @@
 % Please edit documentation in R/stepwise_VT.R
 \name{stepwise.VT.val}
 \alias{stepwise.VT.val}
-\title{Calculate stepwise high order VT}
+\title{Calculate stepwise high order VT in validation}
 \usage{
-stepwise.VT.val(data, J, dwt, mode)
+stepwise.VT.val(data, dwt, mode)
 }
 \arguments{
-\item{data}{A list of response and identifed predictors}
-
-\item{J}{The decomposition level}
+\item{data}{A list of data, including response and predictors}
 
 \item{dwt}{Output from dwt.vt(), including the transformation covariance}
 
@@ -19,8 +17,35 @@ stepwise.VT.val(data, J, dwt, mode)
 A list of objects, including transformed predictors
 }
 \description{
-Calculate stepwise high order VT
+Calculate stepwise high order VT in validation
 }
 \examples{
+mode <- switch(1,"MRA", "MODWT","a trous")
+wf="d4"
+station.id = 5 # station to investigate
+SPI.12 <- SPEI::spi(rain.mon,scale=12)$fitted
+lab.names <- colnames(obs.mon)
+#plot.ts(SPI.12[,1:10])
 
+#--------------------------------------
+###calibration
+x <- window(SPI.12[,station.id],start=c(1950,1),end=c(1979,12))
+dp <- window(obs.mon[,lab.names],start=c(1950,1),end=c(1979,12))
+
+data <- list(x=x,dp=matrix(dp, ncol=ncol(dp)))
+dwt = stepwise.VT(data, mode=mode, wf=wf)
+#--------------------------------------
+###validation
+x <- window(SPI.12[,station.id],start=c(1980,1),end=c(2009,12))
+dp <- window(obs.mon[,lab.names],start=c(1980,1),end=c(2009,12))
+
+data.n <- list(x=x,dp=matrix(dp, ncol=ncol(dp)))
+dwt.val = stepwise.VT.val(data.n, dwt, mode)
+
+###plot transformed predictor before and after
+par(mfrow=c(ncol(dp),1), mar=c(0,3,2,1))
+for(i in 1:ncol(dp))
+{
+  ts.plot(cbind(dwt.val$dp[,i], dwt.val$dp.n[,i]), xlab="NA", col=1:2)
+}
 }

@@ -2,14 +2,12 @@
 % Please edit documentation in R/stepwise_VT.R
 \name{stepwise.VT}
 \alias{stepwise.VT}
-\title{Calculate stepwise high order VT}
+\title{Calculate stepwise high order VT in calibration}
 \usage{
-stepwise.VT(x, py, alpha = 0.1, mode = c("MRA", "MODWT", "AT"), wf)
+stepwise.VT(data, alpha = 0.1, mode = c("MRA", "MODWT", "AT"), wf)
 }
 \arguments{
-\item{x}{A vector of response.}
-
-\item{py}{A matrix containing possible predictors of x.}
+\item{data}{A list of data, including response and predictors}
 
 \item{alpha}{The significance level used to judge whether the sample estimate in Equation \deqn{\hat{PIC} = sqrt(1-exp(-2\hat{PI})} is significant or not. A default alpha value is 0.1.}
 
@@ -21,23 +19,30 @@ stepwise.VT(x, py, alpha = 0.1, mode = c("MRA", "MODWT", "AT"), wf)
 A list of 2 elements: the column numbers of the meaningful predictors (cpy), and partial informational correlation (cpyPIC).
 }
 \description{
-Calculate stepwise high order VT
+Calculate stepwise high order VT in calibration
 }
 \examples{
-data(data1) # AR9 model   x(i)=0.3*x(i-1)-0.6*x(i-4)-0.5*x(i-9)+eps
-x<-data1[,1]   # response
-py<-data1[,-1]  # possible predictors
-stepwise.PIC(x,py)
+###Real-world example
+mode <- switch(1,"MRA", "MODWT","a trous")
+wf="d4"
+station.id = 5 # station to investigate
+SPI.12 <- SPEI::spi(rain.mon,scale=12)$fitted
+lab.names <- colnames(obs.mon)
+#plot.ts(SPI.12[,1:10])
 
-data(data2) # AR4 model:  x(i)=0.6*x(i-1)-0.4*x(i-4)+eps
-x<-data2[,1]   # response
-py<-data2[,-1]  # possible predictors
-stepwise.PIC(x,py)
+x <- window(SPI.12[,station.id],start=c(1950,1),end=c(1979,12))
+dp <- window(obs.mon[,lab.names],start=c(1950,1),end=c(1979,12))
 
-data(data3) # AR1 model  x(i)=0.9*x(i-1)+0.866*eps
-x<-data3[,1]   # response
-py<-data3[,-1]  # possible predictors
-stepwise.PIC(x,py)
+data <- list(x=x,dp=matrix(dp, ncol=ncol(dp)))
+
+dwt = stepwise.VT(data, mode=mode, wf=wf)
+
+###plot transformed predictor before and after
+par(mfrow=c(ncol(dp),1), mar=c(0,3,2,1))
+for(i in 1:ncol(dp))
+{
+  ts.plot(cbind(dwt$dp[,i], dwt$dp.n[,i]), xlab="NA", col=1:2)
+}
 }
 \references{
 Sharma, A., Mehrotra, R., 2014. An information theoretic alternative to model a natural system using observational information alone. Water Resources Research, 50(1): 650-660.
