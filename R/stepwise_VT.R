@@ -1,7 +1,6 @@
-#' Calculate stepwise high order VT
+#' Calculate stepwise high order VT in calibration
 #'
-#' @param x       A vector of response.
-#' @param py      A matrix containing possible predictors of x.
+#' @param data    A list of data, including response and predictors
 #' @param alpha   The significance level used to judge whether the sample estimate in Equation \deqn{\hat{PIC} = sqrt(1-exp(-2\hat{PI})} is significant or not. A default alpha value is 0.1.
 #' @param mode    A mode of variance transfomration, i.e., MRA, MODWT, or AT
 #' @param wf      Wavelet family
@@ -11,24 +10,31 @@
 #'
 #' @references Sharma, A., Mehrotra, R., 2014. An information theoretic alternative to model a natural system using observational information alone. Water Resources Research, 50(1): 650-660.
 #' @examples
-#' data(data1) # AR9 model   x(i)=0.3*x(i-1)-0.6*x(i-4)-0.5*x(i-9)+eps
-#' x<-data1[,1]   # response
-#' py<-data1[,-1]  # possible predictors
-#' stepwise.PIC(x,py)
+#' ###Real-world example
+#' mode <- switch(1,"MRA", "MODWT","a trous")
+#' wf="d4"
+#' station.id = 5 # station to investigate
+#' SPI.12 <- SPEI::spi(rain.mon,scale=12)$fitted
+#' lab.names <- colnames(obs.mon)
+#' #plot.ts(SPI.12[,1:10])
 #'
-#' data(data2) # AR4 model:  x(i)=0.6*x(i-1)-0.4*x(i-4)+eps
-#' x<-data2[,1]   # response
-#' py<-data2[,-1]  # possible predictors
-#' stepwise.PIC(x,py)
+#' x <- window(SPI.12[,station.id],start=c(1950,1),end=c(1979,12))
+#' dp <- window(obs.mon[,lab.names],start=c(1950,1),end=c(1979,12))
 #'
-#' data(data3) # AR1 model  x(i)=0.9*x(i-1)+0.866*eps
-#' x<-data3[,1]   # response
-#' py<-data3[,-1]  # possible predictors
-#' stepwise.PIC(x,py)
-
-stepwise.VT <- function (x, py, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf)
+#' data <- list(x=x,dp=matrix(dp, ncol=ncol(dp)))
+#'
+#' dwt = stepwise.VT(data, mode=mode, wf=wf)
+#'
+#' ###plot transformed predictor before and after
+#' par(mfrow=c(ncol(dp),1), mar=c(0,3,2,1))
+#' for(i in 1:ncol(dp))
+#' {
+#'   ts.plot(cbind(dwt$dp[,i], dwt$dp.n[,i]), xlab="NA", col=1:2)
+#' }
+stepwise.VT <- function (data, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf)
 {
-  x = as.matrix(x)
+  x= as.matrix(data$x); py= as.matrix(data$dp)
+
   n = nrow(x)
   npy = ncol(py)
   cpy = cpyPIC = NULL
@@ -83,21 +89,29 @@ stepwise.VT <- function (x, py, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf)
 
     outwt = out$pw
     lstwt = abs(lsfit(z.vt[1:length(x),], x)$coef)
+
+    z.n = z; ncpy=length(cpy)
+    if(ncpy>1){
+      for(i in 2:ncpy){
+        tmp=z[,1:(i-1)]
+        z.n[,i] <- z[,i]-knnregl1cv(z[,i], tmp)
+        #z.n[,i] <- lm.fit(as.matrix(tmp), z[,i])$residuals
+
+      }
+    }
+
     return(list(cpy = cpy, cpyPIC = cpyPIC, wt = outwt,lstwet = lstwt,
                 x = x, py = py,
-                dp=z, dp.n=z.vt, S=S,
+                dp=z.n, dp.n=z.vt, S=S,
                 wavelet=wf))
   } else {
     message("None of the provided predictors is related to the response variable")
   }
 }
 
-
-
-#' Calculate stepwise high order VT
+#' Calculate stepwise high order VT in validation
 #'
-#' @param data    A list of response and identifed predictors
-#' @param J       The decomposition level
+#' @param data    A list of data, including response and predictors
 #' @param dwt     Output from dwt.vt(), including the transformation covariance
 #' @param mode    A mode of variance transfomration, i.e., MRA, MODWT, or AT
 #'
@@ -105,21 +119,57 @@ stepwise.VT <- function (x, py, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf)
 #' @export
 #'
 #' @examples
+###Real-world example
+#' mode <- switch(1,"MRA", "MODWT","a trous")
+#' wf="d4"
+#' station.id = 5 # station to investigate
+#' SPI.12 <- SPEI::spi(rain.mon,scale=12)$fitted
+#' lab.names <- colnames(obs.mon)
+#' #plot.ts(SPI.12[,1:10])
 #'
-stepwise.VT.val <- function (data, J, dwt, mode){
+#' #--------------------------------------
+#' ###calibration
+#' x <- window(SPI.12[,station.id],start=c(1950,1),end=c(1979,12))
+#' dp <- window(obs.mon[,lab.names],start=c(1950,1),end=c(1979,12))
+#'
+#' data <- list(x=x,dp=matrix(dp, ncol=ncol(dp)))
+#' dwt = stepwise.VT(data, mode=mode, wf=wf)
+#' #--------------------------------------
+#' ###validation
+#' x <- window(SPI.12[,station.id],start=c(1980,1),end=c(2009,12))
+#' dp <- window(obs.mon[,lab.names],start=c(1980,1),end=c(2009,12))
+#'
+#' data.n <- list(x=x,dp=matrix(dp, ncol=ncol(dp)))
+#' dwt.val = stepwise.VT.val(data.n, dwt, mode)
+#'
+#' ###plot transformed predictor before and after
+#' par(mfrow=c(ncol(dp),1), mar=c(0,3,2,1))
+#' for(i in 1:ncol(dp))
+#' {
+#'   ts.plot(cbind(dwt.val$dp[,i], dwt.val$dp.n[,i]), xlab="NA", col=1:2)
+#' }
+stepwise.VT.val <- function (data, dwt, mode){
 
   # initialization
-  x= data$x; dp= as.matrix(data$dp)
+  x= data$x; py= as.matrix(data$dp)
   cpy=dwt$cpy; ncpy=length(cpy)
-  method <- "dwt"; boundary <- "periodic"; pad="zero"
+  wf=dwt$wavelet
+  method <- "dwt"; boundary <- "periodic"; pad="zero";
+
+
+  if(wf!="haar") v <- as.integer(readr::parse_number(wf)/2) else v <- 1
+  #Maximum decomposition level J
+  n <- length(x)
+  J <- ceiling(log(n/(2*v-1))/log(2)) #(Kaiser, 1994)
+  if(mode=="MODWT"&&wf=="haar") J=J-1
 
   dwt.n = c(dwt, method=method, boundary=boundary, pad=pad)
-  dp.n = dp[,cpy]
+  dp.n = py[,cpy]
   if(ncpy>1){
     for(i in 2:ncpy){
-      Z=dp[,cpy[1:(i-1)]]
-      dp.n[,i] <- dp[,cpy[i]]-knnregl1cv(dp[,cpy[i]], Z)
-      #dp.n[,i] <- lm.fit(as.matrix(Z), dp[,cpy[i]])$residuals
+      Z=py[,cpy[1:(i-1)]]
+      dp.n[,i] <- py[,cpy[i]]-knnregl1cv(py[,cpy[i]], Z)
+      #dp.n[,i] <- lm.fit(as.matrix(Z), py[,cpy[i]])$residuals
 
     }
   }
@@ -135,9 +185,10 @@ stepwise.VT.val <- function (data, J, dwt, mode){
     dwt.val<- at.vt.val(data.n, J, dwt.n)
   }
 
-  return(c(dwt.val,py=list(dp)))
+  return(c(dwt.val,py=list(py)))
 
 }
+
 #' Calculate the ratio of conditional error standard deviations
 #'
 #' @param x     A vector of response.
@@ -145,7 +196,6 @@ stepwise.VT.val <- function (data, J, dwt, mode){
 #' @param zout  A matrix containing the remaining possible predictors after taking out the meaningful predictors (zin).
 #'
 #' @return The STD ratio.
-#' @export
 #'
 #' @references Sharma, A., Mehrotra, R., 2014. An information theoretic alternative to model a natural system using observational information alone. Water Resources Research, 50(1): 650-660.
 calc.scaleSTDratio <- function (x, zin, zout)
@@ -226,7 +276,6 @@ pmi.calc <- function(X, Y) {
 #' @param wf      Wavelet family
 #'
 #' @return A list of 2 elements: the partial mutual information (pmi), and partial informational correlation (pic).
-#' @export
 #'
 #' @references Sharma, A., Mehrotra, R., 2014. An information theoretic alternative to model a natural system using observational information alone. Water Resources Research, 50(1): 650-660.
 #' @references Galelli S., Humphrey G.B., Maier H.R., Castelletti A., Dandy G.C. and Gibbs M.S. (2014) An evaluation framework for input variable selection algorithms for environmental data-driven models, Environmental Modelling and Software, 62, 33-51, DOI: 10.1016/j.envsoft.2014.08.015.
@@ -280,7 +329,6 @@ pic.calc <- function(X, Y, Z, mode, wf) {
 #' @param cpyPIC  Partial informational correlation (cpyPIC).
 #'
 #' @return A vector of partial weights(pw) of the same length of z.
-#' @export
 #'
 #' @references Sharma, A., Mehrotra, R., 2014. An information theoretic alternative to model a natural system using observational information alone. Water Resources Research, 50(1): 650-660.
 
