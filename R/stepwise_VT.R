@@ -119,7 +119,7 @@ stepwise.VT <- function (data, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf)
 #' @export
 #'
 #' @examples
-###Real-world example
+#' ###Real-world example
 #' mode <- switch(1,"MRA", "MODWT","a trous")
 #' wf="d4"
 #' station.id = 5 # station to investigate
@@ -189,15 +189,15 @@ stepwise.VT.val <- function (data, dwt, mode){
 
 }
 
-#' Calculate the ratio of conditional error standard deviations
-#'
-#' @param x     A vector of response.
-#' @param zin   A matrix containing the meaningful predictors selected from a large set of possible predictors (z).
-#' @param zout  A matrix containing the remaining possible predictors after taking out the meaningful predictors (zin).
-#'
-#' @return The STD ratio.
-#'
-#' @references Sharma, A., Mehrotra, R., 2014. An information theoretic alternative to model a natural system using observational information alone. Water Resources Research, 50(1): 650-660.
+# Calculate the ratio of conditional error standard deviations
+#
+# @param x     A vector of response.
+# @param zin   A matrix containing the meaningful predictors selected from a large set of possible predictors (z).
+# @param zout  A matrix containing the remaining possible predictors after taking out the meaningful predictors (zin).
+#
+# @return The STD ratio.
+#
+# @references Sharma, A., Mehrotra, R., 2014. An information theoretic alternative to model a natural system using observational information alone. Water Resources Research, 50(1): 650-660.
 calc.scaleSTDratio <- function (x, zin, zout)
 {
   if(!missing(zout)){
@@ -267,18 +267,18 @@ pmi.calc <- function(X, Y) {
 
 }
 #-------------------------------------------------------------------------------
-#' Calculate PIC
-#'
-#' @param X       A vector of response.
-#' @param Y       A matrix of new predictors.
-#' @param Z       A matrix of pre-existing predictors that could be NULL if no prior predictors exist.
-#' @param mode    A mode of variance transfomration, i.e., MRA, MODWT, or AT
-#' @param wf      Wavelet family
-#'
-#' @return A list of 2 elements: the partial mutual information (pmi), and partial informational correlation (pic).
-#'
-#' @references Sharma, A., Mehrotra, R., 2014. An information theoretic alternative to model a natural system using observational information alone. Water Resources Research, 50(1): 650-660.
-#' @references Galelli S., Humphrey G.B., Maier H.R., Castelletti A., Dandy G.C. and Gibbs M.S. (2014) An evaluation framework for input variable selection algorithms for environmental data-driven models, Environmental Modelling and Software, 62, 33-51, DOI: 10.1016/j.envsoft.2014.08.015.
+# Calculate PIC
+#
+# @param X       A vector of response.
+# @param Y       A matrix of new predictors.
+# @param Z       A matrix of pre-existing predictors that could be NULL if no prior predictors exist.
+# @param mode    A mode of variance transfomration, i.e., MRA, MODWT, or AT
+# @param wf      Wavelet family
+#
+# @return A list of 2 elements: the partial mutual information (pmi), and partial informational correlation (pic).
+#
+# @references Sharma, A., Mehrotra, R., 2014. An information theoretic alternative to model a natural system using observational information alone. Water Resources Research, 50(1): 650-660.
+# @references Galelli S., Humphrey G.B., Maier H.R., Castelletti A., Dandy G.C. and Gibbs M.S. (2014) An evaluation framework for input variable selection algorithms for environmental data-driven models, Environmental Modelling and Software, 62, 33-51, DOI: 10.1016/j.envsoft.2014.08.015.
 pic.calc <- function(X, Y, Z, mode, wf) {
 
   Y=as.matrix(Y)
@@ -322,18 +322,15 @@ pic.calc <- function(X, Y, Z, mode, wf) {
               ))
 }
 #-------------------------------------------------------------------------------
-#' Calculate Partial Weight
-#'
-#' @param x       A vector of response.
-#' @param z       A matrix containing identified predictors of x.
-#' @param cpyPIC  Partial informational correlation (cpyPIC).
-#'
-#' @return A vector of partial weights(pw) of the same length of z.
-#'
-#' @references Sharma, A., Mehrotra, R., 2014. An information theoretic alternative to model a natural system using observational information alone. Water Resources Research, 50(1): 650-660.
-
-#' @examples
-#'
+# Calculate Partial Weight
+#
+# @param x       A vector of response.
+# @param z       A matrix containing identified predictors of x.
+# @param cpyPIC  Partial informational correlation (cpyPIC).
+#
+# @return A vector of partial weights(pw) of the same length of z.
+#
+# @references Sharma, A., Mehrotra, R., 2014. An information theoretic alternative to model a natural system using observational information alone. Water Resources Research, 50(1): 650-660.
 pw.calc <- function(x, z, cpyPIC){
   wt <- NA
   Z = as.matrix(z)

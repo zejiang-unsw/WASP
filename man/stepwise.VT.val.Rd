@@ -20,6 +20,7 @@ A list of objects, including transformed predictors
 Calculate stepwise high order VT in validation
 }
 \examples{
+###Real-world example
 mode <- switch(1,"MRA", "MODWT","a trous")
 wf="d4"
 station.id = 5 # station to investigate
