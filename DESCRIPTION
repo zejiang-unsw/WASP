@@ -1,21 +1,21 @@
 Package: WASP
 Title: WAvelet System Prediction
-Version: 1.0.0
+Version: 1.1.0
 Authors@R: 
     person(given = "Ze",
            family = "Jiang",
            role = c("aut", "cre"),
            email = "ze.jiang@unsw.edu.au",
            comment = c(ORCID = "0002-3472-0829"))
-Description: The package WASP (variance transformation) is used for system modelling and prediction. 
+Description: The package WASP (variance transformation) is used for system modelling and prediction.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Suggests: 
+Suggests:
     zoo,
     testthat,
     fitdistrplus
 RoxygenNote: 7.1.0
-Imports: 
+Imports:
     waveslim,
     wavethresh

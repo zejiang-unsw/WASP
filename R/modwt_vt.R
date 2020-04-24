@@ -77,7 +77,7 @@ modwt.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg")){
     if(dif>10^-10) warning(paste0("Difference between Reconstructed and original:",dif))
 
     # variance transformation
-    cov <- cov(x, Bn)
+    cov <- cov(x, Bn[1:length(x),])
     if(cov.opt=="pos") cov <- cov else if(cov.opt=="neg") cov <- -cov
     S[,i] <- as.vector(cov)
 
