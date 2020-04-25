@@ -4,7 +4,7 @@
 \alias{at.vt}
 \title{Variance Transformation Operation - AT(a trous)}
 \usage{
-at.vt(data, wf, J, pad, boundary, cov.opt = c("auto", "pos", "neg"))
+at.vt(data, wf, J, boundary, cov.opt = c("auto", "pos", "neg"))
 }
 \arguments{
 \item{data}{A list of response x and dependent variables dp.}
@@ -13,14 +13,12 @@ at.vt(data, wf, J, pad, boundary, cov.opt = c("auto", "pos", "neg"))
 
 \item{J}{Specifies the depth of the decomposition. This must be a number less than or equal to log(length(x),2).}
 
-\item{pad}{The method used for extend data to dyadic size. Use "per", "zero", or "sym".}
-
 \item{boundary}{Character string specifying the boundary condition. If boundary=="periodic" the default, then the vector you decompose is assumed to be periodic on its defined interval, if boundary=="reflection", the vector beyond its boundaries is assumed to be a symmetric reflection of itself.}
 
 \item{cov.opt}{Options of Covariance matrix sign. Use "pos", "neg", or "auto".}
 }
 \value{
-A list of 8 elements: wf, J, boundary, pad, x (data), dp (data), dp.n (variance trasnformed dp), and S (covariance matrix).
+A list of 8 elements: wf, J, boundary, x (data), dp (data), dp.n (variance trasnformed dp), and S (covariance matrix).
 }
 \description{
 Variance Transformation Operation - AT(a trous)
@@ -41,7 +39,7 @@ for(id in 1:ncol(SPI.cal)){
 }
 
 ## variance transformation
-dwt.list<- lapply(data.list, function(x) at.vt(x, wf="d4", J=7, pad="zero", boundary="periodic"))
+dwt.list<- lapply(data.list, function(x) at.vt(x, wf="d4", J=7, boundary="periodic"))
 
 ## plot original and reconstrcuted predictors for each station
 for(i in 1:length(dwt.list)){

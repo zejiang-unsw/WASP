@@ -4,12 +4,16 @@
 \alias{at.wd}
 \title{a trous (AT) based additive decompostion using Daubechies family wavelet}
 \usage{
-at.wd(xx, v, nthresh, boundary, ...)
+at.wd(x, wf, J, boundary = "periodic")
 }
 \arguments{
-\item{xx}{The input time series with dyadic number size.}
+\item{x}{The input time series.}
 
-\item{v}{The number of vanishing moments for a given wavelet (e.g., haar(v=1) and d4 (v=2)).}
+\item{wf}{Name of the wavelet filter to use in the decomposition.}
+
+\item{J}{Specifies the depth of the decomposition. This must be a number less than or equal to log(length(x),2).}
+
+\item{boundary}{Character string specifying the boundary condition. If boundary=="periodic" the default, then the vector you decompose is assumed to be periodic on its defined interval, if boundary=="reflection", the vector beyond its boundaries is assumed to be a symmetric reflection of itself.}
 }
 \value{
 A matrix of decomposed sub-time series.
