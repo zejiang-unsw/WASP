@@ -59,23 +59,22 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","n
   idwt.dp <- vector("list", ndim)
 
   for(i in 1:ndim){
-    # Padding
+    # center and padding
     dp.c <- scale(dp[,i],scale=F)
-    pp <- padding(dp.c, pad=pad)
+    dp.p <- padding(dp.c, pad=pad)
 
     # Multiresolution Analysis
-    idwt.dp[[i]] <- waveslim::mra(pp, wf = wf, J = J, method = method, boundary = boundary)
+    idwt.dp[[i]] <- waveslim::mra(dp.p, wf = wf, J = J, method = method, boundary = boundary)
     B <- matrix(unlist(lapply(idwt.dp[[i]], function(z) z[1:n])), ncol=J+1, byrow=FALSE)
 
     Bn <- scale(B)
-    Bn[is.na(Bn)] <- 0 # for haar
     V <- as.numeric(apply(B,2,sd))
 
-    dif <- sum(abs(Bn%*%V+mu.dp[i]-dp[,i]))
+    dif <- sum(abs(Bn%*%V-dp.c))
     if(dif>10^-10) warning(paste0("Difference between Reconstructed and original:",dif))
 
     # variance transformation
-    cov <- cov(x, Bn)
+    cov <- cov(x, Bn[1:length(x),])
     if(cov.opt=="pos") cov <- cov else if(cov.opt=="neg") cov <- -cov
     S[,i] <- as.vector(cov)
 
@@ -96,7 +95,7 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","n
     }
 
     dif.var <- (var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
-    if(dif.var>0.15) warning(paste0("Variance difference between Reconstructed and original(percentage):",dif.var*100))
+    if(dif.var>0.15) warning(paste0("Variance difference between Transformed and original(percentage):",dif.var*100))
 
   }
 
@@ -185,19 +184,18 @@ dwt.vt.val <- function(data, J, dwt){
   idwt.dp <- vector("list", ndim)
 
   for(i in 1:ndim){
-    # Padding
+    # center and padding
     dp.c <- scale(dp[,i],scale=F)
-    pp <- padding(dp.c, pad=pad)
+    dp.p <- padding(dp.c, pad=pad)
 
     # Multiresolution Analysis
-    idwt.dp[[i]] <- waveslim::mra(pp, wf = wf, J = J, method = method, boundary = boundary)
+    idwt.dp[[i]] <- waveslim::mra(dp.p, wf = wf, J = J, method = method, boundary = boundary)
     B <- matrix(unlist(lapply(idwt.dp[[i]], function(z) z[1:n])), ncol=J+1, byrow=FALSE)
 
     Bn <- scale(B)
-    Bn[is.na(Bn)] <- 0 # for haar
     V <- as.numeric(apply(B,2,sd))
 
-    dif <- sum(abs(Bn%*%V+mu.dp[i]-dp[,i]))
+    dif <- sum(abs(Bn%*%V-dp.c))
     if(dif>10^-10) warning(paste0("Difference between Reconstructed and original:",dif))
 
     # in case different J
@@ -211,7 +209,7 @@ dwt.vt.val <- function(data, J, dwt){
     dp.n[,i] <- Bn%*%Vr + mu.dp[i]
 
     dif.var <- (var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
-    if(dif.var>0.15) warning(paste0("Variance difference between Reconstructed and original(percentage):",dif.var*100))
+    if(dif.var>0.15) warning(paste0("Variance difference between Transformed and original(percentage):",dif.var*100))
 
   }
 
