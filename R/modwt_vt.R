@@ -62,7 +62,7 @@ modwt.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg")){
   modwt.dp <- vector("list", ndim)
 
   for(i in 1:ndim){
-    #center
+    # center
     dp.c <- scale(dp[,i], scale=F)
 
     # MODWT - variance decomposition
@@ -85,11 +85,6 @@ modwt.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg")){
 
     dp.n[,i] <- Bn%*%Vr + mu.dp[i]
 
-    # B.n <- sapply(1:length(Vr), function(i) Bn[,i]*Vr[i])
-    # #cat(sum(apply(B.n,2,var)), "\n")
-    # B.n.ls <- class.modwt(B.n, J, wf, boundary)
-    # dp.n[,i] <- imodwt(B.n.ls) + mu.dp[i]
-
     #check the correlation after vt then decide the direction of C
     if(cov.opt=="auto"){
       #if(cor(dp.n[,i],dp[,i])<0) cov <- -cov
@@ -100,20 +95,10 @@ modwt.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg")){
       Vr <- as.numeric(cov/norm(cov,type="2")*sd(dp.c))
       dp.n[,i] <- Bn%*%Vr + mu.dp[i]
 
-      # B.n <- sapply(1:length(Vr), function(i) Bn[,i]*Vr[i])
-      # B.n.ls <- class.modwt(B.n, J, wf, boundary)
-      # dp.n[,i] <- imodwt(B.n.ls) + mu.dp[i]
-
     }
 
-    #cat(sum(unlist(apply(B,2,var))), sum(unlist(apply(B.n,2,var))), var(dp.c))
-
-    #statistics check
-    dif.var <- (var(dp.c)-sum(unlist(apply(B,2,var))))/var(dp.c)
-    if(dif.var>0.15) warning(paste0("df.var.origin between Reconstructed and original(percentage):",dif.var*100))
-
-    dif.var <- (var(dp.c)-sum(unlist(apply(Bn%*%Vr,2,var))))/var(dp.c)
-    if(dif.var>0.15) warning(paste0("df.var.vt between Reconstructed and original(percentage):",dif.var*100))
+    dif.var <- (var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
+    if(dif.var>0.15) warning(paste0("Variance difference between Transformed and original(percentage):",dif.var*100))
 
   }
 
@@ -193,15 +178,15 @@ modwt.vt.val <- function(data, J, dwt){
 
   # initialization
   x= data$x; dp= as.matrix(data$dp)
-  mu.dp <- apply(dp,2,mean)
   wf <- dwt$wavelet; boundary <- dwt$boundary
+  mu.dp <- apply(dp,2,mean)
 
   # variance transfrom
-  ndim=ncol(dp);n=nrow(dp);
+  ndim=ncol(dp);n=nrow(dp)
   dp.n <- matrix(nrow=n,ncol=ndim)
   modwt.dp <- vector("list", ndim)
   for(i in 1:ndim){
-    #center
+    # center
     dp.c <- scale(dp[,i], scale=F)
 
     # MODWT - variance decomposition
@@ -223,19 +208,10 @@ modwt.vt.val <- function(data, J, dwt){
 
     Vr <- as.numeric(cov/norm(cov,type="2")*sd(dp.c))
 
-    dp.n[,i] <- Bn%*%Vr  + mu.dp[i]
+    dp.n[,i] <- Bn%*%Vr + mu.dp[i]
 
-    # B.n <- sapply(1:length(Vr), function(i) Bn[,i]*Vr[i])
-    # B.n.ls <- class.modwt(B.n, J, wf, boundary)
-    # dp.n[,i] <- imodwt(B.n.ls) + mu.dp[i]
-
-
-    #statistic check
-    dif.var <- (var(dp.c)-sum(unlist(apply(B,2,var))))/var(dp.c)
-    if(dif.var>0.15) warning(paste0("df.var.origin between Reconstructed and original(percentage):",dif.var*100))
-
-    dif.var <- (var(dp.c)-sum(unlist(apply(Bn%*%Vr,2,var))))/var(dp.c)
-    if(dif.var>0.15) warning(paste0("df.var.vt between Reconstructed and original(percentage):",dif.var*100))
+    dif.var <- (var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
+    if(dif.var>0.15) warning(paste0("Variance difference between Transformed and original(percentage):",dif.var*100))
 
 
   }
@@ -257,25 +233,3 @@ modwt.vt.val <- function(data, J, dwt){
 
 }
 
-#-------------------------------------------------------------------------------
-#' Convert matrix to modwt class object
-#'
-#' @param B.modwt   A matrix of modwt decomposition.
-#' @param J         Specifies the depth of the decomposition. This must be a number less than or equal to log(length(x),2).
-#' @param wf        Name of the wavelet filter to use in the decomposition.
-#' @param boundary  Character string specifying the boundary condition. If boundary=="periodic" the default, then the vector you decompose is assumed to be periodic on its defined interval, if boundary=="reflection", the vector beyond its boundaries is assumed to be a symmetric reflection of itself.
-#'
-#' @return          A class of "modwt" object
-# #' @export
-
-# class.modwt <- function(B.modwt, J, wf, boundary){
-#
-#   B.modwt.ls <- as.list(as.data.frame(B.modwt))
-#   names(B.modwt.ls) <- c(paste0("d", 1:J),paste0("s",J))
-#
-#   attributes(B.modwt.ls)$class <- "modwt"
-#   attributes(B.modwt.ls)$wavelet <- wf
-#   attributes(B.modwt.ls)$boundary <- boundary
-#
-#   return(B.modwt.ls)
-# }
