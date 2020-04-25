@@ -33,7 +33,8 @@
 #' }
 stepwise.VT <- function (data, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf)
 {
-  x= as.matrix(data$x); py= as.matrix(data$dp)
+  x = as.matrix(data$x)
+  py= as.matrix(data$dp)
 
   n = nrow(x)
   npy = ncol(py)
@@ -59,6 +60,7 @@ stepwise.VT <- function (data, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf)
     cpytmp = icoloutz[ctmp]
     picmaxtmp = pictemp[ctmp]
     if (!is.null(z)) {
+      z = as.matrix(z)
       df = n - ncol(z)
     } else {
       df = n
@@ -101,7 +103,7 @@ stepwise.VT <- function (data, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf)
     }
 
     return(list(cpy = cpy, cpyPIC = cpyPIC, wt = outwt,lstwet = lstwt,
-                x = x, py = py,
+                x = data$x, py = py,
                 dp=z.n, dp.n=z.vt, S=S,
                 wavelet=wf))
   } else {
@@ -153,15 +155,12 @@ stepwise.VT.val <- function (data, dwt, mode){
   # initialization
   x= data$x; py= as.matrix(data$dp)
   cpy=dwt$cpy; ncpy=length(cpy)
-  wf=dwt$wavelet
-  method <- "dwt"; boundary <- "periodic"; pad="zero";
-
+  wf=dwt$wavelet; method <- "dwt"; boundary <- "periodic"; pad="zero"
 
   if(wf!="haar") v <- as.integer(readr::parse_number(wf)/2) else v <- 1
   #Maximum decomposition level J
   n <- length(x)
-  J <- ceiling(log(n/(2*v-1))/log(2)) #(Kaiser, 1994)
-  if(mode=="MODWT"&&wf=="haar") J=J-1
+  J <- ceiling(log(n/(2*v-1))/log(2)) - 1 #(Kaiser, 1994)
 
   dwt.n = c(dwt, method=method, boundary=boundary, pad=pad)
   dp.n = py[,cpy]
@@ -276,6 +275,7 @@ pmi.calc <- function(X, Y) {
 # @param wf      Wavelet family
 #
 # @return A list of 2 elements: the partial mutual information (pmi), and partial informational correlation (pic).
+# @export
 #
 # @references Sharma, A., Mehrotra, R., 2014. An information theoretic alternative to model a natural system using observational information alone. Water Resources Research, 50(1): 650-660.
 # @references Galelli S., Humphrey G.B., Maier H.R., Castelletti A., Dandy G.C. and Gibbs M.S. (2014) An evaluation framework for input variable selection algorithms for environmental data-driven models, Environmental Modelling and Software, 62, 33-51, DOI: 10.1016/j.envsoft.2014.08.015.
@@ -286,13 +286,14 @@ pic.calc <- function(X, Y, Z, mode, wf) {
   if(wf!="haar") v <- as.integer(readr::parse_number(wf)/2) else v <- 1
   #Maximum decomposition level J
   n <- length(X)
-  J <- ceiling(log(n/(2*v-1))/log(2)) #(Kaiser, 1994)
-  if(mode=="MODWT"&&wf=="haar") J=J-1
+  J <- ceiling(log(n/(2*v-1))/log(2)) - 1 #(Kaiser, 1994)
+
 
   if(is.null(Z)){
     x.in <- X
     y.in <- Y
   } else {
+    Z=as.matrix(Z)
     x.in <- X-knnregl1cv(X, Z[1:length(X),])
     y.in <- apply(Y, 2, function(i) i-knnregl1cv(i, Z))
 
@@ -308,7 +309,7 @@ pic.calc <- function(X, Y, Z, mode, wf) {
   } else if(mode=="MODWT") {
     dwt.list<- modwt.vt(data.list, wf, J, "periodic", "auto")
   } else {
-    dwt.list<- at.vt(data.list, wf, J, "zero", "periodic", "auto")
+    dwt.list<- at.vt(data.list, wf, J, "periodic", "auto")
   }
 
   y.in = dwt.list$dp.n
