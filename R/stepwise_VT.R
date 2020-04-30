@@ -200,6 +200,7 @@ stepwise.VT.val <- function (data, dwt, mode){
 calc.scaleSTDratio <- function (x, zin, zout)
 {
   if(!missing(zout)){
+    zout = as.matrix(zout)
     xhat = knnregl1cv(x, zout[1:length(x),])
     stdratxzout = sqrt(var(x - xhat)/var(x))
     zinhat = knnregl1cv(zin, zout)
