@@ -89,8 +89,8 @@ at.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg")){
 
     }
 
-    dif.var <- (var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
-    if(dif.var>0.15) warning(paste0("Variance difference between Transformed and original(percentage):",dif.var*100))
+    #dif.var <- abs(var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
+    #if(dif.var>0.15) warning(paste0("Variance difference between Transformed and original(percentage):",dif.var*100))
 
   }
 
@@ -199,8 +199,8 @@ at.vt.val <- function(data, J, dwt){
 
     dp.n[,i] <- Bn%*%Vr + mu.dp[i]
 
-    dif.var <- (var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
-    if(dif.var>0.15) warning(paste0("Variance difference between Transformed and original(percentage):",dif.var*100))
+    #dif.var <- abs(var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
+    #if(dif.var>0.15) warning(paste0("Variance difference between Transformed and original(percentage):",dif.var*100))
 
   }
 

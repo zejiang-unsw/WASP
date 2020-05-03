@@ -67,6 +67,9 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","n
     idwt.dp[[i]] <- waveslim::mra(dp.p, wf = wf, J = J, method = method, boundary = boundary)
     B <- matrix(unlist(lapply(idwt.dp[[i]], function(z) z[1:n])), ncol=J+1, byrow=FALSE)
 
+    # cat(sum(abs(dp.c-rowSums(B))))
+    # cat(sum(abs(var(dp.c)-sum(apply(B,2,var)))))
+
     Bn <- scale(B)
     V <- as.numeric(apply(B,2,sd))
 
@@ -94,7 +97,8 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","n
 
     }
 
-    dif.var <- (var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
+    #cat(var(dp.c),"---",var(dp.n[,i]))
+    dif.var <- abs(var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
     if(dif.var>0.15) warning(paste0("Variance difference between Transformed and original(percentage):",dif.var*100))
 
   }
@@ -208,7 +212,7 @@ dwt.vt.val <- function(data, J, dwt){
 
     dp.n[,i] <- Bn%*%Vr + mu.dp[i]
 
-    dif.var <- (var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
+    dif.var <- abs(var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
     if(dif.var>0.15) warning(paste0("Variance difference between Transformed and original(percentage):",dif.var*100))
 
   }

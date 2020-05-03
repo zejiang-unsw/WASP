@@ -70,9 +70,13 @@ modwt.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg")){
 
     B <- matrix(unlist(modwt.dp[[i]]), ncol=J+1, byrow=FALSE)
 
+    # cat(sum(abs(dp.c-rowSums(B))))
+    # cat(sum(abs(var(dp.c)-sum(apply(B,2,var)))))
+
     Bn <- scale(B)
     V <- as.numeric(apply(B,2,sd))
 
+    #dif <- sum(abs(Bn%*%V-dp.c))
     dif <- sum(abs(imodwt(modwt.dp[[i]])-dp.c))
     if(dif>10^-10) warning(paste0("Difference between Reconstructed and original:",dif))
 
@@ -97,8 +101,9 @@ modwt.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg")){
 
     }
 
-    dif.var <- (var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
-    if(dif.var>0.15) warning(paste0("Variance difference between Transformed and original(percentage):",dif.var*100))
+    #cat(var(dp.c),"---",var(dp.n[,i]))
+    #dif.var <- abs(var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
+    #if(dif.var>0.15) warning(paste0("Variance difference between Transformed and original(percentage):",dif.var*100))
 
   }
 
@@ -197,6 +202,7 @@ modwt.vt.val <- function(data, J, dwt){
     Bn <- scale(B)
     V <- as.numeric(apply(B,2,sd))
 
+    #dif <- sum(abs(Bn%*%V-dp.c))
     dif <- sum(abs(imodwt(modwt.dp[[i]])-dp.c))
     if(dif>10^-10) warning(paste0("Difference between Reconstructed and original:",dif))
 
@@ -210,16 +216,14 @@ modwt.vt.val <- function(data, J, dwt){
 
     dp.n[,i] <- Bn%*%Vr + mu.dp[i]
 
-    dif.var <- (var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
-    if(dif.var>0.15) warning(paste0("Variance difference between Transformed and original(percentage):",dif.var*100))
-
+    #dif.var <- abs(var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
+    #if(dif.var>0.15) warning(paste0("Variance difference between Transformed and original(percentage):",dif.var*100))
 
   }
 
   dwt <- list(wavelet = wf,
               J = J,
               boundary = boundary,
-
 
               x=x,
               dp=dp,
