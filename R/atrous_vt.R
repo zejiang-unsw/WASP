@@ -3,12 +3,11 @@
 #' @param data		  A list of response x and dependent variables dp.
 #' @param wf		    Name of the wavelet filter to use in the decomposition.
 #' @param J      	  Specifies the depth of the decomposition. This must be a number less than or equal to log(length(x),2).
-#' @param pad		    The method used for extend data to dyadic size. Use "per", "zero", or "sym".
 #' @param boundary  Character string specifying the boundary condition. If boundary=="periodic" the default, then the vector you decompose is assumed to be periodic on its defined interval, if boundary=="reflection", the vector beyond its boundaries is assumed to be a symmetric reflection of itself.
 #' @param cov.opt   Options of Covariance matrix sign. Use "pos", "neg", or "auto".
 #'
-#' @return A list of 8 elements: wf, J, boundary, pad, x (data), dp (data), dp.n (variance trasnformed dp), and S (covariance matrix).
-#' @import wavethresh
+#' @return A list of 8 elements: wf, J, boundary, x (data), dp (data), dp.n (variance trasnformed dp), and S (covariance matrix).
+#' @import waveslim
 #' @export
 #'
 #' @references Z Jiang, A Sharma, and F Johnson. WRR
@@ -30,7 +29,7 @@
 #' }
 #'
 #' ## variance transformation
-#' dwt.list<- lapply(data.list, function(x) at.vt(x, wf="d4", J=7, pad="zero", boundary="periodic"))
+#' dwt.list<- lapply(data.list, function(x) at.vt(x, wf="d4", J=7, boundary="periodic"))
 #'
 #' ## plot original and reconstrcuted predictors for each station
 #' for(i in 1:length(dwt.list)){
@@ -45,12 +44,11 @@
 #'
 #' }
 
-at.vt <- function(data, wf, J, pad, boundary, cov.opt=c("auto","pos","neg")){
+at.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg")){
 
   # initialization
   x= data$x; dp= as.matrix(data$dp)
   mu.dp <- apply(dp,2,mean)
-  if(wf!="haar") v <- as.integer(as.numeric(substr(wf,2,3))/2) else v <- 1
 
   # variance transfrom
   ndim=ncol(dp); n=nrow(dp);
@@ -59,29 +57,25 @@ at.vt <- function(data, wf, J, pad, boundary, cov.opt=c("auto","pos","neg")){
 
   for(i in 1:ndim){
 
-    # Padding
+    # center
     dp.c <- scale(dp[,i],scale=F)
-    pp <- padding(dp.c, pad=pad)
 
-    # Multiresolution Analysis
-    coefs <- at.wd(pp, v, nthresh=J, boundary=boundary)
-    B <- coefs[1:n,]
+    # AT - additive decomposition
+    B <- at.wd(dp.c, wf=wf, J=J, boundary=boundary)
 
     Bn <- scale(B)
-    Bn[is.na(Bn)] <- 0 # for haar
     V <- as.numeric(apply(B,2,sd))
 
-    dif <- sum(abs(Bn%*%V+mu.dp[i]-dp[,i]));
+    dif <- sum(abs(Bn%*%V-dp.c))
     if(dif>10^-10) warning(paste0("Difference between Reconstructed and original:",dif))
 
-    cov <- cov(x, Bn)
+    # variance transformation
+    cov <- cov(x, Bn[1:length(x),])
     if(cov.opt=="pos") cov <- cov else if(cov.opt=="neg") cov <- -cov
     S[,i] <- as.vector(cov)
 
-    #Vr <- as.numeric(cov/norm(cov,type="2")*sd(dp.c)) # For variance decompoistion
-    Vr <- as.numeric(cov/norm(cov,type="2")*norm(V,type="2")) #For a trous!
-
-    dp.n[,i] <- scale(Bn%*%Vr)*sd(dp[,i]) + mu.dp[i]
+    Vr <- as.numeric(cov/norm(cov,type="2")*sd(dp.c))
+    dp.n[,i] <- Bn%*%Vr + mu.dp[i]
 
     #check the correlation after vt then decide the direction of C
     if(cov.opt=="auto"){
@@ -90,20 +84,19 @@ at.vt <- function(data, wf, J, pad, boundary, cov.opt=c("auto","pos","neg")){
       if(cor.test(dp.n[,i],dp[,i])$estimate<0&cor.test(dp.n[,i],dp[,i])$p.value<0.05) cov <- -cov
       S[,i] <- as.vector(cov)
 
-      Vr <- as.numeric(cov/norm(cov,type="2")*norm(V,type="2")) #For a trous!
-      dp.n[,i] <- scale(Bn%*%Vr)*sd(dp[,i]) + mu.dp[i]
+      Vr <- as.numeric(cov/norm(cov,type="2")*sd(dp.c))
+      dp.n[,i] <- Bn%*%Vr + mu.dp[i]
 
     }
 
-    dif.var <- (var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
-    if(dif.var>0.15) warning(paste0("Variance difference between Reconstructed and original(percentage):",dif.var*100))
+    #dif.var <- abs(var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
+    #if(dif.var>0.15) warning(paste0("Variance difference between Transformed and original(percentage):",dif.var*100))
 
   }
 
   dwt <- list(wavelet = wf,
               J = J,
               boundary = boundary,
-              pad = pad,
 
               x=x,
               dp=dp,
@@ -123,7 +116,7 @@ at.vt <- function(data, wf, J, pad, boundary, cov.opt=c("auto","pos","neg")){
 #' @param J      	  Specifies the depth of the decomposition. This must be a number less than or equal to log(length(x),2).
 #' @param dwt       A class of "at" data. Output from at.vt().
 #'
-#' @return A list of 8 elements: wf, J, boundary, pad, x (data), dp (data), dp.n (variance trasnformed dp), and S (covariance matrix).
+#' @return A list of 8 elements: wf, J, boundary, x (data), dp (data), dp.n (variance trasnformed dp), and S (covariance matrix).
 #' @export
 #' @references Z Jiang, A Sharma, and F Johnson. WRR
 #'
@@ -143,7 +136,7 @@ at.vt <- function(data, wf, J, pad, boundary, cov.opt=c("auto","pos","neg")){
 #' }
 #'
 #' ## variance transformation - calibration
-#' dwt.list<- lapply(data.list, function(x) at.vt(x, wf="d4", J=7, pad="zero", boundary="periodic"))
+#' dwt.list<- lapply(data.list, function(x) at.vt(x, wf="d4", J=7, boundary="periodic"))
 #'
 #' ##response SPI - validation
 #' SPI.val <- SPI.calc(window(rain.mon, start=c(1979,1), end=c(2009,12)),sc=12)
@@ -176,29 +169,24 @@ at.vt.val <- function(data, J, dwt){
 
   # initialization
   x= data$x; dp= as.matrix(data$dp)
-  wf <- dwt$wavelet; boundary <- dwt$boundary; pad=dwt$pad
+  wf <- dwt$wavelet; boundary <- dwt$boundary
   mu.dp <- apply(dp,2,mean)
-  if(wf!="haar") v <- as.integer(as.numeric(substr(wf,2,3))/2) else v <- 1
 
   # variance transfrom
   ndim=ncol(dp); n=nrow(dp);
   dp.n <- matrix(nrow=n,ncol=ndim)
 
   for(i in 1:ndim){
-
-    # Padding
+    # center
     dp.c <- scale(dp[,i],scale=F)
-    pp <- padding(dp.c, pad=pad)
 
-    # Multiresolution Analysis
-    coefs <- at.wd(pp, v, nthresh=J, boundary=boundary)
-    B <- coefs[1:n,]
+    # AT - additive decomposition
+    B <- at.wd(dp.c, wf=wf, J=J, boundary=boundary)
 
     Bn <- scale(B)
-    Bn[is.na(Bn)] <- 0 # for haar
     V <- as.numeric(apply(B,2,sd))
 
-    dif <- sum(abs(Bn%*%V+mu.dp[i]-dp[,i]))
+    dif <- sum(abs(Bn%*%V-dp.c))
     if(dif>10^-10) warning(paste0("Difference between Reconstructed and original:",dif))
 
     # in case different J
@@ -209,17 +197,16 @@ at.vt.val <- function(data, J, dwt){
 
     Vr <- as.numeric(cov/norm(cov,type="2")*sd(dp.c))
 
-    dp.n[,i] <- scale(Bn%*%Vr)*sd(dp[,i]) + mu.dp[i]
+    dp.n[,i] <- Bn%*%Vr + mu.dp[i]
 
-    dif.var <- (var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
-    if(dif.var>0.15) warning(paste0("Variance difference between Reconstructed and original(percentage):",dif.var*100))
+    #dif.var <- abs(var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
+    #if(dif.var>0.15) warning(paste0("Variance difference between Transformed and original(percentage):",dif.var*100))
 
   }
 
   dwt <- list(wavelet = wf,
               J = J,
               boundary = boundary,
-              pad = pad,
 
               x=x,
               dp=dp,
@@ -236,8 +223,10 @@ at.vt.val <- function(data, J, dwt){
 #--------------------------------------------------------------------------------
 #' a trous (AT) based additive decompostion using Daubechies family wavelet
 #'
-#' @param xx    The input time series with dyadic number size.
-#' @param v     The number of vanishing moments for a given wavelet (e.g., haar(v=1) and d4 (v=2)).
+#' @param x         The input time series.
+#' @param wf		    Name of the wavelet filter to use in the decomposition.
+#' @param J      	  Specifies the depth of the decomposition. This must be a number less than or equal to log(length(x),2).
+#' @param boundary  Character string specifying the boundary condition. If boundary=="periodic" the default, then the vector you decompose is assumed to be periodic on its defined interval, if boundary=="reflection", the vector beyond its boundaries is assumed to be a symmetric reflection of itself.
 #'
 #' @return A matrix of decomposed sub-time series.
 #' @export
@@ -259,22 +248,18 @@ at.vt.val <- function(data, J, dwt){
 #'   print(sum(abs(scale(obs.mon[1:n,i],scale=F)-rowSums(at.atm[1:n,]))))
 #'
 #' }
+at.wd <- function(x, wf, J, boundary="periodic"){
+  s <- NULL
+  for(i in 1:J){
+    s<- cbind(s, waveslim::modwt(x, wf=wf, n.levels = i, boundary = boundary)[[i+1]])
+  }
 
-at.wd <- function(xx, v, nthresh, boundary,...){
+  at <- x-s[,1]
+  for(i in 1:ncol(s[,-1])) at <- cbind(at, s[,i]-s[,i+1])
+  at <- cbind(at, s[,J])
 
-    #DaubExPhase for Daubechies' extremal phase wavelets
-    #DaubLeAsymm for Daubechies' “least-asymmetric” wavelets
-    at.x <- wavethresh::wd(xx, type="station", filter.number=v, family="DaubExPhase", bc=boundary,...)
+  return(at)
 
-    max = nlevelsWT(at.x)
-    Dj <- NULL
-    for (j in (max-nthresh+1):max) {
-      Dj <- cbind(Dj, accessC(at.x,j) - accessC(at.x,j-1))
-    }
-
-    at.wd <- cbind(accessC(at.x,max-nthresh),Dj)
-    output <- at.wd[,ncol(at.wd):1]    #reverse the order
-    return(output)
 }
 
 

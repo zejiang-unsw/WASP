@@ -1,7 +1,7 @@
 Package: WASP
 Title: WAvelet System Prediction
-Version: 1.1.0
-Authors@R: 
+Version: 1.2.0
+Authors@R:
     person(given = "Ze",
            family = "Jiang",
            role = c("aut", "cre"),
@@ -14,8 +14,10 @@ LazyData: true
 Suggests:
     zoo,
     testthat,
-    fitdistrplus
+    fitdistrplus,
+    knitr,
+    rmarkdown
 RoxygenNote: 7.1.0
 Imports:
-    waveslim,
-    wavethresh
+    waveslim
+VignetteBuilder: knitr
