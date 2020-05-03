@@ -160,7 +160,7 @@ stepwise.VT.val <- function (data, dwt, mode){
   if(wf!="haar") v <- as.integer(readr::parse_number(wf)/2) else v <- 1
   #Maximum decomposition level J
   n <- length(x)
-  J <- ceiling(log(n/(2*v-1))/log(2)) - 1 #(Kaiser, 1994)
+  if(wf=="haar") J <- ceiling(log(n/(2*v-1))/log(2))-1 else J <- ceiling(log(n/(2*v-1))/log(2))#(Kaiser, 1994)
 
   dwt.n = c(dwt, method=method, boundary=boundary, pad=pad)
   dp.n = py[,cpy]
@@ -287,7 +287,7 @@ pic.calc <- function(X, Y, Z, mode, wf) {
   if(wf!="haar") v <- as.integer(readr::parse_number(wf)/2) else v <- 1
   #Maximum decomposition level J
   n <- length(X)
-  J <- ceiling(log(n/(2*v-1))/log(2)) - 1 #(Kaiser, 1994)
+  if(wf=="haar") J <- ceiling(log(n/(2*v-1))/log(2))-1 else J <- ceiling(log(n/(2*v-1))/log(2))#(Kaiser, 1994)
 
 
   if(is.null(Z)){
