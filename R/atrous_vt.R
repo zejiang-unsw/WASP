@@ -44,7 +44,7 @@
 #'
 #' }
 
-at.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg")){
+at.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg"), flag=c("biased","unbiased")){
 
   # initialization
   x= data$x; dp= as.matrix(data$dp)
@@ -61,7 +61,8 @@ at.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg")){
     dp.c <- scale(dp[,i],scale=F)
 
     # AT - additive decomposition
-    B <- at.wd(dp.c, wf=wf, J=J, boundary=boundary)
+    at.dp <- at.wd(dp.c, wf=wf, J=J, boundary=boundary)
+    B <- matrix(unlist(at.dp), ncol=J+1, byrow=FALSE)
 
     Bn <- scale(B)
     V <- as.numeric(apply(B,2,sd))
@@ -71,6 +72,18 @@ at.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg")){
 
     # variance transformation
     cov <- cov(x, Bn[1:length(x),])
+    cat("Biased: ", round(cov,3),"\n")
+
+    if(flag=="unbiased"){ ###unbiased wavelet variance - only change cov
+      at.dp.n <- non.bdy(at.dp, wf=wf, method="modwt")
+
+      B.n <- matrix(unlist(at.dp.n), ncol=J+1, byrow=FALSE)
+      cov <- cov(x, scale(B.n)[1:length(x),], use="pairwise.complete.obs")
+      cat("Unbiased: ",round(cov,3),"\n")
+
+      #cov[is.na(cov)] <- 0
+    }
+
     if(cov.opt=="pos") cov <- cov else if(cov.opt=="neg") cov <- -cov
     S[,i] <- as.vector(cov)
 
@@ -181,7 +194,8 @@ at.vt.val <- function(data, J, dwt){
     dp.c <- scale(dp[,i],scale=F)
 
     # AT - additive decomposition
-    B <- at.wd(dp.c, wf=wf, J=J, boundary=boundary)
+    at.dp <- at.wd(dp.c, wf=wf, J=J, boundary=boundary)
+    B <- matrix(unlist(at.dp), ncol=J+1, byrow=FALSE)
 
     Bn <- scale(B)
     V <- as.numeric(apply(B,2,sd))
@@ -255,10 +269,17 @@ at.wd <- function(x, wf, J, boundary="periodic"){
   }
 
   at <- x-s[,1]
-  for(i in 1:ncol(s[,-1])) at <- cbind(at, s[,i]-s[,i+1])
+  for(i in 1:(J-1)) at <- cbind(at, s[,i]-s[,i+1])
   at <- cbind(at, s[,J])
 
-  return(at)
+  at.df <- as.data.frame(at)
+  colnames(at.df) <- c(paste0("d",1:J), paste0("s",J))
+
+  out <- as.list(at.df)
+  attr(out, "class") <- "at"
+  attr(out, "wavelet") <- wf
+  attr(out, "boundary") <- boundary
+  return(out)
 
 }
 
