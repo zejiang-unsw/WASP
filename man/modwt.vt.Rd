@@ -4,7 +4,14 @@
 \alias{modwt.vt}
 \title{Variance Transformation Operation - MODWT}
 \usage{
-modwt.vt(data, wf, J, boundary, cov.opt = c("auto", "pos", "neg"))
+modwt.vt(
+  data,
+  wf,
+  J,
+  boundary,
+  cov.opt = c("auto", "pos", "neg"),
+  flag = c("biased", "unbiased")
+)
 }
 \arguments{
 \item{data}{A list of response x and dependent variables dp.}

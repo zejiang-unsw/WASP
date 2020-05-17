@@ -4,7 +4,14 @@
 \alias{at.vt}
 \title{Variance Transformation Operation - AT(a trous)}
 \usage{
-at.vt(data, wf, J, boundary, cov.opt = c("auto", "pos", "neg"))
+at.vt(
+  data,
+  wf,
+  J,
+  boundary,
+  cov.opt = c("auto", "pos", "neg"),
+  flag = c("biased", "unbiased")
+)
 }
 \arguments{
 \item{data}{A list of response x and dependent variables dp.}

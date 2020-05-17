@@ -4,7 +4,16 @@
 \alias{dwt.vt}
 \title{Variance Transformation Operation - MRA}
 \usage{
-dwt.vt(data, wf, J, method, pad, boundary, cov.opt = c("auto", "pos", "neg"))
+dwt.vt(
+  data,
+  wf,
+  J,
+  method,
+  pad,
+  boundary,
+  cov.opt = c("auto", "pos", "neg"),
+  flag = c("biased", "unbiased")
+)
 }
 \arguments{
 \item{data}{A list of response x and dependent variables dp.}
