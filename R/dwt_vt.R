@@ -46,7 +46,7 @@
 #'
 #' }
 
-dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","neg")){
+dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","neg"), flag=c("biased","unbiased")){
 
   # initialization
   x= data$x; dp= as.matrix(data$dp)
@@ -78,6 +78,18 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","n
 
     # variance transformation
     cov <- cov(x, Bn[1:length(x),])
+    cat("Biased: ", round(cov,3),"\n")
+
+    if(flag=="unbiased"){ ###unbiased wavelet variance - only change cov
+      idwt.dp.n <- non.bdy(idwt.dp[[i]], wf=wf, method="mra")
+
+      B.n <- matrix(unlist(lapply(idwt.dp.n, function(z) z[1:n])), ncol=J+1, byrow=FALSE)
+      cov <- cov(x, scale(B.n)[1:length(x),], use="pairwise.complete.obs")
+      cat("Unbiased: ",round(cov,3),"\n")
+
+      #cov[is.na(cov)] <- 0
+    }
+
     if(cov.opt=="pos") cov <- cov else if(cov.opt=="neg") cov <- -cov
     S[,i] <- as.vector(cov)
 
