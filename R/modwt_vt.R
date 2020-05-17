@@ -49,7 +49,7 @@
 #' lines(x = bar[2,], y = sapply(x.modwt,var)/sum(sapply(x.modwt,var)))
 #' points(x = bar[2,], y = sapply(x.modwt,var)/sum(sapply(x.modwt,var)))
 
-modwt.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg")){
+modwt.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg"), flag=c("biased","unbiased")){
 
   # initialization
   x= data$x; dp= as.matrix(data$dp)
@@ -67,7 +67,6 @@ modwt.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg")){
 
     # MODWT - variance decomposition
     modwt.dp[[i]] <- waveslim::modwt(dp.c, wf = wf, n.levels = J, boundary = boundary)
-
     B <- matrix(unlist(modwt.dp[[i]]), ncol=J+1, byrow=FALSE)
 
     # cat(sum(abs(dp.c-rowSums(B))))
@@ -82,6 +81,18 @@ modwt.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg")){
 
     # variance transformation
     cov <- cov(x, Bn[1:length(x),])
+    cat("Biased: ", round(cov,3),"\n")
+
+    if(flag=="unbiased"){ ###unbiased wavelet variance - only change cov
+      modwt.dp.n <- non.bdy(modwt.dp[[i]], wf=wf, method="modwt")
+
+      B.n <- matrix(unlist(modwt.dp.n), ncol=J+1, byrow=FALSE)
+      cov <- cov(x, scale(B.n)[1:length(x),], use="pairwise.complete.obs")
+      cat("Unbiased: ",round(cov,3),"\n")
+
+      #cov[is.na(cov)] <- 0
+    }
+
     if(cov.opt=="pos") cov <- cov else if(cov.opt=="neg") cov <- -cov
     S[,i] <- as.vector(cov)
 
