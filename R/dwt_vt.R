@@ -7,13 +7,14 @@
 #' @param pad		    The method used for extend data to dyadic size. Use "per", "zero", or "sym".
 #' @param boundary  Character string specifying the boundary condition. If boundary=="periodic" the default, then the vector you decompose is assumed to be periodic on its defined interval, if boundary=="reflection", the vector beyond its boundaries is assumed to be a symmetric reflection of itself.
 #' @param cov.opt   Options of Covariance matrix sign. Use "pos", "neg", or "auto".
+#' @param flag      Biased or Unbiased variance transformation
+#' @param detrend   Detrend the input time series or just center, default (F)
 #'
 #' @return A list of 8 elements: wf, method, boundary, pad, x (data), dp (data), dp.n (variance trasnformed dp), and S (covariance matrix).
 #' @import waveslim
 #' @export
 #'
-#' @references Z Jiang, A Sharma, and F Johnson. WRR
-#' @references Percival, D. B. and A. T. Walden (2000) Wavelet Methods for Time Series Analysis, Cambridge University Press.
+#' @references Jiang, Z., Sharma, A., & Johnson, F. (2020). Refining Predictor Spectral Representation Using Wavelet Theory for Improved Natural System Modeling. Water Resources Research, 56(3), e2019WR026962. doi:10.1029/2019wr026962
 #'
 #' @examples
 #' data(rain.mon)
@@ -46,7 +47,7 @@
 #'
 #' }
 
-dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","neg"), flag=c("biased","unbiased")){
+dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","neg"), flag=c("biased","unbiased"), detrend=F){
 
   # initialization
   x= data$x; dp= as.matrix(data$dp)
@@ -59,16 +60,18 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","n
   idwt.dp <- vector("list", ndim)
 
   for(i in 1:ndim){
-    # center and padding
-    dp.c <- scale(dp[,i],scale=F)
+    # center or detrend
+    if(!detrend){
+      dp.c <- scale(dp[,i],scale=F)
+    } else {
+      #dp.c <- lm(dp[,i]~c(1:n))$resid
+      dp.c <- dp[,i]-smooth.spline(1:n, dp[,i], spar=1)$y
+    }
     dp.p <- padding(dp.c, pad=pad)
 
     # Multiresolution Analysis
     idwt.dp[[i]] <- waveslim::mra(dp.p, wf = wf, J = J, method = method, boundary = boundary)
     B <- matrix(unlist(lapply(idwt.dp[[i]], function(z) z[1:n])), ncol=J+1, byrow=FALSE)
-
-    # cat(sum(abs(dp.c-rowSums(B))))
-    # cat(sum(abs(var(dp.c)-sum(apply(B,2,var)))))
 
     Bn <- scale(B)
     V <- as.numeric(apply(B,2,sd))
@@ -78,16 +81,17 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","n
 
     # variance transformation
     cov <- cov(x, Bn[1:length(x),])
-    cat("Biased: ", round(cov,3),"\n")
+    #cat("Biased: ", round(cov,3),"\n")
 
     if(flag=="unbiased"){ ###unbiased wavelet variance - only change cov
       idwt.dp.n <- non.bdy(idwt.dp[[i]], wf=wf, method="mra")
 
       B.n <- matrix(unlist(lapply(idwt.dp.n, function(z) z[1:n])), ncol=J+1, byrow=FALSE)
       cov <- cov(x, scale(B.n)[1:length(x),], use="pairwise.complete.obs")
-      cat("Unbiased: ",round(cov,3),"\n")
 
-      #cov[is.na(cov)] <- 0
+      #if unbiased cov is not available then use biased
+      cov[is.na(cov)] <- cov(x, Bn[1:length(x),])[is.na(cov)]
+      #cat("Unbiased: ",round(cov,3),"\n")
     }
 
     if(cov.opt=="pos") cov <- cov else if(cov.opt=="neg") cov <- -cov
@@ -95,21 +99,28 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","n
 
     Vr <- as.numeric(cov/norm(cov,type="2")*sd(dp.c))
 
-    dp.n[,i] <- Bn%*%Vr + mu.dp[i]
+    if(!detrend){
+      dp.n[,i] <- Bn%*%Vr + mu.dp[i]
+    } else {
+      #dp.n[,i] <- Bn%*%Vr + lm(dp[,i]~c(1:n))$fitted
+      dp.n[,i] <- Bn%*%Vr + smooth.spline(1:n, dp[,i], spar=1)$y
+    }
 
     #check the correlation after vt then decide the direction of C
     if(cov.opt=="auto"){
-      #if(cor(dp.n[,i],dp[,i])<0) cov <- -cov
-      #cat(cor.test(dp.n[,i],dp[,i])$p.value,"&",cor.test(dp.n[,i],dp[,i])$estimate,"\n")
+
       if(cor.test(dp.n[,i],dp[,i])$estimate<0&cor.test(dp.n[,i],dp[,i])$p.value<0.05) cov <- -cov
       S[,i] <- as.vector(cov)
 
       Vr <- as.numeric(cov/norm(cov,type="2")*sd(dp.c))
-      dp.n[,i] <- Bn%*%Vr + mu.dp[i]
-
+      if(!detrend){
+        dp.n[,i] <- Bn%*%Vr + mu.dp[i]
+      } else {
+        #dp.n[,i] <- Bn%*%Vr + lm(dp[,i]~c(1:n))$fitted
+        dp.n[,i] <- Bn%*%Vr + smooth.spline(1:n, dp[,i], spar=1)$y
+      }
     }
 
-    #cat(var(dp.c),"---",var(dp.n[,i]))
     dif.var <- abs(var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
     if(dif.var>0.15) warning(paste0("Variance difference between Transformed and original(percentage):",dif.var*100))
 
@@ -137,6 +148,7 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","n
 #' @param data		  A list of response x and dependent variables dp.
 #' @param J      	  Specifies the depth of the decomposition. This must be a number less than or equal to log(length(x),2).
 #' @param dwt       A class of "dwt" data. Output from dwt.vt().
+#' @param detrend   Detrend the input time series or just center, default (F)
 #'
 #' @return          A list of 8 elements: wf, method, boundary, pad, x (data), dp (data), dp.n (variance trasnformed dp), and S (covariance matrix).
 #' @export
@@ -187,7 +199,7 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","n
 #'
 #' }
 
-dwt.vt.val <- function(data, J, dwt){
+dwt.vt.val <- function(data, J, dwt, detrend=F){
 
   # initialization
   x= data$x; dp= as.matrix(data$dp)
@@ -200,8 +212,13 @@ dwt.vt.val <- function(data, J, dwt){
   idwt.dp <- vector("list", ndim)
 
   for(i in 1:ndim){
-    # center and padding
-    dp.c <- scale(dp[,i],scale=F)
+    # center or detrend
+    if(!detrend){
+      dp.c <- scale(dp[,i],scale=F)
+    } else {
+      #dp.c <- lm(dp[,i]~c(1:n))$resid
+      dp.c <- dp[,i]-smooth.spline(1:n, dp[,i], spar=1)$y
+    }
     dp.p <- padding(dp.c, pad=pad)
 
     # Multiresolution Analysis
@@ -222,10 +239,16 @@ dwt.vt.val <- function(data, J, dwt){
 
     Vr <- as.numeric(cov/norm(cov,type="2")*sd(dp.c))
 
-    dp.n[,i] <- Bn%*%Vr + mu.dp[i]
+    if(!detrend){
+      dp.n[,i] <- Bn%*%Vr + mu.dp[i]
+    } else {
+      #dp.n[,i] <- Bn%*%Vr + lm(dp[,i]~c(1:n))$fitted
+      dp.n[,i] <- Bn%*%Vr + smooth.spline(1:n, dp[,i], spar=1)$y
+    }
 
-    dif.var <- abs(var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
-    if(dif.var>0.15) warning(paste0("Variance difference between Transformed and original(percentage):",dif.var*100))
+
+    #dif.var <- abs(var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
+    #if(dif.var>0.15) warning(paste0("Variance difference between Transformed and original(percentage):",dif.var*100))
 
   }
 
