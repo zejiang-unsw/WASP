@@ -4,6 +4,8 @@
 #' @param alpha   The significance level used to judge whether the sample estimate in Equation \deqn{\hat{PIC} = sqrt(1-exp(-2\hat{PI})} is significant or not. A default alpha value is 0.1.
 #' @param mode    A mode of variance transfomration, i.e., MRA, MODWT, or AT
 #' @param wf      Wavelet family
+#' @param flag    Biased or Unbiased variance transformation
+#' @param detrend Detrend the input time series or just center, default (F)
 #'
 #' @return A list of 2 elements: the column numbers of the meaningful predictors (cpy), and partial informational correlation (cpyPIC).
 #' @export
@@ -119,6 +121,7 @@ stepwise.VT <- function (data, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf, flag
 #' @param data    A list of data, including response and predictors
 #' @param dwt     Output from dwt.vt(), including the transformation covariance
 #' @param mode    A mode of variance transfomration, i.e., MRA, MODWT, or AT
+#' @param detrend Detrend the input time series or just center, default (F)
 #'
 #' @return        A list of objects, including transformed predictors
 #' @export

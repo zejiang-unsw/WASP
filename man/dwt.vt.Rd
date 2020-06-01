@@ -12,7 +12,8 @@ dwt.vt(
   pad,
   boundary,
   cov.opt = c("auto", "pos", "neg"),
-  flag = c("biased", "unbiased")
+  flag = c("biased", "unbiased"),
+  detrend = F
 )
 }
 \arguments{
@@ -29,6 +30,10 @@ dwt.vt(
 \item{boundary}{Character string specifying the boundary condition. If boundary=="periodic" the default, then the vector you decompose is assumed to be periodic on its defined interval, if boundary=="reflection", the vector beyond its boundaries is assumed to be a symmetric reflection of itself.}
 
 \item{cov.opt}{Options of Covariance matrix sign. Use "pos", "neg", or "auto".}
+
+\item{flag}{Biased or Unbiased variance transformation}
+
+\item{detrend}{Detrend the input time series or just center, default (F)}
 }
 \value{
 A list of 8 elements: wf, method, boundary, pad, x (data), dp (data), dp.n (variance trasnformed dp), and S (covariance matrix).
@@ -68,7 +73,5 @@ for(i in 1:length(dwt.list)){
 }
 }
 \references{
-Z Jiang, A Sharma, and F Johnson. WRR
-
-Percival, D. B. and A. T. Walden (2000) Wavelet Methods for Time Series Analysis, Cambridge University Press.
+Jiang, Z., Sharma, A., & Johnson, F. (2020). Refining Predictor Spectral Representation Using Wavelet Theory for Improved Natural System Modeling. Water Resources Research, 56(3), e2019WR026962. doi:10.1029/2019wr026962
 }

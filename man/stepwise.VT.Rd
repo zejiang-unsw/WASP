@@ -4,7 +4,14 @@
 \alias{stepwise.VT}
 \title{Calculate stepwise high order VT in calibration}
 \usage{
-stepwise.VT(data, alpha = 0.1, mode = c("MRA", "MODWT", "AT"), wf)
+stepwise.VT(
+  data,
+  alpha = 0.1,
+  mode = c("MRA", "MODWT", "AT"),
+  wf,
+  flag = c("biased", "unbiased"),
+  detrend = F
+)
 }
 \arguments{
 \item{data}{A list of data, including response and predictors}
@@ -14,6 +21,10 @@ stepwise.VT(data, alpha = 0.1, mode = c("MRA", "MODWT", "AT"), wf)
 \item{mode}{A mode of variance transfomration, i.e., MRA, MODWT, or AT}
 
 \item{wf}{Wavelet family}
+
+\item{flag}{Biased or Unbiased variance transformation}
+
+\item{detrend}{Detrend the input time series or just center, default (F)}
 }
 \value{
 A list of 2 elements: the column numbers of the meaningful predictors (cpy), and partial informational correlation (cpyPIC).
