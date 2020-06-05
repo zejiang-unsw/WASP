@@ -1,7 +1,6 @@
 #' Calculate stepwise high order VT in calibration
 #'
 #' @param data    A list of data, including response and predictors
-#' @param alpha   The significance level used to judge whether the sample estimate in Equation \deqn{\hat{PIC} = sqrt(1-exp(-2\hat{PI})} is significant or not. A default alpha value is 0.1.
 #' @param mode    A mode of variance transfomration, i.e., MRA, MODWT, or AT
 #' @param wf      Wavelet family
 #' @param flag    Biased or Unbiased variance transformation
@@ -34,7 +33,7 @@
 #' {
 #'   ts.plot(cbind(dwt$dp[,i], dwt$dp.n[,i]), xlab="NA", col=1:2)
 #' }
-stepwise.VT <- function (data, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf, flag=c("biased","unbiased"), detrend=F)
+stepwise.VT <- function (data, mode=c("MRA","MODWT","AT"), wf, flag=c("biased","unbiased"), detrend=F)
 {
   x = as.matrix(data$x)
   py= as.matrix(data$dp)
@@ -44,9 +43,10 @@ stepwise.VT <- function (data, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf, flag
   cpy = cpyPIC = NULL
   icpy = 0
   z = NULL;z.vt=NULL
-  S=NULL
+  S=NULL; r2=NULL
   isig = T
   icoloutz = 1:npy
+
   #cat("calc.PIC-----------","\n")
   while (isig) {
     npicmax = npy - icpy
@@ -58,49 +58,45 @@ stepwise.VT <- function (data, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf, flag
 
     pytmp = temp$py
     Stmp = temp$S
-    xtmp = temp$x
 
     ctmp = order(-pictemp)[1]
     cpytmp = icoloutz[ctmp]
     picmaxtmp = pictemp[ctmp]
-    #cat("picmaxtmp",picmaxtmp,"\n")
 
-    if (!is.null(z)) {
-      z = as.matrix(z)
-      df = n - ncol(z)
-    } else {
-      df = n
+    cpy = c(cpy, cpytmp)
+    cpyPIC = c(cpyPIC, picmaxtmp)
+    z = cbind(z, py[, cpytmp])
+
+    S = cbind(S, Stmp[,ctmp])
+    z.vt = cbind(z.vt, pytmp[,ctmp])
+
+    z=z.vt #mathematically this is more valid
+
+    u <- x-knnregl1cv(x, z.vt)
+    r2 <- c(r2, 1 - sum(u^2)/sum((x - mean(x))^2))
+    #r2 <- c(r2, FNN::knn.reg(z.vt, y=x, k=ceiling(sqrt(length(x)/2)))$R2Pred)
+
+    icoloutz = icoloutz[-ctmp]
+    icpy = icpy + 1
+
+    if ((npy - icpy) == 0) isig = F
+    if(icpy>1) {
+      if(r2[icpy]<r2[icpy-1]) {
+        isig=F
+
+        cpy=cpy[-icpy]
+        cpyPIC=cpyPIC[-icpy]
+
+        z = as.matrix(z[,-icpy])
+        z.vt = as.matrix(z.vt[,-icpy])
+        S= as.matrix(S[,-icpy])
+
+        #r2=r2[-icpy]
+      }
     }
 
-    #method 1
-    t <-  qt(1-alpha, df=df)
-    picthres <- sqrt(t^2/(t^2+df))
-
-    #method 2
-    #picthres <- qt((0.5 + alpha/2), df)
-
-    #method 3
-    #picthres <- pic.boot(pytmp[,ctmp], xtmp, prob=1-alpha)
-    #cat("picthres",picthres,"\n")
-
-    if (picmaxtmp > picthres) {
-      cpy = c(cpy, cpytmp)
-      cpyPIC = c(cpyPIC, picmaxtmp)
-      z = cbind(z, py[, cpytmp])
-
-      S = cbind(S, Stmp[,ctmp])
-      z.vt = cbind(z.vt, pytmp[,ctmp])
-
-      z=z.vt #mathematically this is more valid
-
-      icoloutz = icoloutz[-ctmp]
-      icpy = icpy + 1
-      if ((npy - icpy) == 0) isig = F
-    } else {
-      isig = F
-    }
   }
-
+  #cat("R2: ",r2,"\n")
   #cat("calc.PW------------","\n")
   if (!is.null(z)) {
     out = pw.calc(x, z.vt, cpyPIC)
@@ -119,7 +115,7 @@ stepwise.VT <- function (data, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf, flag
     }
 
     return(list(cpy = cpy, cpyPIC = cpyPIC, wt = outwt,lstwet = lstwt,
-                x = x, py = py,
+                x = x, py = py, r2=r2,
                 dp=z.n, dp.n=z.vt, S=S,
                 wavelet=wf))
   } else {
