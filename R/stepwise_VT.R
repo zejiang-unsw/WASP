@@ -58,13 +58,10 @@ stepwise.VT <- function (data, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf, flag
 
     pytmp = temp$py
     Stmp = temp$S
-    xtmp = temp$x
 
     ctmp = order(-pictemp)[1]
     cpytmp = icoloutz[ctmp]
     picmaxtmp = pictemp[ctmp]
-    #cat("picmaxtmp",picmaxtmp,"\n")
-
     if (!is.null(z)) {
       z = as.matrix(z)
       df = n - ncol(z)
@@ -72,15 +69,8 @@ stepwise.VT <- function (data, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf, flag
       df = n
     }
 
-    #method 1
     t <-  qt(1-alpha, df=df)
     picthres <- sqrt(t^2/(t^2+df))
-
-    #method 2
-    #picthres <- qt((0.5 + alpha/2), df)
-
-    #method 3
-    #picthres <- pic.boot(pytmp[,ctmp], xtmp, prob=1-alpha)
     #cat("picthres",picthres,"\n")
 
     if (picmaxtmp > picthres) {
@@ -100,7 +90,6 @@ stepwise.VT <- function (data, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf, flag
       isig = F
     }
   }
-
   #cat("calc.PW------------","\n")
   if (!is.null(z)) {
     out = pw.calc(x, z.vt, cpyPIC)
@@ -119,7 +108,7 @@ stepwise.VT <- function (data, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf, flag
     }
 
     return(list(cpy = cpy, cpyPIC = cpyPIC, wt = outwt,lstwet = lstwt,
-                x = x, py = py,
+                x = data$x, py = py,
                 dp=z.n, dp.n=z.vt, S=S,
                 wavelet=wf))
   } else {
@@ -231,18 +220,6 @@ calc.scaleSTDratio <- function (x, zin, zout)
   }
 
 }
-#-------------------------------------------------------------------------------
-pic.boot <- function(Z, X, prob){
-
-  Z.boot <- sapply(1:100, function(i) sample(Z, replace = FALSE))
-  pmi.boot <- apply(Z.boot, 2, function(i) pmi.calc(X,i))
-
-  pmi <- quantile(pmi.boot, probs = prob)
-
-  pmi[pmi<0] <- 0
-  pic <- sqrt(1-exp(-2*pmi))
-
-}
 
 #-------------------------------------------------------------------------------
 kernel.est.uvn <- function(Z) {
@@ -251,7 +228,6 @@ kernel.est.uvn <- function(Z) {
   d <- 1
   # compute sigma & constant
   sigma <- 1.5*bw.nrd0(Z)
-  #sigma <- bw.nrd(Z)
   constant <- sqrt(2*pi) * sigma * N
 
   # Commence main loop
@@ -274,7 +250,6 @@ kernel.est.mvn <- function(Z) {
 
   # Compute sigma & constant
   sigma <- 1.5 * (4/(d + 2))^(1/(d + 4)) * N^(-1/(d + 4))
-  #sigma <- (4/(d + 2))^(1/(d + 4)) * N^(-1/(d + 4))
   constant <- (sqrt(2*pi)*sigma)^d * sqrt(det.Cov) * N
 
   # Commence main loop
@@ -355,7 +330,6 @@ pic.calc <- function(X, Y, Z, mode, wf, flag, detrend)
   pic <- sqrt(1-exp(-2*pmi))
 
   return(list(pic=as.numeric(pic),
-              #x = dwt.list$x, dp = dwt.list$dp,
               py=dwt.list$dp.n, S=dwt.list$S
               ))
 }
