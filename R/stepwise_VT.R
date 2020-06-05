@@ -4,11 +4,14 @@
 #' @param alpha   The significance level used to judge whether the sample estimate in Equation \deqn{\hat{PIC} = sqrt(1-exp(-2\hat{PI})} is significant or not. A default alpha value is 0.1.
 #' @param mode    A mode of variance transfomration, i.e., MRA, MODWT, or AT
 #' @param wf      Wavelet family
+#' @param flag    Biased or Unbiased variance transformation
+#' @param detrend Detrend the input time series or just center, default (F)
 #'
 #' @return A list of 2 elements: the column numbers of the meaningful predictors (cpy), and partial informational correlation (cpyPIC).
 #' @export
 #'
 #' @references Sharma, A., Mehrotra, R., 2014. An information theoretic alternative to model a natural system using observational information alone. Water Resources Research, 50(1): 650-660.
+#'
 #' @examples
 #' ###Real-world example
 #' mode <- switch(1,"MRA", "MODWT","a trous")
@@ -31,7 +34,7 @@
 #' {
 #'   ts.plot(cbind(dwt$dp[,i], dwt$dp.n[,i]), xlab="NA", col=1:2)
 #' }
-stepwise.VT <- function (data, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf)
+stepwise.VT <- function (data, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf, flag=c("biased","unbiased"), detrend=F)
 {
   x = as.matrix(data$x)
   py= as.matrix(data$dp)
@@ -50,7 +53,7 @@ stepwise.VT <- function (data, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf)
     pictemp = rep(0, npicmax)
     y = py[, icoloutz]
 
-    temp = pic.calc(x,y,z, mode, wf)
+    temp = pic.calc(x,y,z, mode, wf, flag, detrend)
     pictemp = temp$pic
 
     pytmp = temp$py
@@ -78,6 +81,8 @@ stepwise.VT <- function (data, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf)
       S = cbind(S, Stmp[,ctmp])
       z.vt = cbind(z.vt, pytmp[,ctmp])
 
+      z=z.vt #mathematically this is more valid
+
       icoloutz = icoloutz[-ctmp]
       icpy = icpy + 1
       if ((npy - icpy) == 0) isig = F
@@ -92,12 +97,12 @@ stepwise.VT <- function (data, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf)
     outwt = out$pw
     lstwt = abs(lsfit(z.vt[1:length(x),], x)$coef)
 
-    z.n = z; ncpy=length(cpy)
+    z.n = py[,cpy]; ncpy=length(cpy)
     if(ncpy>1){
       for(i in 2:ncpy){
         tmp=z[,1:(i-1)]
-        z.n[,i] <- z[,i]-knnregl1cv(z[,i], tmp)
-        #z.n[,i] <- lm.fit(as.matrix(tmp), z[,i])$residuals
+        z.n[,i] <- z.n[,i]-knnregl1cv(z.n[,i], tmp)
+        #z.n[,i] <- lm.fit(as.matrix(tmp), z.n[,i])$residuals
 
       }
     }
@@ -116,6 +121,7 @@ stepwise.VT <- function (data, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf)
 #' @param data    A list of data, including response and predictors
 #' @param dwt     Output from dwt.vt(), including the transformation covariance
 #' @param mode    A mode of variance transfomration, i.e., MRA, MODWT, or AT
+#' @param detrend Detrend the input time series or just center, default (F)
 #'
 #' @return        A list of objects, including transformed predictors
 #' @export
@@ -150,8 +156,8 @@ stepwise.VT <- function (data, alpha = 0.1, mode=c("MRA","MODWT","AT"), wf)
 #' {
 #'   ts.plot(cbind(dwt.val$dp[,i], dwt.val$dp.n[,i]), xlab="NA", col=1:2)
 #' }
-stepwise.VT.val <- function (data, dwt, mode){
-
+stepwise.VT.val <- function (data, dwt, mode, detrend=F)
+{
   # initialization
   x= data$x; py= as.matrix(data$dp)
   cpy=dwt$cpy; ncpy=length(cpy)
@@ -160,28 +166,31 @@ stepwise.VT.val <- function (data, dwt, mode){
   if(wf!="haar") v <- as.integer(readr::parse_number(wf)/2) else v <- 1
   #Maximum decomposition level J
   n <- length(x)
-  J <- ceiling(log(n/(2*v-1))/log(2)) - 1 #(Kaiser, 1994)
+  if(wf=="haar") J <- ceiling(log(n/(2*v-1))/log(2))-1 else J <- ceiling(log(n/(2*v-1))/log(2))#(Kaiser, 1994)
 
   dwt.n = c(dwt, method=method, boundary=boundary, pad=pad)
-  dp.n = py[,cpy]
-  if(ncpy>1){
-    for(i in 2:ncpy){
-      Z=py[,cpy[1:(i-1)]]
-      dp.n[,i] <- py[,cpy[i]]-knnregl1cv(py[,cpy[i]], Z)
-      #dp.n[,i] <- lm.fit(as.matrix(Z), py[,cpy[i]])$residuals
+  dp = dp.n= as.matrix(py[,cpy])
 
-    }
-  }
+  for(i in 1:ncpy){
 
-  data.n = list(x=x, dp=dp.n)
+      data.n = list(x=x, dp=as.matrix(dp[,1:i]))
 
-  #variance transform
-  if(mode=="MRA"){
-    dwt.val<- dwt.vt.val(data.n, J, dwt.n)
-  } else if(mode=="MODWT"){
-    dwt.val<- modwt.vt.val(data.n, J, dwt.n)
-  } else {
-    dwt.val<- at.vt.val(data.n, J, dwt.n)
+      #variance transform
+      if(mode=="MRA"){
+        dwt.val<- dwt.vt.val(data.n, J, dwt.n, detrend)
+      } else if(mode=="MODWT"){
+        dwt.val<- modwt.vt.val(data.n, J, dwt.n, detrend)
+      } else {
+        dwt.val<- at.vt.val(data.n, J, dwt.n, detrend)
+      }
+
+      dp.n[,1:i] <- dwt.val$dp.n
+
+      if((i+1)<=ncpy){
+        dp[,i+1] <- dp[,i+1]-knnregl1cv(dp[,i+1], dp.n[,1:i])
+        #dp[,i+1] <- lm.fit(as.matrix(dp.n[,1:i]), dp[,i+1])$residuals
+      } else break
+
   }
 
   return(c(dwt.val,py=list(py)))
@@ -280,14 +289,15 @@ pmi.calc <- function(X, Y) {
 #
 # @references Sharma, A., Mehrotra, R., 2014. An information theoretic alternative to model a natural system using observational information alone. Water Resources Research, 50(1): 650-660.
 # @references Galelli S., Humphrey G.B., Maier H.R., Castelletti A., Dandy G.C. and Gibbs M.S. (2014) An evaluation framework for input variable selection algorithms for environmental data-driven models, Environmental Modelling and Software, 62, 33-51, DOI: 10.1016/j.envsoft.2014.08.015.
-pic.calc <- function(X, Y, Z, mode, wf) {
+pic.calc <- function(X, Y, Z, mode, wf, flag, detrend)
+{
 
   Y=as.matrix(Y)
 
   if(wf!="haar") v <- as.integer(readr::parse_number(wf)/2) else v <- 1
   #Maximum decomposition level J
   n <- length(X)
-  J <- ceiling(log(n/(2*v-1))/log(2)) - 1 #(Kaiser, 1994)
+  if(wf=="haar") J <- ceiling(log(n/(2*v-1))/log(2))-1 else J <- ceiling(log(n/(2*v-1))/log(2))#(Kaiser, 1994)
 
 
   if(is.null(Z)){
@@ -306,11 +316,11 @@ pic.calc <- function(X, Y, Z, mode, wf) {
 
   #variance transform
   if(mode=="MRA"){
-    dwt.list<- dwt.vt(data.list, wf, J, "dwt", "zero", "periodic", "auto")
+    dwt.list<- dwt.vt(data.list, wf, J, "dwt", "zero", "periodic", "auto", flag, detrend)
   } else if(mode=="MODWT") {
-    dwt.list<- modwt.vt(data.list, wf, J, "periodic", "auto")
+    dwt.list<- modwt.vt(data.list, wf, J, "periodic", "auto", flag, detrend)
   } else {
-    dwt.list<- at.vt(data.list, wf, J, "periodic", "auto")
+    dwt.list<- at.vt(data.list, wf, J, "periodic", "auto", flag, detrend)
   }
 
   y.in = dwt.list$dp.n

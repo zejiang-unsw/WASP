@@ -4,7 +4,15 @@
 \alias{at.vt}
 \title{Variance Transformation Operation - AT(a trous)}
 \usage{
-at.vt(data, wf, J, boundary, cov.opt = c("auto", "pos", "neg"))
+at.vt(
+  data,
+  wf,
+  J,
+  boundary,
+  cov.opt = c("auto", "pos", "neg"),
+  flag = c("biased", "unbiased"),
+  detrend = F
+)
 }
 \arguments{
 \item{data}{A list of response x and dependent variables dp.}
@@ -16,9 +24,13 @@ at.vt(data, wf, J, boundary, cov.opt = c("auto", "pos", "neg"))
 \item{boundary}{Character string specifying the boundary condition. If boundary=="periodic" the default, then the vector you decompose is assumed to be periodic on its defined interval, if boundary=="reflection", the vector beyond its boundaries is assumed to be a symmetric reflection of itself.}
 
 \item{cov.opt}{Options of Covariance matrix sign. Use "pos", "neg", or "auto".}
+
+\item{flag}{Biased or Unbiased variance transformation}
+
+\item{detrend}{Detrend the input time series or just center, default (F)}
 }
 \value{
-A list of 8 elements: wf, J, boundary, x (data), dp (data), dp.n (variance trasnformed dp), and S (covariance matrix).
+A list of 8 elements: wf, J, boundary, x (data), dp (data), dp.n (variance transformed dp), and S (covariance matrix).
 }
 \description{
 Variance Transformation Operation - AT(a trous)
@@ -56,6 +68,4 @@ for(i in 1:length(dwt.list)){
 }
 \references{
 Z Jiang, A Sharma, and F Johnson. WRR
-
-Percival, D. B. and A. T. Walden (2000) Wavelet Methods for Time Series Analysis, Cambridge University Press.
 }

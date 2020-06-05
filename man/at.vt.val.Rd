@@ -4,7 +4,7 @@
 \alias{at.vt.val}
 \title{Variance Transformation Operation for Validation}
 \usage{
-at.vt.val(data, J, dwt)
+at.vt.val(data, J, dwt, detrend = F)
 }
 \arguments{
 \item{data}{A list of response x and dependent variables dp.}
@@ -12,9 +12,11 @@ at.vt.val(data, J, dwt)
 \item{J}{Specifies the depth of the decomposition. This must be a number less than or equal to log(length(x),2).}
 
 \item{dwt}{A class of "at" data. Output from at.vt().}
+
+\item{detrend}{Detrend the input time series or just center, default (F)}
 }
 \value{
-A list of 8 elements: wf, J, boundary, x (data), dp (data), dp.n (variance trasnformed dp), and S (covariance matrix).
+A list of 8 elements: wf, J, boundary, x (data), dp (data), dp.n (variance transformed dp), and S (covariance matrix).
 }
 \description{
 Variance Transformation Operation for Validation

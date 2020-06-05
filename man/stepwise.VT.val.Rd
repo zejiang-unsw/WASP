@@ -4,7 +4,7 @@
 \alias{stepwise.VT.val}
 \title{Calculate stepwise high order VT in validation}
 \usage{
-stepwise.VT.val(data, dwt, mode)
+stepwise.VT.val(data, dwt, mode, detrend = F)
 }
 \arguments{
 \item{data}{A list of data, including response and predictors}
@@ -12,6 +12,8 @@ stepwise.VT.val(data, dwt, mode)
 \item{dwt}{Output from dwt.vt(), including the transformation covariance}
 
 \item{mode}{A mode of variance transfomration, i.e., MRA, MODWT, or AT}
+
+\item{detrend}{Detrend the input time series or just center, default (F)}
 }
 \value{
 A list of objects, including transformed predictors
