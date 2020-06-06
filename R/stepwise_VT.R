@@ -82,7 +82,7 @@ stepwise.VT <- function (data, mode=c("MRA","MODWT","AT"), wf, flag=c("biased","
     if ((npy - icpy) == 0) isig = F
     if(icpy>1) {
       r2thres <- r2.boot(z.vt, x, prob=0.95)
-      cat("r2thres: ",r2thres,"\n")
+      #cat("r2thres: ",r2thres,"\n")
 
       if(r2[icpy]<r2[icpy-1]|r2[icpy]<r2thres) {
         isig=F
