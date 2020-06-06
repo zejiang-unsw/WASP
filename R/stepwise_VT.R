@@ -81,7 +81,10 @@ stepwise.VT <- function (data, mode=c("MRA","MODWT","AT"), wf, flag=c("biased","
 
     if ((npy - icpy) == 0) isig = F
     if(icpy>1) {
-      if(r2[icpy]<r2[icpy-1]) {
+      r2thres <- r2.boot(z.vt, x, prob=0.95)
+      cat("r2thres: ",r2thres,"\n")
+
+      if(r2[icpy]<r2[icpy-1]|r2[icpy]<r2thres) {
         isig=F
 
         cpy=cpy[-icpy]
@@ -91,7 +94,6 @@ stepwise.VT <- function (data, mode=c("MRA","MODWT","AT"), wf, flag=c("biased","
         z.vt = as.matrix(z.vt[,-icpy])
         S= as.matrix(S[,-icpy])
 
-        #r2=r2[-icpy]
       }
     }
 
@@ -228,18 +230,19 @@ calc.scaleSTDratio <- function (x, zin, zout)
 
 }
 #-------------------------------------------------------------------------------
-pic.boot <- function(Z, X, prob){
+r2.boot <- function(z.vt, x, prob){
 
-  Z.boot <- sapply(1:100, function(i) sample(Z, replace = FALSE))
-  pmi.boot <- apply(Z.boot, 2, function(i) pmi.calc(X,i))
+  z.boot <- sapply(1:100, function(i) sample(z.vt[,ncol(z.vt)], replace = FALSE))
+  u.boot <- apply(z.boot, 2, function(i) x-knnregl1cv(x, cbind(z.vt[,-ncol(z.vt)],i)))
+  r2.boot <- apply(u.boot, 2, function(i) 1 - sum(i^2)/sum((x - mean(x))^2))
 
-  pmi <- quantile(pmi.boot, probs = prob)
+  #r2.boot <- apply(z.boot, 2, function(i) FNN::knn.reg(cbind(z.vt[,-ncol(z.vt)],i), y=x, k=ceiling(sqrt(length(x)/2)))$R2Pred)
 
-  pmi[pmi<0] <- 0
-  pic <- sqrt(1-exp(-2*pmi))
+  r2thres <- quantile(r2.boot, probs = prob)
+
+  return(r2thres)
 
 }
-
 #-------------------------------------------------------------------------------
 kernel.est.uvn <- function(Z) {
 
