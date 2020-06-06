@@ -238,7 +238,7 @@ r2.boot <- function(z.vt, x, prob){
 
   #r2.boot <- apply(z.boot, 2, function(i) FNN::knn.reg(cbind(z.vt[,-ncol(z.vt)],i), y=x, k=ceiling(sqrt(length(x)/2)))$R2Pred)
 
-  r2thres <- quantile(r2.boot, probs = prob)
+  r2thres <- quantile(r2.boot, probs = prob, type=8)
 
   return(r2thres)
 
