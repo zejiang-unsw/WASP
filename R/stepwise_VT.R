@@ -74,13 +74,13 @@ stepwise.VT <- function (data, alpha=0.1, mode=c("MRA","MODWT","AT"), wf, flag=c
     z=z.vt #mathematically this is more valid
 
     u <- x-knnregl1cv(x, z.vt)
+    #u <- lm.fit(z.vt, x)$residuals
     r2 <- c(r2, 1 - sum(u^2)/sum((x - mean(x))^2))
     #r2 <- c(r2, FNN::knn.reg(z.vt, y=x, k=ceiling(sqrt(length(x)/2)))$R2Pred)
 
     icoloutz = icoloutz[-ctmp]
     icpy = icpy + 1
 
-    if ((npy - icpy) == 0) isig = F
     if(icpy>1) {
       r2thres <- r2.boot(z.vt, x, prob=1-alpha)
       #cat("r2thres: ",r2thres,"\n")
@@ -97,7 +97,7 @@ stepwise.VT <- function (data, alpha=0.1, mode=c("MRA","MODWT","AT"), wf, flag=c
 
       }
     }
-
+    if ((npy - icpy) == 0) isig = F
   }
   #cat("R2: ",r2,"\n")
   #cat("calc.PW------------","\n")
@@ -245,7 +245,10 @@ calc.scaleSTDratio <- function (x, zin, zout)
 r2.boot <- function(z.vt, x, prob){
 
   z.boot <- sapply(1:100, function(i) sample(z.vt[,ncol(z.vt)], replace = FALSE))
-  u.boot <- apply(z.boot, 2, function(i) x-knnregl1cv(x, cbind(z.vt[,-ncol(z.vt)],i)))
+
+  #u.boot <- apply(z.boot, 2, function(i) x-knnregl1cv(x, cbind(z.vt[,-ncol(z.vt)],i)))
+  u.boot <- apply(z.boot, 2, function(i) lm.fit(cbind(z.vt[,-ncol(z.vt)],i),x)$residuals)
+
   r2.boot <- apply(u.boot, 2, function(i) 1 - sum(i^2)/sum((x - mean(x))^2))
 
   #r2.boot <- apply(z.boot, 2, function(i) FNN::knn.reg(cbind(z.vt[,-ncol(z.vt)],i), y=x, k=ceiling(sqrt(length(x)/2)))$R2Pred)
