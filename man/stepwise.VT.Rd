@@ -16,9 +16,9 @@ stepwise.VT(
 \arguments{
 \item{data}{A list of data, including response and predictors}
 
-\item{alpha}{The significance level used to judge whether the sample estimate in Equation \deqn{\hat{PIC} = sqrt(1-exp(-2\hat{PI})} is significant or not. A default alpha value is 0.1.}
+\item{alpha}{The significance level used to judge whether the sample estimate is significant. A default alpha value is 0.1.}
 
-\item{mode}{A mode of variance transfomration, i.e., MRA, MODWT, or AT}
+\item{mode}{A mode of variance transformation, i.e., MRA, MODWT, or AT}
 
 \item{wf}{Wavelet family}
 
