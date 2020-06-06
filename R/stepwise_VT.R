@@ -1,7 +1,8 @@
 #' Calculate stepwise high order VT in calibration
 #'
 #' @param data    A list of data, including response and predictors
-#' @param mode    A mode of variance transfomration, i.e., MRA, MODWT, or AT
+#' @param alpha   The significance level used to judge whether the sample estimate is significant. A default alpha value is 0.1.
+#' @param mode    A mode of variance transformation, i.e., MRA, MODWT, or AT
 #' @param wf      Wavelet family
 #' @param flag    Biased or Unbiased variance transformation
 #' @param detrend Detrend the input time series or just center, default (F)
@@ -33,7 +34,7 @@
 #' {
 #'   ts.plot(cbind(dwt$dp[,i], dwt$dp.n[,i]), xlab="NA", col=1:2)
 #' }
-stepwise.VT <- function (data, mode=c("MRA","MODWT","AT"), wf, flag=c("biased","unbiased"), detrend=F)
+stepwise.VT <- function (data, alpha=0.1, mode=c("MRA","MODWT","AT"), wf, flag=c("biased","unbiased"), detrend=F)
 {
   x = as.matrix(data$x)
   py= as.matrix(data$dp)
@@ -81,7 +82,7 @@ stepwise.VT <- function (data, mode=c("MRA","MODWT","AT"), wf, flag=c("biased","
 
     if ((npy - icpy) == 0) isig = F
     if(icpy>1) {
-      r2thres <- r2.boot(z.vt, x, prob=0.95)
+      r2thres <- r2.boot(z.vt, x, prob=1-alpha)
       #cat("r2thres: ",r2thres,"\n")
 
       if(r2[icpy]<r2[icpy-1]|r2[icpy]<r2thres) {
@@ -230,6 +231,17 @@ calc.scaleSTDratio <- function (x, zin, zout)
 
 }
 #-------------------------------------------------------------------------------
+#' R2 threshold via re-sampling
+#'
+#' @param z.vt  Identified independent variables
+#' @param x     Response or dependent variable
+#' @param prob  Probability with values in [0,1].
+#'
+#' @return
+#' @export
+#'
+#' @examples
+#'
 r2.boot <- function(z.vt, x, prob){
 
   z.boot <- sapply(1:100, function(i) sample(z.vt[,ncol(z.vt)], replace = FALSE))
