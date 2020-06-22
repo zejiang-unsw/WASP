@@ -5,7 +5,7 @@ An open-source wavelet tool for improving prediction accuracy for natural system
 ## Requirements
 <pre>
 Dependencies:
-  waveslim,
+  waveslim
 
 Suggest:
   zoo,

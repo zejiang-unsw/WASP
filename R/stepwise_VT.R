@@ -73,9 +73,12 @@ stepwise.VT <- function (data, alpha=0.1, mode=c("MRA","MODWT","AT"), wf, flag=c
 
     z=z.vt #mathematically this is more valid
 
+	  #method 1 and 2
     u <- x-knnregl1cv(x, z.vt)
     #u <- lm.fit(z.vt, x)$residuals
     r2 <- c(r2, 1 - sum(u^2)/sum((x - mean(x))^2))
+
+	  #method 3
     #r2 <- c(r2, FNN::knn.reg(z.vt, y=x, k=ceiling(sqrt(length(x)/2)))$R2Pred)
 
     icoloutz = icoloutz[-ctmp]
