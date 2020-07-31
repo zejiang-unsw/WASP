@@ -73,6 +73,16 @@ stepwise.VT <- function (data, alpha=0.1, mode=c("MRA","MODWT","AT"), wf, flag=c
 
     z=z.vt #mathematically this is more valid
 
+    if (!is.null(z)) {
+      z = as.matrix(z)
+      df = n - ncol(z)
+    } else {
+      df = n
+    }
+    t <-  qt(1-alpha, df=df)
+    picthres <- sqrt(t^2/(t^2+df))
+    # picthres <- qt((0.5 + alpha/2), df)
+
 	  #method 1 and 2
     u <- x-knnregl1cv(x, z.vt)
     #u <- lm.fit(z.vt, x)$residuals
@@ -85,10 +95,14 @@ stepwise.VT <- function (data, alpha=0.1, mode=c("MRA","MODWT","AT"), wf, flag=c
     icpy = icpy + 1
 
     if(icpy>1) {
-      r2thres <- r2.boot(z.vt, x, prob=1-alpha)
+      #r2thres <- r2.boot(z.vt, x, prob=1-alpha)
       #cat("r2thres: ",r2thres,"\n")
 
-      if(r2[icpy]<r2[icpy-1]|r2[icpy]<r2thres) {
+      #if(r2[icpy]<r2[icpy-1]|r2[icpy]<r2thres) {
+      #cat(r2[icpy]<r2[icpy-1],"|",r2[icpy]<r2thres,"\n")
+      if(r2[icpy]<r2[icpy-1]|picmaxtmp<picthres) {
+      #cat(r2[icpy]<r2[icpy-1],"|",picmaxtmp<picthres,"\n")
+      #if(r2[icpy]<r2[icpy-1]) {
         isig=F
 
         cpy=cpy[-icpy]
@@ -249,11 +263,12 @@ r2.boot <- function(z.vt, x, prob){
 
   z.boot <- sapply(1:100, function(i) sample(z.vt[,ncol(z.vt)], replace = FALSE))
 
+  #method 1 and 2
   #u.boot <- apply(z.boot, 2, function(i) x-knnregl1cv(x, cbind(z.vt[,-ncol(z.vt)],i)))
   u.boot <- apply(z.boot, 2, function(i) lm.fit(cbind(z.vt[,-ncol(z.vt)],i),x)$residuals)
-
   r2.boot <- apply(u.boot, 2, function(i) 1 - sum(i^2)/sum((x - mean(x))^2))
 
+  #method 3
   #r2.boot <- apply(z.boot, 2, function(i) FNN::knn.reg(cbind(z.vt[,-ncol(z.vt)],i), y=x, k=ceiling(sqrt(length(x)/2)))$R2Pred)
 
   r2thres <- quantile(r2.boot, probs = prob, type=8)
