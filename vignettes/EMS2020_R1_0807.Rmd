@@ -55,9 +55,6 @@ library(bookdown)
 ###table output
 require(magick)
 require(webshot)
-### save_kable()
-# install.packages("magick")
-# install.packages("webshot")
 # webshot::install_phantomjs(force=TRUE)
 ```
 
@@ -97,7 +94,9 @@ library(tidyr)
 # if you want to knit with new results, change eval=TRUE
 source("./code/EMS2020_Figure3-5.R") 
 source("./code/EMS2020_Figure4.R")   
-source("./code/EMS2020_Figure4S.R")  
+source("./code/EMS2020_Figure4S.R") 
+source("./code/EMS2020_unbiased_wf.R")
+source("./code/EMS2020_biased_wf.R") 
 ```
 
 # Figure 1: Flowchart of the proposed method
