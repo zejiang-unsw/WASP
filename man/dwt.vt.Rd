@@ -12,7 +12,7 @@ dwt.vt(
   pad,
   boundary,
   cov.opt = c("auto", "pos", "neg"),
-  flag = c("biased", "unbiased"),
+  flag = "biased",
   detrend = F
 )
 }
@@ -31,7 +31,7 @@ dwt.vt(
 
 \item{cov.opt}{Options of Covariance matrix sign. Use "pos", "neg", or "auto".}
 
-\item{flag}{Biased or Unbiased variance transformation}
+\item{flag}{Biased or Unbiased variance transformation, c("biased","unbiased").}
 
 \item{detrend}{Detrend the input time series or just center, default (F)}
 }

@@ -5,7 +5,7 @@
 #' @param J      	  Specifies the depth of the decomposition. This must be a number less than or equal to log(length(x),2).
 #' @param boundary  Character string specifying the boundary condition. If boundary=="periodic" the default, then the vector you decompose is assumed to be periodic on its defined interval, if boundary=="reflection", the vector beyond its boundaries is assumed to be a symmetric reflection of itself.
 #' @param cov.opt   Options of Covariance matrix sign. Use "pos", "neg", or "auto".
-#' @param flag      Biased or Unbiased variance transformation
+#' @param flag      Biased or Unbiased variance transformation, c("biased","unbiased").
 #' @param detrend   Detrend the input time series or just center, default (F)
 #'
 #' @return A list of 8 elements: wf, J, boundary, x (data), dp (data), dp.n (variance transformed dp), and S (covariance matrix).
@@ -50,8 +50,8 @@
 #' lines(x = bar[2,], y = sapply(x.modwt,var)/sum(sapply(x.modwt,var)))
 #' points(x = bar[2,], y = sapply(x.modwt,var)/sum(sapply(x.modwt,var)))
 
-modwt.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg"), flag=c("biased","unbiased"), detrend=F){
-
+modwt.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg"), flag="biased", detrend=F)
+{
   # initialization
   x= data$x; dp= as.matrix(data$dp)
   mu.dp <- apply(dp,2,mean)
@@ -75,7 +75,7 @@ modwt.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg"), flag=
     modwt.dp[[i]] <- waveslim::modwt(dp.c, wf = wf, n.levels = J, boundary = boundary)
     B <- matrix(unlist(modwt.dp[[i]]), ncol=J+1, byrow=FALSE)
 
-    Bn <- scale(B)
+    Bn <- scale(B)[1:n,]
     V <- as.numeric(apply(B,2,sd))
 
     dif <- sum(abs(imodwt(modwt.dp[[i]])-dp.c))

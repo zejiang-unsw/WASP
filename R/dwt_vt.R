@@ -7,7 +7,7 @@
 #' @param pad		    The method used for extend data to dyadic size. Use "per", "zero", or "sym".
 #' @param boundary  Character string specifying the boundary condition. If boundary=="periodic" the default, then the vector you decompose is assumed to be periodic on its defined interval, if boundary=="reflection", the vector beyond its boundaries is assumed to be a symmetric reflection of itself.
 #' @param cov.opt   Options of Covariance matrix sign. Use "pos", "neg", or "auto".
-#' @param flag      Biased or Unbiased variance transformation
+#' @param flag      Biased or Unbiased variance transformation, c("biased","unbiased").
 #' @param detrend   Detrend the input time series or just center, default (F)
 #'
 #' @return A list of 8 elements: wf, method, boundary, pad, x (data), dp (data), dp.n (variance trasnformed dp), and S (covariance matrix).
@@ -47,8 +47,8 @@
 #'
 #' }
 
-dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","neg"), flag=c("biased","unbiased"), detrend=F){
-
+dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","neg"), flag="biased", detrend=F)
+{
   # initialization
   x= data$x; dp= as.matrix(data$dp)
   mu.dp <- apply(dp,2,mean)
@@ -81,7 +81,8 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","n
 
     # variance transformation
     cov <- cov(x, Bn[1:length(x),])
-    #cat("Biased: ", round(cov,3),"\n")
+    # cat("Biased cov: ", round(cov,3),"\n")
+    # cat("Biased cov1: ", round(cor(x, B[1:length(x),])*sd(x),3),"\n")
 
     if(flag=="unbiased"){ ###unbiased wavelet variance - only change cov
       idwt.dp.n <- non.bdy(idwt.dp[[i]], wf=wf, method="mra")
@@ -98,6 +99,10 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","n
     S[,i] <- as.vector(cov)
 
     Vr <- as.numeric(cov/norm(cov,type="2")*sd(dp.c))
+    # cat(norm(cov,type="2"),"\n")
+    # cat(norm(cor(x, B[1:length(x),]),type="2"),"\n")
+    # cat("Biased alpha: ", round(Vr,3),"\n")
+    # cat("Biased alpha1: ", round(cor(x, B[1:length(x),])/norm(cor(x, B[1:length(x),])/sd(dp.c),type="2"),3),"\n")
 
     if(!detrend){
       dp.n[,i] <- Bn%*%Vr + mu.dp[i]

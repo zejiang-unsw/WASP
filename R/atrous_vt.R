@@ -5,7 +5,7 @@
 #' @param J      	  Specifies the depth of the decomposition. This must be a number less than or equal to log(length(x),2).
 #' @param boundary  Character string specifying the boundary condition. If boundary=="periodic" the default, then the vector you decompose is assumed to be periodic on its defined interval, if boundary=="reflection", the vector beyond its boundaries is assumed to be a symmetric reflection of itself.
 #' @param cov.opt   Options of Covariance matrix sign. Use "pos", "neg", or "auto".
-#' @param flag      Biased or Unbiased variance transformation
+#' @param flag      Biased or Unbiased variance transformation, c("biased","unbiased").
 #' @param detrend   Detrend the input time series or just center, default (F)
 #'
 #' @return A list of 8 elements: wf, J, boundary, x (data), dp (data), dp.n (variance transformed dp), and S (covariance matrix).
@@ -45,8 +45,8 @@
 #'
 #' }
 
-at.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg"), flag=c("biased","unbiased"), detrend=F){
-
+at.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg"), flag="biased", detrend=F)
+{
   # initialization
   x= data$x; dp= as.matrix(data$dp)
   mu.dp <- apply(dp,2,mean)
@@ -293,6 +293,7 @@ at.wd <- function(x, wf, J, boundary="periodic"){
   for(i in 1:J){
     s<- cbind(s, waveslim::modwt(x, wf=wf, n.levels = i, boundary = boundary)[[i+1]])
   }
+  s <- s[1:length(x),]
 
   at <- x-s[,1]
   for(i in 1:(J-1)) at <- cbind(at, s[,i]-s[,i+1])
