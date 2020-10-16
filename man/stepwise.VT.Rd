@@ -34,7 +34,7 @@ Calculate stepwise high order VT in calibration
 }
 \examples{
 ###Real-world example
-mode <- switch(1,"MRA", "MODWT","a trous")
+mode <- switch(1,"MRA", "MODWT","AT")
 wf="d4"
 station.id = 5 # station to investigate
 SPI.12 <- SPEI::spi(rain.mon,scale=12)$fitted
@@ -46,7 +46,7 @@ dp <- window(obs.mon[,lab.names],start=c(1950,1),end=c(1979,12))
 
 data <- list(x=x,dp=matrix(dp, ncol=ncol(dp)))
 
-dwt = stepwise.VT(data, mode=mode, wf=wf)
+dwt = stepwise.VT(data, mode=mode, wf=wf, flag="biased")
 
 ###plot transformed predictor before and after
 par(mfrow=c(ncol(dp),1), mar=c(0,3,2,1))

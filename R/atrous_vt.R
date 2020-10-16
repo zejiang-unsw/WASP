@@ -12,14 +12,15 @@
 #' @import waveslim
 #' @export
 #'
-#' @references Z Jiang, A Sharma, and F Johnson. WRR
+#' @references Jiang, Z., Sharma, A., & Johnson, F. (2020). Refining Predictor Spectral Representation Using Wavelet Theory for Improved Natural System Modeling. Water Resources Research, 56(3), e2019WR026962. doi:10.1029/2019wr026962
 #'
 #' @examples
 #' data(rain.mon)
 #' data(obs.mon)
 #'
 #' ##response SPI - calibration
-#' SPI.cal <- SPI.calc(window(rain.mon, start=c(1949,1), end=c(1979,12)),sc=12)
+#' # SPI.cal <- SPI.calc(window(rain.mon, start=c(1949,1), end=c(1979,12)),sc=12)
+#' SPI.cal <- SPEI::spi(window(rain.mon, start=c(1949,1), end=c(1979,12)),scale=12)$fitted
 #'
 #' ## create paired response and predictors dataset for each station
 #' data.list <- list()
@@ -30,7 +31,7 @@
 #' }
 #'
 #' ## variance transformation
-#' dwt.list<- lapply(data.list, function(x) at.vt(x, wf="d4", J=7, boundary="periodic"))
+#' dwt.list<- lapply(data.list, function(x) at.vt(x, wf="d4", J=7, boundary="periodic", cov.opt="auto"))
 #'
 #' ## plot original and reconstrcuted predictors for each station
 #' for(i in 1:length(dwt.list)){
@@ -147,14 +148,15 @@ at.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg"), flag="bi
 #'
 #' @return A list of 8 elements: wf, J, boundary, x (data), dp (data), dp.n (variance transformed dp), and S (covariance matrix).
 #' @export
-#' @references Z Jiang, A Sharma, and F Johnson. WRR
+#' @references Jiang, Z., Sharma, A., & Johnson, F. (2020). Refining Predictor Spectral Representation Using Wavelet Theory for Improved Natural System Modeling. Water Resources Research, 56(3), e2019WR026962. doi:10.1029/2019wr026962
 #'
 #' @examples
 #' data(rain.mon)
 #' data(obs.mon)
 #'
 #' ##response SPI - calibration
-#' SPI.cal <- SPI.calc(window(rain.mon, start=c(1949,1), end=c(1979,12)),sc=12)
+#' # SPI.cal <- SPI.calc(window(rain.mon, start=c(1949,1), end=c(1979,12)),sc=12)
+#' SPI.cal <- SPEI::spi(window(rain.mon, start=c(1949,1), end=c(1979,12)),scale=12)$fitted
 #'
 #' ## create paired response and predictors dataset for each station
 #' data.list <- list()
@@ -165,10 +167,11 @@ at.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg"), flag="bi
 #' }
 #'
 #' ## variance transformation - calibration
-#' dwt.list<- lapply(data.list, function(x) at.vt(x, wf="d4", J=7, boundary="periodic"))
+#' dwt.list<- lapply(data.list, function(x) at.vt(x, wf="d4", J=7, boundary="periodic", cov.opt="auto"))
 #'
 #' ##response SPI - validation
-#' SPI.val <- SPI.calc(window(rain.mon, start=c(1979,1), end=c(2009,12)),sc=12)
+#' #SPI.val <- SPI.calc(window(rain.mon, start=c(1979,1), end=c(2009,12)),sc=12)
+#' SPI.val <- SPEI::spi(window(rain.mon, start=c(1979,1), end=c(2009,12)),scale=12)$fitted
 #'
 #' ## create paired response and predictors dataset for each station
 #' data.list <- list()
@@ -275,17 +278,17 @@ at.vt.val <- function(data, J, dwt, detrend=F){
 #' @examples
 #' data(obs.mon)
 #'
-#' n <- nrow(obs.mon);v=2
-#' J <- ceiling(log(n/(2*v-1))/log(2)) #(Kaiser, 1994)
+#' n <- nrow(obs.mon); v=1
+#' J <- floor(log(n/(2*v-1))/log(2)) #(Kaiser, 1994)
 #'
 #' names <- colnames(obs.mon)
 #' at.atm <- vector("list", ncol(obs.mon))
 #' for(i in 1:ncol(obs.mon)){
-#'   tmp <- padding(scale(obs.mon[,i],scale=F), pad="zero")
-#'   at.atm <- at.wd(tmp, v=2, nthresh = J, boundary = "periodic")
+#'   tmp <- as.numeric(scale(obs.mon[,i],scale=FALSE))
+#'   at.atm <- do.call(cbind, at.wd(tmp, wf="haar", J = J, boundary = "periodic"))
 #'
 #'   plot.ts(cbind(obs.mon[1:n,i],at.atm[1:n,1:9]), main=names[i])
-#'   print(sum(abs(scale(obs.mon[1:n,i],scale=F)-rowSums(at.atm[1:n,]))))
+#'   print(sum(abs(scale(obs.mon[1:n,i],scale=FALSE)-rowSums(at.atm[1:n,]))))
 #'
 #' }
 at.wd <- function(x, wf, J, boundary="periodic"){

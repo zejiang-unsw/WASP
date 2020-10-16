@@ -16,13 +16,14 @@
 #'
 #' @examples
 #' ###real-world example
+#' data(Ind_AWAP.2.5)
 #' x <- window(SPI.12,start=c(1950,1),end=c(2009,12))
 #' dp <- window(obs.mon,start=c(1950,1),end=c(2009,12))
 #'
-#' for(id in 5){
+#' for(id in sample(Ind_AWAP.2.5,1)){
 #'
 #'   data <- list(x=x[,id],dp=dp)
-#'   dwt <- modwt.vt(data, wf="d4", J=7, boundary="periodic")
+#'   dwt <- modwt.vt(data, wf="d4", J=7, boundary="periodic", cov.opt="auto")
 #'
 #'   par(mfrow=c(ncol(dp),1),pty="m",mar=c(1,4,1,2))
 #'   for(i in 1:ncol(dp))
@@ -33,7 +34,7 @@
 #' fd <- c(3,5,10,15,25,30,55,70,95)
 #'
 #' data.SW1 <- data.gen.SW(nobs=512,fp=25,fd=fd)
-#' dwt.SW1 <- modwt.vt(data.SW1, wf="d4", J=7, boundary="periodic")
+#' dwt.SW1 <- modwt.vt(data.SW1, wf="d4", J=7, boundary="periodic", cov.opt="auto")
 #'
 #' x.modwt <- waveslim::modwt(dwt.SW1$x, wf = "d4", n.levels = 7,  boundary = "periodic")
 #' dp.modwt <- waveslim::modwt(dwt.SW1$dp[,1], wf = "d4", n.levels = 7,  boundary = "periodic")
@@ -46,7 +47,7 @@
 #'               sapply(dp.vt.modwt,var)/sum(sapply(dp.vt.modwt,var)))
 #'
 #' par(mfrow=c(1,1))
-#' bar <- barplot(data, beside = T, col=c("red","blue"))
+#' bar <- barplot(data, beside = TRUE, col=c("red","blue"))
 #' lines(x = bar[2,], y = sapply(x.modwt,var)/sum(sapply(x.modwt,var)))
 #' points(x = bar[2,], y = sapply(x.modwt,var)/sum(sapply(x.modwt,var)))
 
@@ -161,7 +162,8 @@ modwt.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg"), flag=
 #' data(obs.mon)
 #'
 #' ##response SPI - calibration
-#' SPI.cal <- SPI.calc(window(rain.mon, start=c(1949,1), end=c(1979,12)),sc=12)
+#' # SPI.cal <- SPI.calc(window(rain.mon, start=c(1949,1), end=c(1979,12)),sc=12)
+#' SPI.cal <- SPEI::spi(window(rain.mon, start=c(1949,1), end=c(1979,12)),scale=12)$fitted
 #'
 #' ## create paired response and predictors dataset for each station
 #' data.list <- list()
@@ -172,10 +174,11 @@ modwt.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg"), flag=
 #' }
 #'
 #' ## variance transformation - calibration
-#' dwt.list<- lapply(data.list, function(x) modwt.vt(x, wf="d4", J=7, boundary="periodic"))
+#' dwt.list<- lapply(data.list, function(x) modwt.vt(x, wf="d4", J=7, boundary="periodic", cov.opt="auto"))
 #'
 #' ##response SPI - validation
-#' SPI.val <- SPI.calc(window(rain.mon, start=c(1979,1), end=c(2009,12)),sc=12)
+#' # SPI.val <- SPI.calc(window(rain.mon, start=c(1979,1), end=c(2009,12)),sc=12)
+#' SPI.val <- SPEI::spi(window(rain.mon, start=c(1979,1), end=c(2009,12)),scale=12)$fitted
 #'
 #' ## create paired response and predictors dataset for each station
 #' data.list <- list()

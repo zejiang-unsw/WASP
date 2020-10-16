@@ -18,17 +18,18 @@ Plot function: Variance structure before and after variance transformation
 \examples{
 data("data.HL")
 data("data.SW1")
+
 #variance transfrom
-dwt.SW1<- dwt.vt(data.SW1, wf, J, method, pad, boundary)
+dwt.SW1<- dwt.vt(data.SW1[[1]], wf="d4", J=7, method="dwt", pad="zero", boundary="periodic", cov.opt="auto")
 
 #plot
 fig1 <- fig.dwt.vt(dwt.SW1)
 fig1
 
 #variance transfrom
-dwt.HL<- dwt.vt(data.HL, wf, J, method, pad, boundary)
+dwt.HL<- dwt.vt(data.HL[[1]], wf="d4", J=7, method="dwt", pad="zero", boundary="periodic", cov.opt="auto")
 
 #plot
-fig2 <- fig.vt(dwt.HL)
+fig2 <- fig.dwt.vt(dwt.HL)
 fig2
 }

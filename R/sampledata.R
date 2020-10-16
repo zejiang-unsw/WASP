@@ -16,12 +16,12 @@ NULL
 NULL
 
 #'@title Sample data: Australia map
-#'@description A dataset containing the Austrlia map.
+#'@description A dataset containing the Australia map.
 #'
 #'@docType data
 #'@keywords datasets
-#'@name Aus_map
-#'@usage data(Aus_map)
+#'@name aus.coast
+#'@usage data(aus.coast)
 NULL
 
 #'@title Sample data: AWAP rainfall data over Australia

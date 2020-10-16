@@ -24,17 +24,17 @@ a trous (AT) based additive decompostion using Daubechies family wavelet
 \examples{
 data(obs.mon)
 
-n <- nrow(obs.mon);v=2
-J <- ceiling(log(n/(2*v-1))/log(2)) #(Kaiser, 1994)
+n <- nrow(obs.mon); v=1
+J <- floor(log(n/(2*v-1))/log(2)) #(Kaiser, 1994)
 
 names <- colnames(obs.mon)
 at.atm <- vector("list", ncol(obs.mon))
 for(i in 1:ncol(obs.mon)){
-  tmp <- padding(scale(obs.mon[,i],scale=F), pad="zero")
-  at.atm <- at.wd(tmp, v=2, nthresh = J, boundary = "periodic")
+  tmp <- as.numeric(scale(obs.mon[,i],scale=FALSE))
+  at.atm <- do.call(cbind, at.wd(tmp, wf="haar", J = J, boundary = "periodic"))
 
   plot.ts(cbind(obs.mon[1:n,i],at.atm[1:n,1:9]), main=names[i])
-  print(sum(abs(scale(obs.mon[1:n,i],scale=F)-rowSums(at.atm[1:n,]))))
+  print(sum(abs(scale(obs.mon[1:n,i],scale=FALSE)-rowSums(at.atm[1:n,]))))
 
 }
 }

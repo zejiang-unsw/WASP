@@ -5,7 +5,7 @@
 #' @param k     	The number of nearest neighbours used. The default value is 0, indicating Lall and Sharma default is used.
 #' @param pw   		A vector of partial weights of the same length of z.
 #' @param reg		  A logical operator to inform whether a conditional expectation should be output or not nensemble, Used if reg=F and represents the number of realisations that are generated Value.
-#' @param nemsemble				  An integer the specifies the number of ensembles used. The default is 100.
+#' @param nensemble				  An integer the specifies the number of ensembles used. The default is 100.
 #' @param tailcorrection	  A logical value, T (default) or F, that denotes whether a reduced value of k (number of nearest neighbours) should be used in the tails of any conditioning plane. Whether one is in the tails or not is determined based on the nearest neighbour response value.
 #' @param tailprob				  A scalar that denotes the p-value of the cdf (on either extreme) the tailcorrection takes effect. The default value is 0.25.
 #' @param tailfac				    A scalar that specifies the lowest fraction of the default k that can be used in the tails. Depending on the how extreme one is in the tails, the actual k decreases linearly from k (for a p-value greater than tailprob) to tailfac*k proportional to the actual p-value of the nearest neighbour response, divided by tailprob. The default value is 0.2.
@@ -16,23 +16,24 @@
 #' @references Sharma, A., Tarboton, D.G. and Lall, U., 1997. Streamflow simulation: A nonparametric approach. Water resources research, 33(2), pp.291-308.
 #' @references Sharma, A. and O'Neill, R., 2002. A nonparametric approach for representing interannual dependence in monthly streamflow sequences. Water resources research, 38(7), pp.5-1.
 #' @examples
-#' data(data1) #AR9 model   x(i)=0.3*x(i-1)-0.6*x(i-4)-0.5*x(i-9)+eps
-#' x = data1[,1]     #response
-#' py = data1[,-1]   #possible predictors
-#' ans.ar9 = stepwise.PIC(x,py) #identify the meaningful predictors and estimate partial weights
+#' #AR9 model   x(i)=0.3*x(i-1)-0.6*x(i-4)-0.5*x(i-9)+eps
+#' data.ar9<-data.gen.ar9(500)
+#' x = data.ar9$x     #response
+#' py = data.ar9$dp   #possible predictors
+#' ans.ar9 = NPRED::stepwise.PIC(x,py) #identify the meaningful predictors and estimate partial weights
 #' z = py[,ans.ar9$cpy]    #predictor matrix
 #' pw = ans.ar9$wt         #partial weights
 #' zout = apply(z,2,mean)  #vector denoting where we want outputs, can be a matrix representing grid.
 #'
-#' knn(x,z,zout,reg=T,pw=pw) #knn regression estimate using partial weights.
+#' knn(x,z,zout,reg=TRUE,pw=pw) #knn regression estimate using partial weights.
 #'
-#' knn(x,z,zout,reg=F,pw=pw) #alternatively, knn conditional bootstrap (100 realisations).
+#' knn(x,z,zout,reg=FALSE,pw=pw) #alternatively, knn conditional bootstrap (100 realisations).
 #' #Mean of the conditional bootstrap estimate should be approximately the same as the regression estimate.
 #'
 #' zout <- ts(data.gen.ar9(500,ndim=length(ans.ar9$cpy))$dp) #new input
 #' xhat1=xhat2=x
-#' xhat1 <- NPRED::knn(x,z,zout,k=5,reg=T,extrap=F) # without extrapolation
-#' xhat2 <- NPRED::knn(x,z,zout,k=5,reg=T,extrap=T) # with extrapolation
+#' xhat1 <- NPRED::knn(x,z,zout,k=5,reg=TRUE,extrap=FALSE) # without extrapolation
+#' xhat2 <- NPRED::knn(x,z,zout,k=5,reg=TRUE,extrap=TRUE) # with extrapolation
 #'
 #' ts.plot(ts(x),ts(xhat1),ts(xhat2),col=c("black","red","blue"),ylim=c(-5,5), lwd=c(2,2,1))
 

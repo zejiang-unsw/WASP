@@ -12,6 +12,10 @@ output:
     fig_caption: yes #placed in floating environments
     latex_engine: pdflatex #xelatex
     keep_tex: false
+vignette: >
+  %\VignetteIndexEntry{WASP}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 geometry: "left=3cm,right=3cm,top=2cm,bottom=2cm"
 link-citations: yes
 linkcolor: blue
@@ -90,7 +94,7 @@ library(tidyr)
 
 # Run code
 
-```{r cod, eval=FALSE, echo=TRUE, message=TRUE, warning=TRUE}
+```{r cod, eval=FALSE, message=TRUE, warning=TRUE}
 # if you want to knit with new results, change eval=TRUE
 source("./code/EMS2020_Figure3-5.R") 
 source("./code/EMS2020_Figure4.R")   
@@ -128,7 +132,7 @@ sub.cali <- which(folds==1, arr.ind=TRUE); sub.vali <- which(folds==2, arr.ind=T
 data <- list(x=SPI.12.ts[sub.cali,Grid],dp=data.CI.ts[sub.cali,])
 
 #variance transformation - calibration
-dwt <- modwt.vt(data, wf=wf, J=8, boundary="periodic")
+dwt <- modwt.vt(data, wf=wf, J=8, boundary="periodic", cov.opt = "auto")
 
 #stepwise PIC selection
 sel <- NPRED::stepwise.PIC(dwt$x, dwt$dp.n)
@@ -201,7 +205,7 @@ for(sc in c(12,36)){
         #---------------------------------------
         p <- ggplot(data=na.omit(Sel.df), aes(x=lon, y=lat)) + 
              geom_tile(aes(fill=Driver))+
-             geom_polygon(data=Aus_map, aes(x = long, y = lat, group=group), color="grey", fill="NA")+
+             geom_polygon(data=aus.coast, aes(x = long, y = lat, group=group), color="grey", fill="NA")+
              geom_text(data=samp, aes(x = lon, y = lat, label=label), color="red", size=2)+
              geom_point(data=miss, aes(x = lon, y = lat),shape=16, size=2)+
              #geom_tile(data=miss.na, aes(x = lon, y = lat),fill="white")+
@@ -465,7 +469,7 @@ for(sc in c(12,36)){
       sl1 <- list("sp.points",SPI.obs.p, first=FALSE, col="grey28", pch=19)
       } else sl1 <- list("sp.points",NULL, first=FALSE, col="grey28")
       
-      sl2 <- list("sp.polygons",Aus_map, first=FALSE, col="grey")
+      sl2 <- list("sp.polygons",aus.coast, first=FALSE, col="grey")
 
       ## labels and color
       label <- seq(min.OL,max.OL,10);labelat = round(label,digits=2); 
@@ -473,7 +477,7 @@ for(sc in c(12,36)){
       pal <-  colorRampPalette(c("lightblue", "blue"))
       my.palette <- pal(length(label))
   
-      #df.ras.mask <- mask(SPI.obs.ras, Aus_map)
+      #df.ras.mask <- mask(SPI.obs.ras, aus.coast)
       p <- spplot(SPI.obs.ras, xlim=c(110,156), ylim=c(-45,-9),
                   col.regions = my.palette,
                   zlim=c(-20,max.OL),
@@ -763,14 +767,14 @@ cowplot::plot_grid(plotlist = p.list, ncol=2, labels = c("(a)","(b)"), label_siz
 This is the map of Grid Index over Australia shown in Fig. \@ref(fig:figS2). Grids with missing data (i.e., where 25% of rainfall values are zero or missing) are in white color, while the investigated four randomly sampled grids are highlighted in red color. 
 
 ```{r figS2, fig.cap='Map of grid index over Australia.', fig.height=6, fig.width=9, out.width= '100%'}
-data(Aus_map)
+data(aus.coast)
 data(lat_lon.2.5)
 data(data.AWAP.2.5)
 
 grids.ras <- raster::rasterFromXYZ(cbind(lat_lon.2.5, ID=1:nrow(lat_lon.2.5)))
 #grids.ras
 #---------------------------------------
-sl1 <- list("sp.polygons",Aus_map, first=FALSE, col="grey")
+sl1 <- list("sp.polygons",aus.coast, first=FALSE, col="grey")
 
 #Missing grids and sampled grids
 Ind_AWAP.2.5_NaN1 <- which(apply(data.AWAP.2.5, 2, function(m) sum(is.na(m)))==nrow(data.AWAP.2.5))
@@ -847,7 +851,7 @@ for(sc in c(12,36)){
       sl1 <- list("sp.points",SPI.obs.p, first=FALSE, col="grey28", pch=19)
       } else sl1 <- list("sp.points",NULL, first=FALSE, col="grey28")
       
-      sl2 <- list("sp.polygons",Aus_map, first=FALSE, col="grey")
+      sl2 <- list("sp.polygons",aus.coast, first=FALSE, col="grey")
 
       ## labels and color
       label <- seq(min.OL,max.OL,10);labelat = round(label,digits=2); 
@@ -855,7 +859,7 @@ for(sc in c(12,36)){
       pal <-  colorRampPalette(c("lightblue", "blue"))
       my.palette <- pal(length(label))
   
-      #df.ras.mask <- mask(SPI.obs.ras, Aus_map)
+      #df.ras.mask <- mask(SPI.obs.ras, aus.coast)
       p <- spplot(SPI.obs.ras, xlim=c(110,156), ylim=c(-45,-9),
                   col.regions = my.palette,
                   zlim=c(-20,max.OL),
