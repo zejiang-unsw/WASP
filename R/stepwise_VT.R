@@ -248,16 +248,14 @@ calc.scaleSTDratio <- function (x, zin, zout)
 
 }
 #-------------------------------------------------------------------------------
-#' R2 threshold via re-sampling
+#' R2 threshold by re-sampling approach
 #'
 #' @param z.vt  Identified independent variables
 #' @param x     Response or dependent variable
 #' @param prob  Probability with values in [0,1].
 #'
-#' @return
+#' @return A quantile assosciated with prob.
 #' @export
-#'
-#' @examples
 #'
 r2.boot <- function(z.vt, x, prob){
 

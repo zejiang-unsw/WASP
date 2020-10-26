@@ -17,8 +17,9 @@ Depends: R (>= 2.10)
 Imports: 
     waveslim, stats, tidyr, ggplot2
 Suggests: 
-    zoo, sp, SPEI, NPRED, readr, 
-    testthat, fitdistrplus,
-    knitr, rmarkdown
+    zoo, sp, readr, knitr, rmarkdown, SPEI, NPRED
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr
+
+
+

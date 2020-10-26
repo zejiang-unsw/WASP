@@ -19,9 +19,6 @@ Dataframe with as many rows as levels in the wavelet transform object. The first
 \description{
 Produces an estimate of the multiscale variance along with approximate confidence intervals.
 }
-\examples{
-
-}
 \references{
 Percival, D. B. (1995) Biometrika, 82, No. 3, 619-631.
 }

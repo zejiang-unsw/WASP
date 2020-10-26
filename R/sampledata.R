@@ -103,12 +103,3 @@ NULL
 #'@name data.HL
 #'@usage data(data.HL)
 NULL
-
-#'@title Sample data: Rossler system
-#'@description A list with four vectors (n=100,000) named time, x, y and z containing the time, the x-components, the y-components and the z-components of the Rossler system, respectively.
-#'
-#'@docType data
-#'@keywords datasets
-#'@name data.Rossler
-#'@usage data(data.Rossler)
-NULL

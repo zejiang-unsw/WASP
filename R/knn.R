@@ -28,7 +28,8 @@
 #' knn(x,z,zout,reg=TRUE,pw=pw) #knn regression estimate using partial weights.
 #'
 #' knn(x,z,zout,reg=FALSE,pw=pw) #alternatively, knn conditional bootstrap (100 realisations).
-#' #Mean of the conditional bootstrap estimate should be approximately the same as the regression estimate.
+#' #Mean of the conditional bootstrap estimate should be
+#' #approximately the same as the regression estimate.
 #'
 #' zout <- ts(data.gen.ar9(500,ndim=length(ans.ar9$cpy))$dp) #new input
 #' xhat1=xhat2=x
