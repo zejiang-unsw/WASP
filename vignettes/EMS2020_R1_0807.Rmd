@@ -120,7 +120,7 @@ Not that this will be empty figure in output directory since the figure is the c
 #load response and predictor variables
 data(SPI.12); data(data.CI); data(Ind_AWAP.2.5)
 #study grids and period
-Grid = sample(Ind_AWAP.2.5,1)
+Grid <- sample(Ind_AWAP.2.5,1)
 Grid = 149 # A sample grid
 SPI.12.ts <- window(SPI.12, start=c(1910,1),end=c(2009,12))
 data.CI.ts <- window(data.CI, start=c(1910,1),end=c(2009,12))
