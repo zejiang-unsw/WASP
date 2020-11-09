@@ -2,6 +2,7 @@
 #'
 #' @param data    A list of data, including response and predictors
 #' @param alpha   The significance level used to judge whether the sample estimate is significant. A default alpha value is 0.1.
+#' @param nvarmax The maximum number of variables to be selected.
 #' @param mode    A mode of variance transformation, i.e., MRA, MODWT, or AT
 #' @param wf      Wavelet family
 #' @param flag    Biased or Unbiased variance transformation
@@ -34,7 +35,7 @@
 #' {
 #'   ts.plot(cbind(dwt$dp[,i], dwt$dp.n[,i]), xlab="NA", col=1:2)
 #' }
-stepwise.VT <- function (data, alpha=0.1, mode=c("MRA","MODWT","AT"), wf, flag=c("biased","unbiased"), detrend=F)
+stepwise.VT <- function (data, alpha=0.1, nvarmax=4, mode=c("MRA","MODWT","AT"), wf, flag="biased", detrend=F)
 {
   x = as.matrix(data$x)
   py= as.matrix(data$dp)
@@ -114,7 +115,7 @@ stepwise.VT <- function (data, alpha=0.1, mode=c("MRA","MODWT","AT"), wf, flag=c
 
       }
     }
-    if ((npy - icpy) == 0) isig = F
+    if ((npy - icpy)==0|icpy>=nvarmax) isig = F
   }
   #cat("R2: ",r2,"\n")
   #cat("calc.PW------------","\n")
