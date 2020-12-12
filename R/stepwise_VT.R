@@ -4,8 +4,13 @@
 #' @param alpha   The significance level used to judge whether the sample estimate is significant. A default alpha value is 0.1.
 #' @param mode    A mode of variance transformation, i.e., MRA, MODWT, or AT
 #' @param wf      Wavelet family
-#' @param flag    Biased or Unbiased variance transformation
-#' @param detrend Detrend the input time series or just center, default (F)
+#' @param method  Either "dwt" or "modwt" of MRA.
+#' @param pad      The method used for extend data to dyadic size. Use "per", "zero", or "sym".
+#' @param boundary Character string specifying the boundary condition. If boundary=="periodic" the default, then the vector you decompose is assumed to be periodic on its defined interval, if boundary=="reflection", the vector beyond its boundaries is assumed to be a symmetric reflection of itself.
+#' @param cov.opt Options of Covariance matrix sign. Use "pos", "neg", or "auto".
+#' @param flag    Biased or Unbiased variance transformation.
+#' @param detrend Detrend the input time series or just center, default (F).
+#'
 #'
 #' @return A list of 2 elements: the column numbers of the meaningful predictors (cpy), and partial informational correlation (cpyPIC).
 #' @export
@@ -34,7 +39,8 @@
 #' {
 #'   ts.plot(cbind(dwt$dp[,i], dwt$dp.n[,i]), xlab="NA", col=1:2)
 #' }
-stepwise.VT <- function (data, alpha=0.1, mode=c("MRA","MODWT","AT"), wf, flag=c("biased","unbiased"), detrend=F)
+stepwise.VT <- function (data, alpha=0.1, mode=c("MRA","MODWT","AT"), wf, method="dwt",pad="zero",
+                         boundary="periodic", cov.opt="auto", flag="biased", detrend=F)
 {
   x = as.matrix(data$x)
   py= as.matrix(data$dp)
@@ -54,7 +60,7 @@ stepwise.VT <- function (data, alpha=0.1, mode=c("MRA","MODWT","AT"), wf, flag=c
     pictemp = rep(0, npicmax)
     y = py[, icoloutz]
 
-    temp = pic.calc(x,y,z, mode, wf, flag, detrend)
+    temp = pic.calc(x,y,z, mode, wf, method, pad, boundary, cov.opt, flag, detrend)
     pictemp = temp$pic
 
     pytmp = temp$py
@@ -147,7 +153,7 @@ stepwise.VT <- function (data, alpha=0.1, mode=c("MRA","MODWT","AT"), wf, flag=c
 #'
 #' @param data    A list of data, including response and predictors
 #' @param dwt     Output from dwt.vt(), including the transformation covariance
-#' @param mode    A mode of variance transfomration, i.e., MRA, MODWT, or AT
+#' @param mode    A mode of variance transformation, i.e., MRA, MODWT, or AT
 #' @param detrend Detrend the input time series or just center, default (F)
 #'
 #' @return        A list of objects, including transformed predictors
@@ -183,17 +189,19 @@ stepwise.VT <- function (data, alpha=0.1, mode=c("MRA","MODWT","AT"), wf, flag=c
 #' {
 #'   ts.plot(cbind(dwt.val$dp[,i], dwt.val$dp.n[,i]), xlab="NA", col=1:2)
 #' }
-stepwise.VT.val <- function (data, dwt, mode, detrend=F)
+stepwise.VT.val <- function (data, dwt, mode=c("MRA","MODWT","AT"), detrend=F)
 {
   # initialization
   x= data$x; py= as.matrix(data$dp)
   cpy=dwt$cpy; ncpy=length(cpy)
-  wf=dwt$wavelet; method <- "dwt"; boundary <- "periodic"; pad="zero"
+  wf=dwt$wavelet; boundary <- dwt$boundary;
+  if(mode=="MRA") {method <- dwt$method; pad=dwt$pad}
 
   if(wf!="haar") v <- as.integer(readr::parse_number(wf)/2) else v <- 1
   #Maximum decomposition level J
   n <- length(x)
-  if(wf=="haar") J <- ceiling(log(n/(2*v-1))/log(2))-1 else J <- ceiling(log(n/(2*v-1))/log(2))#(Kaiser, 1994)
+  #if(wf=="haar") J <- ceiling(log(n/(2*v-1))/log(2))-1 else J <- ceiling(log(n/(2*v-1))/log(2))#(Kaiser, 1994)
+  J <- floor(log(n/(2*v-1))/log(2))
 
   dwt.n = c(dwt, method=method, boundary=boundary, pad=pad)
   dp = dp.n= as.matrix(py[,cpy])
@@ -340,13 +348,21 @@ pmi.calc <- function(X, Y) {
 # @param Z       A matrix of pre-existing predictors that could be NULL if no prior predictors exist.
 # @param mode    A mode of variance transfomration, i.e., MRA, MODWT, or AT
 # @param wf      Wavelet family
+# @param method  Either "dwt" or "modwt" of MRA.
+# @param pad      The method used for extend data to dyadic size. Use "per", "zero", or "sym".
+# @param boundary Character string specifying the boundary condition. If boundary=="periodic" the default, then the vector you decompose is assumed to be periodic on its defined interval, if boundary=="reflection", the vector beyond its boundaries is assumed to be a symmetric reflection of itself.
+# @param cov.opt Options of Covariance matrix sign. Use "pos", "neg", or "auto".
+# @param flag    Biased or Unbiased variance transformation.
+# @param detrend Detrend the input time series or just center, default (F).
 #
 # @return A list of 2 elements: the partial mutual information (pmi), and partial informational correlation (pic).
 # @export
 #
 # @references Sharma, A., Mehrotra, R., 2014. An information theoretic alternative to model a natural system using observational information alone. Water Resources Research, 50(1): 650-660.
 # @references Galelli S., Humphrey G.B., Maier H.R., Castelletti A., Dandy G.C. and Gibbs M.S. (2014) An evaluation framework for input variable selection algorithms for environmental data-driven models, Environmental Modelling and Software, 62, 33-51, DOI: 10.1016/j.envsoft.2014.08.015.
-pic.calc <- function(X, Y, Z, mode, wf, flag, detrend)
+
+pic.calc <- function(X, Y, Z, mode, wf, method="dwt",pad="zero",
+                     boundary="periodic", cov.opt="auto", flag="biased", detrend=F)
 {
 
   Y=as.matrix(Y)
@@ -354,8 +370,8 @@ pic.calc <- function(X, Y, Z, mode, wf, flag, detrend)
   if(wf!="haar") v <- as.integer(readr::parse_number(wf)/2) else v <- 1
   #Maximum decomposition level J
   n <- length(X)
-  if(wf=="haar") J <- ceiling(log(n/(2*v-1))/log(2))-1 else J <- ceiling(log(n/(2*v-1))/log(2))#(Kaiser, 1994)
-
+  #if(wf=="haar") J <- ceiling(log(n/(2*v-1))/log(2))-1 else J <- ceiling(log(n/(2*v-1))/log(2))#(Kaiser, 1994)
+  J <- floor(log2(n/(2*(2*v-1))+1))
 
   if(is.null(Z)){
     x.in <- X
@@ -373,11 +389,11 @@ pic.calc <- function(X, Y, Z, mode, wf, flag, detrend)
 
   #variance transform
   if(mode=="MRA"){
-    dwt.list<- dwt.vt(data.list, wf, J, "dwt", "zero", "periodic", "auto", flag, detrend)
+    dwt.list<- dwt.vt(data.list, wf, J, method, pad, boundary, cov.opt, flag, detrend)
   } else if(mode=="MODWT") {
-    dwt.list<- modwt.vt(data.list, wf, J, "periodic", "auto", flag, detrend)
+    dwt.list<- modwt.vt(data.list, wf, J, boundary, cov.opt, flag, detrend)
   } else {
-    dwt.list<- at.vt(data.list, wf, J, "periodic", "auto", flag, detrend)
+    dwt.list<- at.vt(data.list, wf, J, boundary, cov.opt, flag, detrend)
   }
 
   y.in = dwt.list$dp.n
