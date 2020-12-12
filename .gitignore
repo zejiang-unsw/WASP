@@ -22,9 +22,8 @@
 
 # produced vignettes
 vignettes/*.html
-vignettes/*.pdf
+#vignettes/*.pdf
 
-vignettes/cache/
 vignettes/figure/
 vignettes/result/
 
@@ -41,4 +40,8 @@ vignettes/result/
 
 /tests/
 /data-raw/
-inst/doc
+vignettes/WASP.Rmd
+vignettes/EMS2020_R1.Rmd
+vignettes/EMS2020_R1.pdf
+vignettes/EMS2020.Rmd
+vignettes/code/EMS2020_stepwiseVT.R
