@@ -1,3 +1,4 @@
+
 #' WASP: WAvelet System Prediction
 #'
 #' The package WASP (variance transformation) is used for system modelling and prediction.
@@ -15,7 +16,7 @@
 #' @author
 #' Ze Jiang
 #'
-#' Maintainer: Ze Jiang zejiangunsw@gamil.com
+#' Maintainer: Ze Jiang <ze.jiang@unsw.edu.au>
 #'
 #' @references
 #' Jiang, Z., Sharma, A., & Johnson, F. (2020). Refining Predictor Spectral Representation Using Wavelet Theory for Improved Natural System Modeling. Water Resources Research, 56(3), e2019WR026962. doi:10.1029/2019wr026962
@@ -25,10 +26,13 @@
 #' @section WASP functions:
 #' Variance transformation functions: dwt.vt, modwt.vt, at.vt and associated
 #'
-#' SPI calculation function
+#' K-nearest neighbor function: knn
 #'
-#' Synthetic data generator functions
+#' Synthetic data generator functions: data.gen.SW,  data.gen.HL, data.gen.Rossler;
+#' data.gen.ar1, data.gen.ar4, data.gen.ar9, data.gen.tar1, data.gen.tar2.
+#'
 #'
 #' @docType package
 #' @name WASP-package
 NULL
+
