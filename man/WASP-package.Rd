@@ -20,9 +20,10 @@ License: \tab GPL-3\cr
 
 Variance transformation functions: dwt.vt, modwt.vt, at.vt and associated
 
-SPI calculation function
+K-nearest neighbor function: knn
 
-Synthetic data generator functions
+Synthetic data generator functions: data.gen.SW,  data.gen.HL, data.gen.Rossler;
+data.gen.ar1, data.gen.ar4, data.gen.ar9, data.gen.tar1, data.gen.tar2.
 }
 
 \references{
@@ -33,5 +34,5 @@ Percival, D. B. and A. T. Walden (2000) Wavelet Methods for Time Series Analysis
 \author{
 Ze Jiang
 
-Maintainer: Ze Jiang zejiangunsw@gamil.com
+Maintainer: Ze Jiang <ze.jiang@unsw.edu.au>
 }

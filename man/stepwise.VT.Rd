@@ -7,9 +7,14 @@
 stepwise.VT(
   data,
   alpha = 0.1,
+  nvarmax = 4,
   mode = c("MRA", "MODWT", "AT"),
   wf,
-  flag = c("biased", "unbiased"),
+  method = "dwt",
+  pad = "zero",
+  boundary = "periodic",
+  cov.opt = "auto",
+  flag = "biased",
   detrend = F
 )
 }
@@ -18,13 +23,23 @@ stepwise.VT(
 
 \item{alpha}{The significance level used to judge whether the sample estimate is significant. A default alpha value is 0.1.}
 
+\item{nvarmax}{The maximum number of variables to be selected.}
+
 \item{mode}{A mode of variance transformation, i.e., MRA, MODWT, or AT}
 
 \item{wf}{Wavelet family}
 
-\item{flag}{Biased or Unbiased variance transformation}
+\item{method}{Either "dwt" or "modwt" of MRA.}
 
-\item{detrend}{Detrend the input time series or just center, default (F)}
+\item{pad}{The method used for extend data to dyadic size. Use "per", "zero", or "sym".}
+
+\item{boundary}{Character string specifying the boundary condition. If boundary=="periodic" the default, then the vector you decompose is assumed to be periodic on its defined interval, if boundary=="reflection", the vector beyond its boundaries is assumed to be a symmetric reflection of itself.}
+
+\item{cov.opt}{Options of Covariance matrix sign. Use "pos", "neg", or "auto".}
+
+\item{flag}{Biased or Unbiased variance transformation.}
+
+\item{detrend}{Detrend the input time series or just center, default (F).}
 }
 \value{
 A list of 2 elements: the column numbers of the meaningful predictors (cpy), and partial informational correlation (cpyPIC).
@@ -49,8 +64,9 @@ data <- list(x=x,dp=matrix(dp, ncol=ncol(dp)))
 dwt = stepwise.VT(data, mode=mode, wf=wf, flag="biased")
 
 ###plot transformed predictor before and after
-par(mfrow=c(ncol(dp),1), mar=c(0,3,2,1))
-for(i in 1:ncol(dp))
+cpy <- dwt$cpy
+par(mfrow=c(length(cpy),1), mar=c(2,3,2,1))
+for(i in 1:length(cpy))
 {
   ts.plot(cbind(dwt$dp[,i], dwt$dp.n[,i]), xlab="NA", col=1:2)
 }
