@@ -36,7 +36,7 @@ x <- window(SPI.12[,station.id],start=c(1950,1),end=c(1979,12))
 dp <- window(obs.mon[,lab.names],start=c(1950,1),end=c(1979,12))
 
 data <- list(x=x,dp=matrix(dp, ncol=ncol(dp)))
-dwt = stepwise.VT(data, mode=mode, wf=wf)
+dwt = stepwise.VT(data, mode=mode, wf=wf, flag="biased")
 #--------------------------------------
 ###validation
 x <- window(SPI.12[,station.id],start=c(1980,1),end=c(2009,12))

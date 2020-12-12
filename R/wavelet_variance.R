@@ -8,7 +8,6 @@
 #' @export
 #'
 #' @references Cornish, C. R., Bretherton, C. S., & Percival, D. B. (2006). Maximal overlap wavelet statistical analysis with application to atmospheric turbulence. Boundary-Layer Meteorology, 119(2), 339-374.
-#' @examples
 #'
 non.bdy <- function (x, wf, method = c("dwt","modwt","mra"))
 {
@@ -36,7 +35,6 @@ non.bdy <- function (x, wf, method = c("dwt","modwt","mra"))
 #' @export
 #'
 #' @references Percival, D. B. (1995) Biometrika, 82, No. 3, 619-631.
-#' @examples
 #'
 wave.var <- function (x, type = "eta3", p = 0.025)
 {

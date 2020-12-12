@@ -21,7 +21,8 @@
 #' data(obs.mon)
 #'
 #' ## response SPI - calibration
-#' SPI.cal <- SPI.calc(window(rain.mon, start=c(1949,1), end=c(1979,12)),sc=12)
+#' # SPI.cal <- SPI.calc(window(rain.mon, start=c(1949,1), end=c(1979,12)),sc=12)
+#' SPI.cal <- SPEI::spi(window(rain.mon, start=c(1949,1), end=c(1979,12)),scale=12)$fitted
 #'
 #' ## create paired response and predictors dataset for each station
 #' data.list <- list()
@@ -32,7 +33,8 @@
 #' }
 #'
 #' ## variance transformation
-#' dwt.list<- lapply(data.list, function(x) dwt.vt(x, wf="d4", J=7, method="dwt", pad="zero", boundary="periodic"))
+#' dwt.list<- lapply(data.list, function(x)
+#' dwt.vt(x, wf="d4", J=7, method="dwt", pad="zero", boundary="periodic", cov.opt="auto"))
 #'
 #' ## plot original and reconstrcuted predictors for each station
 #' for(i in 1:length(dwt.list)){
@@ -164,7 +166,8 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","n
 #' data(obs.mon)
 #'
 #' ##response SPI - calibration
-#' SPI.cal <- SPI.calc(window(rain.mon, start=c(1949,1), end=c(1979,12)),sc=12)
+#' # SPI.cal <- SPI.calc(window(rain.mon, start=c(1949,1), end=c(1979,12)),sc=12)
+#' SPI.cal <- SPEI::spi(window(rain.mon, start=c(1949,1), end=c(1979,12)),scale=12)$fitted
 #'
 #' ## create paired response and predictors dataset for each station
 #' data.list <- list()
@@ -175,10 +178,12 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","n
 #' }
 #'
 #' ## variance transformation - calibration
-#' dwt.list<- lapply(data.list, function(x) dwt.vt(x, wf="d4", J=7, method="dwt", pad="zero", boundary="periodic"))
+#' dwt.list<- lapply(data.list, function(x)
+#' dwt.vt(x, wf="d4", J=7, method="dwt", pad="zero", boundary="periodic", cov.opt="auto"))
 #'
 #' ##response SPI - validation
-#' SPI.val <- SPI.calc(window(rain.mon, start=c(1979,1), end=c(2009,12)),sc=12)
+#' # SPI.val <- SPI.calc(window(rain.mon, start=c(1979,1), end=c(2009,12)),sc=12)
+#' SPI.val <- SPEI::spi(window(rain.mon, start=c(1979,1), end=c(2009,12)),scale=12)$fitted
 #'
 #' ## create paired response and predictors dataset for each station
 #' data.list <- list()
@@ -189,7 +194,8 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt=c("auto","pos","n
 #' }
 #'
 #' #variance transformation - validation
-#' dwt.list.val<- lapply(1:length(data.list), function(i) dwt.vt.val(data.list[[i]], J=7, dwt.list[[i]]))
+#' dwt.list.val<- lapply(1:length(data.list),
+#' function(i) dwt.vt.val(data.list[[i]], J=7, dwt.list[[i]]))
 #'
 #' ## plot original and reconstrcuted predictors for each station
 #' for(i in 1:length(dwt.list.val)){

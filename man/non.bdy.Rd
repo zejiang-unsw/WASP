@@ -19,9 +19,6 @@ Same object as x only with some missing values (NA).
 \description{
 Replace Boundary Wavelet Coefficients with Missing Values (NA).
 }
-\examples{
-
-}
 \references{
 Cornish, C. R., Bretherton, C. S., & Percival, D. B. (2006). Maximal overlap wavelet statistical analysis with application to atmospheric turbulence. Boundary-Layer Meteorology, 119(2), 339-374.
 }

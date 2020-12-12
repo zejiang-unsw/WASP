@@ -16,12 +16,12 @@ NULL
 NULL
 
 #'@title Sample data: Australia map
-#'@description A dataset containing the Austrlia map.
+#'@description A dataset containing the Australia map.
 #'
 #'@docType data
 #'@keywords datasets
-#'@name Aus_map
-#'@usage data(Aus_map)
+#'@name aus.coast
+#'@usage data(aus.coast)
 NULL
 
 #'@title Sample data: AWAP rainfall data over Australia
@@ -102,13 +102,4 @@ NULL
 #'@keywords datasets
 #'@name data.HL
 #'@usage data(data.HL)
-NULL
-
-#'@title Sample data: Rossler system
-#'@description A list with four vectors (n=100,000) named time, x, y and z containing the time, the x-components, the y-components and the z-components of the Rossler system, respectively.
-#'
-#'@docType data
-#'@keywords datasets
-#'@name data.Rossler
-#'@usage data(data.Rossler)
 NULL

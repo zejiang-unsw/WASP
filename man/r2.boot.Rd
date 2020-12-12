@@ -2,7 +2,7 @@
 % Please edit documentation in R/stepwise_VT.R
 \name{r2.boot}
 \alias{r2.boot}
-\title{R2 threshold via re-sampling}
+\title{R2 threshold by re-sampling approach}
 \usage{
 r2.boot(z.vt, x, prob)
 }
@@ -14,11 +14,8 @@ r2.boot(z.vt, x, prob)
 \item{prob}{Probability with values in [0,1].}
 }
 \value{
-
+A quantile assosciated with prob.
 }
 \description{
-R2 threshold via re-sampling
-}
-\examples{
-
+R2 threshold by re-sampling approach
 }

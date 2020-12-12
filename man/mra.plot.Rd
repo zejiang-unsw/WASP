@@ -14,9 +14,13 @@ mra.plot(y, y.mra, limits.x, limits.y, type = c("details", "coefs"), ...)
 \item{limits.x}{x limit for plot.}
 
 \item{limits.y}{y limit for plot.}
+
+\item{type}{type of wavelet coefficients, details or approximations}
+
+\item{...}{arguments for plot()}
 }
 \value{
-A plot with origianl time series and decomposed frequency components.
+A plot with original time series and decomposed frequency components.
 }
 \description{
 Plot function: Plot origianl time series and decomposed frequency components
@@ -48,5 +52,5 @@ print(sum(abs(x-rowSums(x.mra.m[1:n,]))))               #additive check
 var(x);sum(apply(x.mra.m[1:n,],2,var))                  #variance check
 
 limits.x <- c(0,n); limits.y <- c(-3,3)
-mra.plot(x, x.mra.m, limits.x, limits.y)
+mra.plot(x, x.mra.m, limits.x, limits.y, type="details")
 }

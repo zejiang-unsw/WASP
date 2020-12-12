@@ -2,6 +2,7 @@
 #'
 #' @param data    A list of data, including response and predictors
 #' @param alpha   The significance level used to judge whether the sample estimate is significant. A default alpha value is 0.1.
+#' @param nvarmax The maximum number of variables to be selected.
 #' @param mode    A mode of variance transformation, i.e., MRA, MODWT, or AT
 #' @param wf      Wavelet family
 #' @param method  Either "dwt" or "modwt" of MRA.
@@ -19,7 +20,7 @@
 #'
 #' @examples
 #' ###Real-world example
-#' mode <- switch(1,"MRA", "MODWT","a trous")
+#' mode <- switch(1,"MRA", "MODWT","AT")
 #' wf="d4"
 #' station.id = 5 # station to investigate
 #' SPI.12 <- SPEI::spi(rain.mon,scale=12)$fitted
@@ -31,7 +32,7 @@
 #'
 #' data <- list(x=x,dp=matrix(dp, ncol=ncol(dp)))
 #'
-#' dwt = stepwise.VT(data, mode=mode, wf=wf)
+#' dwt = stepwise.VT(data, mode=mode, wf=wf, flag="biased")
 #'
 #' ###plot transformed predictor before and after
 #' par(mfrow=c(ncol(dp),1), mar=c(0,3,2,1))
@@ -39,7 +40,7 @@
 #' {
 #'   ts.plot(cbind(dwt$dp[,i], dwt$dp.n[,i]), xlab="NA", col=1:2)
 #' }
-stepwise.VT <- function (data, alpha=0.1, mode=c("MRA","MODWT","AT"), wf, method="dwt",pad="zero",
+stepwise.VT <- function (data, alpha=0.1, nvarmax=4, mode=c("MRA","MODWT","AT"), wf, method="dwt",pad="zero",
                          boundary="periodic", cov.opt="auto", flag="biased", detrend=F)
 {
   x = as.matrix(data$x)
@@ -120,7 +121,7 @@ stepwise.VT <- function (data, alpha=0.1, mode=c("MRA","MODWT","AT"), wf, method
 
       }
     }
-    if ((npy - icpy) == 0) isig = F
+    if ((npy - icpy)==0|icpy>=nvarmax) isig = F
   }
   #cat("R2: ",r2,"\n")
   #cat("calc.PW------------","\n")
@@ -174,7 +175,7 @@ stepwise.VT <- function (data, alpha=0.1, mode=c("MRA","MODWT","AT"), wf, method
 #' dp <- window(obs.mon[,lab.names],start=c(1950,1),end=c(1979,12))
 #'
 #' data <- list(x=x,dp=matrix(dp, ncol=ncol(dp)))
-#' dwt = stepwise.VT(data, mode=mode, wf=wf)
+#' dwt = stepwise.VT(data, mode=mode, wf=wf, flag="biased")
 #' #--------------------------------------
 #' ###validation
 #' x <- window(SPI.12[,station.id],start=c(1980,1),end=c(2009,12))
@@ -256,16 +257,14 @@ calc.scaleSTDratio <- function (x, zin, zout)
 
 }
 #-------------------------------------------------------------------------------
-#' R2 threshold via re-sampling
+#' R2 threshold by re-sampling approach
 #'
 #' @param z.vt  Identified independent variables
 #' @param x     Response or dependent variable
 #' @param prob  Probability with values in [0,1].
 #'
-#' @return
+#' @return A quantile assosciated with prob.
 #' @export
-#'
-#' @examples
 #'
 r2.boot <- function(z.vt, x, prob){
 
@@ -427,5 +426,3 @@ pw.calc <- function(x, z, cpyPIC){
   }
   return(list(pw=wt))
 }
-
-

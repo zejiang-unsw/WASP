@@ -4,8 +4,10 @@
 #' @param y.mra       Decomposed frequency components (d1,d2,..,aJ).
 #' @param limits.x    x limit for plot.
 #' @param limits.y    y limit for plot.
+#' @param type        type of wavelet coefficients, details or approximations
+#' @param ...         arguments for plot()
 #'
-#' @return A plot with origianl time series and decomposed frequency components.
+#' @return A plot with original time series and decomposed frequency components.
 #' @export
 #'
 #' @examples
@@ -35,10 +37,10 @@
 #' var(x);sum(apply(x.mra.m[1:n,],2,var))                  #variance check
 #'
 #' limits.x <- c(0,n); limits.y <- c(-3,3)
-#' mra.plot(x, x.mra.m, limits.x, limits.y)
+#' mra.plot(x, x.mra.m, limits.x, limits.y, type="details")
 
-mra.plot <- function(y, y.mra, limits.x, limits.y, type=c("details","coefs"),...){
-
+mra.plot <- function(y, y.mra, limits.x, limits.y, type=c("details","coefs"),...)
+{
   if(type=="details"){
       ylab=c("d", "a")
   } else {
@@ -76,22 +78,26 @@ mra.plot <- function(y, y.mra, limits.x, limits.y, type=c("details","coefs"),...
 #'
 #' @return A plot with variance structure before and after variance transformation.
 #' @export
+#' @import ggplot2
 #'
 #' @examples
 #' data("data.HL")
 #' data("data.SW1")
+#'
 #' #variance transfrom
-#' dwt.SW1<- dwt.vt(data.SW1, wf, J, method, pad, boundary)
+#' dwt.SW1<- dwt.vt(data.SW1[[1]], wf="d4", J=7, method="dwt",
+#' pad="zero", boundary="periodic", cov.opt="auto")
 #'
 #' #plot
 #' fig1 <- fig.dwt.vt(dwt.SW1)
 #' fig1
 #'
 #' #variance transfrom
-#' dwt.HL<- dwt.vt(data.HL, wf, J, method, pad, boundary)
+#' dwt.HL<- dwt.vt(data.HL[[1]], wf="d4", J=7, method="dwt",
+#' pad="zero", boundary="periodic", cov.opt="auto")
 #'
 #' #plot
-#' fig2 <- fig.vt(dwt.HL)
+#' fig2 <- fig.dwt.vt(dwt.HL)
 #' fig2
 
 fig.dwt.vt <- function(dwt.data){
@@ -126,18 +132,18 @@ fig.dwt.vt <- function(dwt.data){
   dp.Dj.n$Group <- 3
 
   df <- cbind(Level=rep(1:length(idwt.x),3),rbind(x.Dj, dp.Dj, dp.Dj.n))
-  df.n <- gather(df, Predictor, Value, 2:(ndim+1))
+  df.n <- tidyr::gather(df, Predictor, Value, 2:(ndim+1))
   df.n$Predictor <- factor(df.n$Predictor, levels=paste0("X",1:ndim))
 
   #barplot+lineplot
-  fig <- ggplot(df.n[df.n$Group!=1,], aes(factor(Level), Value)) +
+  fig <- ggplot2::ggplot(df.n[df.n$Group!=1,], aes(factor(Level), Value)) +
     geom_bar(aes(fill = factor(Group)), position = "dodge", stat="identity") +
     geom_line(data=df.n[df.n$Group==1,],aes(x=factor(Level), y=Value),group=1) +
     facet_grid(Predictor~., scales = "free", space = "free") +
 
-    scale_y_continuous(breaks=seq(0,1,0.5), limits=c(0,1))
+    scale_y_continuous(breaks=seq(0,1,0.5), limits=c(0,1)) +
 
-    scale_fill_manual(values=c("red","blue"))+
+    scale_fill_manual(values=c("red","blue")) +
 
     xlab("Decomposition level") +
     ylab("Variance (percent)") +
