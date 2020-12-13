@@ -92,7 +92,7 @@ stepwise.VT <- function (data, alpha=0.1, nvarmax=4, mode=c("MRA","MODWT","AT"),
     # picthres <- qt((0.5 + alpha/2), df)
 
 	  #method 1 and 2
-    u <- x-knnregl1cv(x, z.vt)
+    u <- x-knnregl1cv(x, z.vt[1:n, ])
     #u <- lm.fit(z.vt, x)$residuals
     r2 <- c(r2, 1 - sum(u^2)/sum((x - mean(x))^2))
 
@@ -399,7 +399,7 @@ pic.calc <- function(X, Y, Z, mode, wf, method="dwt", pad="zero",
 
   y.in = dwt.list$dp.n
 
-  pmi <- apply(y.in, 2, function(i) pmi.calc(x.in,i))
+  pmi <- apply(y.in[1:n,], 2, function(i) pmi.calc(x.in,i))
   pmi[pmi<0] <- 0
   pic <- sqrt(1-exp(-2*pmi))
 
