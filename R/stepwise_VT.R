@@ -5,6 +5,7 @@
 #' @param nvarmax The maximum number of variables to be selected.
 #' @param mode    A mode of variance transformation, i.e., MRA, MODWT, or AT
 #' @param wf      Wavelet family
+#' @param J      	Specifies the depth of the decomposition. This must be a number less than or equal to log(length(x),2).
 #' @param method  Either "dwt" or "modwt" of MRA.
 #' @param pad      The method used for extend data to dyadic size. Use "per", "zero", or "sym".
 #' @param boundary Character string specifying the boundary condition. If boundary=="periodic" the default, then the vector you decompose is assumed to be periodic on its defined interval, if boundary=="reflection", the vector beyond its boundaries is assumed to be a symmetric reflection of itself.
@@ -41,7 +42,7 @@
 #' {
 #'   ts.plot(cbind(dwt$dp[,i], dwt$dp.n[,i]), xlab="NA", col=1:2)
 #' }
-stepwise.VT <- function (data, alpha=0.1, nvarmax=4, mode=c("MRA","MODWT","AT"), wf, method="dwt",pad="zero",
+stepwise.VT <- function (data, alpha=0.1, nvarmax=4, mode=c("MRA","MODWT","AT"), wf, J, method="dwt",pad="zero",
                          boundary="periodic", cov.opt="auto", flag="biased", detrend=F)
 {
   x = as.matrix(data$x)
@@ -62,7 +63,7 @@ stepwise.VT <- function (data, alpha=0.1, nvarmax=4, mode=c("MRA","MODWT","AT"),
     pictemp = rep(0, npicmax)
     y = py[, icoloutz]
 
-    temp = pic.calc(x,y,z, mode, wf, method, pad, boundary, cov.opt, flag, detrend)
+    temp = pic.calc(x,y,z, mode, wf, J, method, pad, boundary, cov.opt, flag, detrend)
     pictemp = temp$pic
 
     pytmp = temp$py
@@ -154,6 +155,7 @@ stepwise.VT <- function (data, alpha=0.1, nvarmax=4, mode=c("MRA","MODWT","AT"),
 #' Calculate stepwise high order VT in validation
 #'
 #' @param data    A list of data, including response and predictors
+#' @param J      	Specifies the depth of the decomposition. This must be a number less than or equal to log(length(x),2).
 #' @param dwt     Output from dwt.vt(), including the transformation covariance
 #' @param mode    A mode of variance transformation, i.e., MRA, MODWT, or AT
 #' @param detrend Detrend the input time series or just center, default (F)
@@ -192,7 +194,7 @@ stepwise.VT <- function (data, alpha=0.1, nvarmax=4, mode=c("MRA","MODWT","AT"),
 #' {
 #'   ts.plot(cbind(dwt.val$dp[,i], dwt.val$dp.n[,i]), xlab="NA", col=1:2)
 #' }
-stepwise.VT.val <- function (data, dwt, mode=c("MRA","MODWT","AT"), detrend=F)
+stepwise.VT.val <- function (data, J, dwt, mode=c("MRA","MODWT","AT"), detrend=F)
 {
   # initialization
   x= data$x; py= as.matrix(data$dp)
@@ -204,7 +206,7 @@ stepwise.VT.val <- function (data, dwt, mode=c("MRA","MODWT","AT"), detrend=F)
   #Maximum decomposition level J
   n <- length(x)
   #if(wf=="haar") J <- ceiling(log(n/(2*v-1))/log(2))-1 else J <- ceiling(log(n/(2*v-1))/log(2))#(Kaiser, 1994)
-  J <- floor(log(n/(2*v-1))/log(2))
+  if(is.null(J)) J <- floor(log(n/(2*v-1))/log(2))
 
   dwt.n = c(dwt, method=method, boundary=boundary, pad=pad)
   dp = dp.n= as.matrix(py[,cpy])
@@ -348,6 +350,7 @@ pmi.calc <- function(X, Y) {
 # @param Y       A matrix of new predictors.
 # @param Z       A matrix of pre-existing predictors that could be NULL if no prior predictors exist.
 # @param mode    A mode of variance transfomration, i.e., MRA, MODWT, or AT
+# @param J       The maximum decomposition level
 # @param wf      Wavelet family
 # @param method  Either "dwt" or "modwt" of MRA.
 # @param pad      The method used for extend data to dyadic size. Use "per", "zero", or "sym".
@@ -362,7 +365,7 @@ pmi.calc <- function(X, Y) {
 # @references Sharma, A., Mehrotra, R., 2014. An information theoretic alternative to model a natural system using observational information alone. Water Resources Research, 50(1): 650-660.
 # @references Galelli S., Humphrey G.B., Maier H.R., Castelletti A., Dandy G.C. and Gibbs M.S. (2014) An evaluation framework for input variable selection algorithms for environmental data-driven models, Environmental Modelling and Software, 62, 33-51, DOI: 10.1016/j.envsoft.2014.08.015.
 
-pic.calc <- function(X, Y, Z, mode, wf, method="dwt", pad="zero",
+pic.calc <- function(X, Y, Z, mode, wf, J, method="dwt", pad="zero",
                      boundary="periodic", cov.opt="auto", flag="biased", detrend=F)
 {
 
@@ -372,7 +375,7 @@ pic.calc <- function(X, Y, Z, mode, wf, method="dwt", pad="zero",
   #Maximum decomposition level J
   n <- length(X)
   #if(wf=="haar") J <- ceiling(log(n/(2*v-1))/log(2))-1 else J <- ceiling(log(n/(2*v-1))/log(2))#(Kaiser, 1994)
-  J <- floor(log2(n/(2*(2*v-1))+1))
+  if(is.null(J)) J <- floor(log2(n/(2*(2*v-1))+1))
 
   if(is.null(Z)){
     x.in <- X
