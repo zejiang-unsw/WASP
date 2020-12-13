@@ -10,6 +10,7 @@ stepwise.VT(
   nvarmax = 4,
   mode = c("MRA", "MODWT", "AT"),
   wf,
+  J,
   method = "dwt",
   pad = "zero",
   boundary = "periodic",
@@ -28,6 +29,8 @@ stepwise.VT(
 \item{mode}{A mode of variance transformation, i.e., MRA, MODWT, or AT}
 
 \item{wf}{Wavelet family}
+
+\item{J}{Specifies the depth of the decomposition. This must be a number less than or equal to log(length(x),2).}
 
 \item{method}{Either "dwt" or "modwt" of MRA.}
 

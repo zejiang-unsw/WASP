@@ -4,10 +4,12 @@
 \alias{stepwise.VT.val}
 \title{Calculate stepwise high order VT in validation}
 \usage{
-stepwise.VT.val(data, dwt, mode = c("MRA", "MODWT", "AT"), detrend = F)
+stepwise.VT.val(data, J, dwt, mode = c("MRA", "MODWT", "AT"), detrend = F)
 }
 \arguments{
 \item{data}{A list of data, including response and predictors}
+
+\item{J}{Specifies the depth of the decomposition. This must be a number less than or equal to log(length(x),2).}
 
 \item{dwt}{Output from dwt.vt(), including the transformation covariance}
 
