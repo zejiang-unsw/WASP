@@ -13,7 +13,7 @@ Description: The package WASP (variance transformation) is used for system model
 License: GPL-3 + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.6.3)
+Depends: R (>= 3.6.0)
 Imports: 
     waveslim, stats, tidyr, ggplot2
 Suggests: 

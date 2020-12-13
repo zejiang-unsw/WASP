@@ -37,6 +37,7 @@ dp <- window(obs.mon[,lab.names],start=c(1950,1),end=c(1979,12))
 
 data <- list(x=x,dp=matrix(dp, ncol=ncol(dp)))
 dwt = stepwise.VT(data, mode=mode, wf=wf, flag="biased")
+cpy <- dwt$cpy
 #--------------------------------------
 ###validation
 x <- window(SPI.12[,station.id],start=c(1980,1),end=c(2009,12))
@@ -46,8 +47,8 @@ data.n <- list(x=x,dp=matrix(dp, ncol=ncol(dp)))
 dwt.val = stepwise.VT.val(data.n, dwt, mode)
 
 ###plot transformed predictor before and after
-par(mfrow=c(ncol(dp),1), mar=c(0,3,2,1))
-for(i in 1:ncol(dp))
+par(mfrow=c(length(cpy),1), mar=c(0,3,2,1))
+for(i in 1:length(cpy))
 {
   ts.plot(cbind(dwt.val$dp[,i], dwt.val$dp.n[,i]), xlab="NA", col=1:2)
 }

@@ -145,7 +145,7 @@ stepwise.VT <- function (data, alpha=0.1, nvarmax=4, mode=c("MRA","MODWT","AT"),
     return(list(cpy = cpy, cpyPIC = cpyPIC, wt = outwt,lstwet = lstwt,
                 x = x, py = py, r2=r2,
                 dp=z.n, dp.n=z.vt, S=S,
-                wavelet=wf))
+                wavelet=wf, method=method, pad=pad, boundary=boundary))
   } else {
     message("None of the provided predictors is related to the response variable")
   }
@@ -177,6 +177,7 @@ stepwise.VT <- function (data, alpha=0.1, nvarmax=4, mode=c("MRA","MODWT","AT"),
 #'
 #' data <- list(x=x,dp=matrix(dp, ncol=ncol(dp)))
 #' dwt = stepwise.VT(data, mode=mode, wf=wf, flag="biased")
+#' cpy <- dwt$cpy
 #' #--------------------------------------
 #' ###validation
 #' x <- window(SPI.12[,station.id],start=c(1980,1),end=c(2009,12))
@@ -186,8 +187,8 @@ stepwise.VT <- function (data, alpha=0.1, nvarmax=4, mode=c("MRA","MODWT","AT"),
 #' dwt.val = stepwise.VT.val(data.n, dwt, mode)
 #'
 #' ###plot transformed predictor before and after
-#' par(mfrow=c(ncol(dp),1), mar=c(0,3,2,1))
-#' for(i in 1:ncol(dp))
+#' par(mfrow=c(length(cpy),1), mar=c(0,3,2,1))
+#' for(i in 1:length(cpy))
 #' {
 #'   ts.plot(cbind(dwt.val$dp[,i], dwt.val$dp.n[,i]), xlab="NA", col=1:2)
 #' }
@@ -361,7 +362,7 @@ pmi.calc <- function(X, Y) {
 # @references Sharma, A., Mehrotra, R., 2014. An information theoretic alternative to model a natural system using observational information alone. Water Resources Research, 50(1): 650-660.
 # @references Galelli S., Humphrey G.B., Maier H.R., Castelletti A., Dandy G.C. and Gibbs M.S. (2014) An evaluation framework for input variable selection algorithms for environmental data-driven models, Environmental Modelling and Software, 62, 33-51, DOI: 10.1016/j.envsoft.2014.08.015.
 
-pic.calc <- function(X, Y, Z, mode, wf, method="dwt",pad="zero",
+pic.calc <- function(X, Y, Z, mode, wf, method="dwt", pad="zero",
                      boundary="periodic", cov.opt="auto", flag="biased", detrend=F)
 {
 
