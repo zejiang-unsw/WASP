@@ -375,7 +375,7 @@ pic.calc <- function(X, Y, Z, mode, wf, J, method="dwt", pad="zero",
   #Maximum decomposition level J
   n <- length(X)
   #if(wf=="haar") J <- ceiling(log(n/(2*v-1))/log(2))-1 else J <- ceiling(log(n/(2*v-1))/log(2))#(Kaiser, 1994)
-  if(is.null(J)) J <- floor(log2(n/(2*(2*v-1))+1))
+  if(is.null(J)) J <- floor(log(n/(2*v-1))/log(2))
 
   if(is.null(Z)){
     x.in <- X
