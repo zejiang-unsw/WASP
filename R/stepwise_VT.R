@@ -206,7 +206,7 @@ stepwise.VT.val <- function (data, J, dwt, mode=c("MRA","MODWT","AT"), detrend=F
   #Maximum decomposition level J
   n <- length(x)
   #if(wf=="haar") J <- ceiling(log(n/(2*v-1))/log(2))-1 else J <- ceiling(log(n/(2*v-1))/log(2))#(Kaiser, 1994)
-  if(is.null(J)) J <- floor(log(n/(2*v-1))/log(2))
+  if(missing(J)) J <- floor(log(n/(2*v-1))/log(2))
 
   dwt.n = c(dwt, method=method, boundary=boundary, pad=pad)
   dp = dp.n= as.matrix(py[,cpy])
@@ -375,7 +375,7 @@ pic.calc <- function(X, Y, Z, mode, wf, J, method="dwt", pad="zero",
   #Maximum decomposition level J
   n <- length(X)
   #if(wf=="haar") J <- ceiling(log(n/(2*v-1))/log(2))-1 else J <- ceiling(log(n/(2*v-1))/log(2))#(Kaiser, 1994)
-  if(is.null(J)) J <- floor(log(n/(2*v-1))/log(2))
+  if(missing(J)) J <- floor(log(n/(2*v-1))/log(2))
 
   if(is.null(Z)){
     x.in <- X
