@@ -45,3 +45,6 @@ vignettes/EMS2020_R1.Rmd
 vignettes/EMS2020_R1.pdf
 vignettes/EMS2020.Rmd
 vignettes/code/EMS2020_stepwiseVT.R
+vignettes/*.m
+vignettes/*.txt
+vignettes/*.xlsx
