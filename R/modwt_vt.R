@@ -17,6 +17,8 @@
 #' @examples
 #' ###real-world example
 #' data(Ind_AWAP.2.5)
+#' data(obs.mon)
+#' data(SPI.12)
 #' x <- window(SPI.12,start=c(1950,1),end=c(2009,12))
 #' dp <- window(obs.mon,start=c(1950,1),end=c(2009,12))
 #'
@@ -51,7 +53,8 @@
 #' lines(x = bar[2,], y = sapply(x.modwt,var)/sum(sapply(x.modwt,var)))
 #' points(x = bar[2,], y = sapply(x.modwt,var)/sum(sapply(x.modwt,var)))
 
-modwt.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg"), flag="biased", detrend=F)
+modwt.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg"),
+                     flag="biased", detrend=FALSE)
 {
   # initialization
   x= data$x; dp= as.matrix(data$dp)
@@ -206,7 +209,7 @@ modwt.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg"), flag=
 #'
 #' }
 
-modwt.vt.val <- function(data, J, dwt, detrend=F){
+modwt.vt.val <- function(data, J, dwt, detrend=FALSE){
 
   # initialization
   x= data$x; dp= as.matrix(data$dp)

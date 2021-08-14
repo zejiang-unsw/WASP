@@ -21,6 +21,9 @@
 #'
 #' @examples
 #' ###Real-world example
+#' data("rain.mon")
+#' data("obs.mon")
+#' op <- par()
 #' mode <- switch(1,"MRA", "MODWT","AT")
 #' wf="d4"
 #' station.id = 5 # station to investigate
@@ -33,17 +36,17 @@
 #'
 #' data <- list(x=x,dp=matrix(dp, ncol=ncol(dp)))
 #'
-#' dwt = stepwise.VT(data, mode=mode, wf=wf, flag="biased")
+#' dwt <- stepwise.VT(data, mode=mode, wf=wf, flag="biased")
 #'
 #' ###plot transformed predictor before and after
 #' cpy <- dwt$cpy
 #' par(mfrow=c(length(cpy),1), mar=c(2,3,2,1))
-#' for(i in 1:length(cpy))
-#' {
+#' for(i in seq_along(cpy)) {
 #'   ts.plot(cbind(dwt$dp[,i], dwt$dp.n[,i]), xlab="NA", col=1:2)
 #' }
+#' par(op)
 stepwise.VT <- function (data, alpha=0.1, nvarmax=4, mode=c("MRA","MODWT","AT"), wf, J, method="dwt",pad="zero",
-                         boundary="periodic", cov.opt="auto", flag="biased", detrend=F)
+                         boundary="periodic", cov.opt="auto", flag="biased", detrend=FALSE)
 {
   x = as.matrix(data$x)
   py= as.matrix(data$dp)
@@ -165,6 +168,8 @@ stepwise.VT <- function (data, alpha=0.1, nvarmax=4, mode=c("MRA","MODWT","AT"),
 #'
 #' @examples
 #' ###Real-world example
+#' data("rain.mon")
+#' data("obs.mon")
 #' mode <- switch(1,"MRA", "MODWT","a trous")
 #' wf="d4"
 #' station.id = 5 # station to investigate
@@ -178,7 +183,7 @@ stepwise.VT <- function (data, alpha=0.1, nvarmax=4, mode=c("MRA","MODWT","AT"),
 #' dp <- window(obs.mon[,lab.names],start=c(1950,1),end=c(1979,12))
 #'
 #' data <- list(x=x,dp=matrix(dp, ncol=ncol(dp)))
-#' dwt = stepwise.VT(data, mode=mode, wf=wf, flag="biased")
+#' dwt <- stepwise.VT(data, mode=mode, wf=wf, flag="biased")
 #' cpy <- dwt$cpy
 #' #--------------------------------------
 #' ###validation
@@ -186,7 +191,7 @@ stepwise.VT <- function (data, alpha=0.1, nvarmax=4, mode=c("MRA","MODWT","AT"),
 #' dp <- window(obs.mon[,lab.names],start=c(1980,1),end=c(2009,12))
 #'
 #' data.n <- list(x=x,dp=matrix(dp, ncol=ncol(dp)))
-#' dwt.val = stepwise.VT.val(data.n, dwt, mode)
+#' dwt.val <- stepwise.VT.val(data=data.n, dwt=dwt, mode=mode)
 #'
 #' ###plot transformed predictor before and after
 #' par(mfrow=c(length(cpy),1), mar=c(0,3,2,1))
@@ -194,7 +199,7 @@ stepwise.VT <- function (data, alpha=0.1, nvarmax=4, mode=c("MRA","MODWT","AT"),
 #' {
 #'   ts.plot(cbind(dwt.val$dp[,i], dwt.val$dp.n[,i]), xlab="NA", col=1:2)
 #' }
-stepwise.VT.val <- function (data, J, dwt, mode=c("MRA","MODWT","AT"), detrend=F)
+stepwise.VT.val <- function (data, J, dwt, mode=c("MRA","MODWT","AT"), detrend=FALSE)
 {
   # initialization
   x= data$x; py= as.matrix(data$dp)
@@ -431,3 +436,4 @@ pw.calc <- function(x, z, cpyPIC){
   }
   return(list(pw=wt))
 }
+

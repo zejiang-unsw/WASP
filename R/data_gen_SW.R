@@ -20,7 +20,6 @@
 #' ts.plot(ts(data.SW1$x),ts(data.SW3$x),col=c("black","red"))
 #' plot.ts(cbind(data.SW1$x,data.SW1$dp))
 #' plot.ts(cbind(data.SW3$x,data.SW3$dp))
-
 data.gen.SW<-function(nobs=512,fp=25,fd,sd.x=0.1,sd.y=0.1)
 {
 

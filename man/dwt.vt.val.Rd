@@ -4,7 +4,7 @@
 \alias{dwt.vt.val}
 \title{Variance Transformation Operation for Validation}
 \usage{
-dwt.vt.val(data, J, dwt, detrend = F)
+dwt.vt.val(data, J, dwt, detrend = FALSE)
 }
 \arguments{
 \item{data}{A list of response x and dependent variables dp.}

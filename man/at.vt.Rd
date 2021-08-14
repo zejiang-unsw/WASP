@@ -11,7 +11,7 @@ at.vt(
   boundary,
   cov.opt = c("auto", "pos", "neg"),
   flag = "biased",
-  detrend = F
+  detrend = FALSE
 )
 }
 \arguments{

@@ -4,7 +4,7 @@
 \alias{stepwise.VT.val}
 \title{Calculate stepwise high order VT in validation}
 \usage{
-stepwise.VT.val(data, J, dwt, mode = c("MRA", "MODWT", "AT"), detrend = F)
+stepwise.VT.val(data, J, dwt, mode = c("MRA", "MODWT", "AT"), detrend = FALSE)
 }
 \arguments{
 \item{data}{A list of data, including response and predictors}
@@ -25,6 +25,8 @@ Calculate stepwise high order VT in validation
 }
 \examples{
 ###Real-world example
+data("rain.mon")
+data("obs.mon")
 mode <- switch(1,"MRA", "MODWT","a trous")
 wf="d4"
 station.id = 5 # station to investigate
@@ -38,7 +40,7 @@ x <- window(SPI.12[,station.id],start=c(1950,1),end=c(1979,12))
 dp <- window(obs.mon[,lab.names],start=c(1950,1),end=c(1979,12))
 
 data <- list(x=x,dp=matrix(dp, ncol=ncol(dp)))
-dwt = stepwise.VT(data, mode=mode, wf=wf, flag="biased")
+dwt <- stepwise.VT(data, mode=mode, wf=wf, flag="biased")
 cpy <- dwt$cpy
 #--------------------------------------
 ###validation
@@ -46,7 +48,7 @@ x <- window(SPI.12[,station.id],start=c(1980,1),end=c(2009,12))
 dp <- window(obs.mon[,lab.names],start=c(1980,1),end=c(2009,12))
 
 data.n <- list(x=x,dp=matrix(dp, ncol=ncol(dp)))
-dwt.val = stepwise.VT.val(data.n, dwt, mode)
+dwt.val <- stepwise.VT.val(data=data.n, dwt=dwt, mode=mode)
 
 ###plot transformed predictor before and after
 par(mfrow=c(length(cpy),1), mar=c(0,3,2,1))

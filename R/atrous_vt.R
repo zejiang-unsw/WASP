@@ -47,7 +47,8 @@
 #'
 #' }
 
-at.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg"), flag="biased", detrend=F)
+at.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg"),
+                  flag="biased", detrend=FALSE)
 {
   # initialization
   x= data$x; dp= as.matrix(data$dp)
@@ -61,7 +62,7 @@ at.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg"), flag="bi
   for(i in 1:ndim){
     # center or detrend
     if(!detrend){
-      dp.c <- scale(dp[,i],scale=F)
+      dp.c <- scale(dp[,i],scale=FALSE)
     } else {
       #dp.c <- lm(dp[,i]~c(1:n))$resid
       dp.c <- dp[,i]-smooth.spline(1:n, dp[,i], spar=1)$y
@@ -200,7 +201,7 @@ at.vt <- function(data, wf, J, boundary, cov.opt=c("auto","pos","neg"), flag="bi
 #'
 #' }
 
-at.vt.val <- function(data, J, dwt, detrend=F){
+at.vt.val <- function(data, J, dwt, detrend=FALSE){
 
   # initialization
   x= data$x; dp= as.matrix(data$dp)

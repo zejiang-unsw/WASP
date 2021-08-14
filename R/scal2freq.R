@@ -4,10 +4,21 @@
 #' @param scale a scale
 #' @param delta the sampling period.
 #'
-#' @return
+#' @return A vector of two numbers: frequency and period.
 #' @export
 #'
 #' @examples
+#' delta=1/12 # monthly data
+#' scales=2^(1:7)
+#'
+#' for(wf in c("haar", "d4", "d6", "d8", "d16")[1:5]){
+#'
+#'   df1 <- scal2freqM(wf,scales,delta)
+#'   df2 <- scal2freqR(wf,scales,delta)
+#'
+#'   print(cbind(df1$frequency, df2$frequency))
+#'
+#' }
 scal2freqM <- function(wf, scale, delta){
 
   if(TRUE){
@@ -41,10 +52,21 @@ scal2freqM <- function(wf, scale, delta){
 #' @param scale a scale
 #' @param delta the sampling period.
 #'
-#' @return
+#' @return A vector of two numbers: frequency and period.
 #' @export
 #'
 #' @examples
+#' delta=1/12 # monthly data
+#' scales=2^(1:7)
+#'
+#' for(wf in c("haar", "d4", "d6", "d8", "d16")[1:5]){
+#'
+#'   df1 <- scal2freqM(wf,scales,delta)
+#'   df2 <- scal2freqR(wf,scales,delta)
+#'
+#'   print(cbind(df1$frequency, df2$frequency))
+#'
+#' }
 scal2freqR <- function(wf, scale, delta){
 
   if(wf %in% c("haar", "d4", "d6", "d8", "d16")){

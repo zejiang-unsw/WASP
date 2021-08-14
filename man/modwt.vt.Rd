@@ -11,7 +11,7 @@ modwt.vt(
   boundary,
   cov.opt = c("auto", "pos", "neg"),
   flag = "biased",
-  detrend = F
+  detrend = FALSE
 )
 }
 \arguments{
@@ -38,6 +38,8 @@ Variance Transformation Operation - MODWT
 \examples{
 ###real-world example
 data(Ind_AWAP.2.5)
+data(obs.mon)
+data(SPI.12)
 x <- window(SPI.12,start=c(1950,1),end=c(2009,12))
 dp <- window(obs.mon,start=c(1950,1),end=c(2009,12))
 

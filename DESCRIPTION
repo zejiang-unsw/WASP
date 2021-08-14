@@ -1,29 +1,32 @@
 Package: WASP
-Title: WAvelet System Prediction
+Title: Wavelet System Prediction
 Version: 1.3.3
-Authors@R: 
-    person(given = "Ze",
-           family = "Jiang",
-           role = c("aut", "cre"),
-           email = "ze.jiang@unsw.edu.au",
-           comment = c(ORCID = "0000-0002-3472-0829"))
-Author: Ze Jiang [aut, cre] (<https://orcid.org/0000-0002-3472-0829>)
+Author: Ze Jiang [aut, cre] (<https://orcid.org/0000-0002-3472-0829>),
+        Ashish Sharma [aut] (<https://orcid.org/0000-0002-6758-0519>),
+        Fiona Johnson [aut] (<https://orcid.org/0000-0001-5708-1807>)
 Maintainer: Ze Jiang <ze.jiang@unsw.edu.au>
-Description: The package WASP (variance transformation) is used for system modelling and prediction. 
-License: GPL-3 + file LICENSE
+Description: The wavelet-based variance transformation method is used for system modelling and prediction. Details of methodologies used in the package can be found in Jiang, Z., Sharma, A., & Johnson, F. (2020) <doi:10.1029/2019WR026962>, Jiang, Z., Rashid, M. M., Johnson, F., & Sharma, A. (2020) <doi:10.1016/j.envsoft.2020.104907>, and Mehrotra, R., & Sharma, A. (2006). <doi:10.1016/j.advwatres.2005.08.007>.
+License: GPL-3
 Encoding: UTF-8
-LazyData: true
 Depends: R (>= 3.6.0)
+URL: https://github.com/zejiang-unsw/WASP#readme
+BugReports: https://github.com/zejiang-unsw/WASP/issues
 Imports: 
     waveslim, stats, tidyr, ggplot2
 Suggests: 
-    zoo,
     sp,
+    zoo,
+    FNN,
     readr,
     knitr,
+    cowplot,
+    bookdown,
     rmarkdown,
     SPEI,
     NPRED,
+    fracdiff,
+    synthesis,
+    kableExtra,
     testthat
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr

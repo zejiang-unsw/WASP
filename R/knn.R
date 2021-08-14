@@ -16,6 +16,7 @@
 #' @references Sharma, A., Tarboton, D.G. and Lall, U., 1997. Streamflow simulation: A nonparametric approach. Water resources research, 33(2), pp.291-308.
 #' @references Sharma, A. and O'Neill, R., 2002. A nonparametric approach for representing interannual dependence in monthly streamflow sequences. Water resources research, 38(7), pp.5-1.
 #' @examples
+#' \donttest{
 #' #AR9 model   x(i)=0.3*x(i-1)-0.6*x(i-4)-0.5*x(i-9)+eps
 #' data.ar9<-data.gen.ar9(500)
 #' x = data.ar9$x     #response
@@ -33,11 +34,11 @@
 #'
 #' zout <- ts(data.gen.ar9(500,ndim=length(ans.ar9$cpy))$dp) #new input
 #' xhat1=xhat2=x
-#' xhat1 <- NPRED::knn(x,z,zout,k=5,reg=TRUE,extrap=FALSE) # without extrapolation
-#' xhat2 <- NPRED::knn(x,z,zout,k=5,reg=TRUE,extrap=TRUE) # with extrapolation
+#' xhat1 <- knn(x,z,zout,k=5,reg=TRUE,extrap=FALSE) # without extrapolation
+#' xhat2 <- knn(x,z,zout,k=5,reg=TRUE,extrap=TRUE) # with extrapolation
 #'
 #' ts.plot(ts(x),ts(xhat1),ts(xhat2),col=c("black","red","blue"),ylim=c(-5,5), lwd=c(2,2,1))
-
+#' }
 knn <- function (x, z, zout, k = 0, pw, reg = T, nensemble = 100, tailcorrection = T,
                  tailprob = 0.25, tailfac = 0.2, extrap = T)
 {

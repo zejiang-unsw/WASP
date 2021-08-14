@@ -68,15 +68,6 @@ NULL
 #'@usage data(SPI.12)
 NULL
 
-#'@title Sample data: Standardized Precipitation Index with 36 month accumulation period.
-#'@description A dataset containing 1200 rows (data length) and 252 columns.
-#'
-#'@docType data
-#'@keywords datasets
-#'@name SPI.36
-#'@usage data(SPI.36)
-NULL
-
 #'@title Sample data: Sinewave model 1 (SW1):\deqn{ x_{t}= sin(2pi*f*t)+eps}
 #'@description A dataset containing 3 lists: a vector of response (x), a matrix of 9 potential predictors (dp) with each column containing one potential predictor, and a vector of true predictor numbers.
 #'

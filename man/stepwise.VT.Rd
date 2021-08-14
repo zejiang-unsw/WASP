@@ -16,7 +16,7 @@ stepwise.VT(
   boundary = "periodic",
   cov.opt = "auto",
   flag = "biased",
-  detrend = F
+  detrend = FALSE
 )
 }
 \arguments{
@@ -52,6 +52,9 @@ Calculate stepwise high order VT in calibration
 }
 \examples{
 ###Real-world example
+data("rain.mon")
+data("obs.mon")
+op <- par()
 mode <- switch(1,"MRA", "MODWT","AT")
 wf="d4"
 station.id = 5 # station to investigate
@@ -64,15 +67,15 @@ dp <- window(obs.mon[,lab.names],start=c(1950,1),end=c(1979,12))
 
 data <- list(x=x,dp=matrix(dp, ncol=ncol(dp)))
 
-dwt = stepwise.VT(data, mode=mode, wf=wf, flag="biased")
+dwt <- stepwise.VT(data, mode=mode, wf=wf, flag="biased")
 
 ###plot transformed predictor before and after
 cpy <- dwt$cpy
 par(mfrow=c(length(cpy),1), mar=c(2,3,2,1))
-for(i in 1:length(cpy))
-{
+for(i in seq_along(cpy)) {
   ts.plot(cbind(dwt$dp[,i], dwt$dp.n[,i]), xlab="NA", col=1:2)
 }
+par(op)
 }
 \references{
 Sharma, A., Mehrotra, R., 2014. An information theoretic alternative to model a natural system using observational information alone. Water Resources Research, 50(1): 650-660.
