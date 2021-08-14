@@ -51,29 +51,33 @@ A list of 2 elements: the column numbers of the meaningful predictors (cpy), and
 Calculate stepwise high order VT in calibration
 }
 \examples{
-###Real-world example
+### Real-world example
 data("rain.mon")
 data("obs.mon")
 op <- par()
-mode <- switch(1,"MRA", "MODWT","AT")
-wf="d4"
-station.id = 5 # station to investigate
-SPI.12 <- SPEI::spi(rain.mon,scale=12)$fitted
+mode <- switch(1,
+  "MRA",
+  "MODWT",
+  "AT"
+)
+wf <- "d4"
+station.id <- 5 # station to investigate
+SPI.12 <- SPEI::spi(rain.mon, scale = 12)$fitted
 lab.names <- colnames(obs.mon)
-#plot.ts(SPI.12[,1:10])
+# plot.ts(SPI.12[,1:10])
 
-x <- window(SPI.12[,station.id],start=c(1950,1),end=c(1979,12))
-dp <- window(obs.mon[,lab.names],start=c(1950,1),end=c(1979,12))
+x <- window(SPI.12[, station.id], start = c(1950, 1), end = c(1979, 12))
+dp <- window(obs.mon[, lab.names], start = c(1950, 1), end = c(1979, 12))
 
-data <- list(x=x,dp=matrix(dp, ncol=ncol(dp)))
+data <- list(x = x, dp = matrix(dp, ncol = ncol(dp)))
 
-dwt <- stepwise.VT(data, mode=mode, wf=wf, flag="biased")
+dwt <- stepwise.VT(data, mode = mode, wf = wf, flag = "biased")
 
-###plot transformed predictor before and after
+### plot transformed predictor before and after
 cpy <- dwt$cpy
-par(mfrow=c(length(cpy),1), mar=c(2,3,2,1))
-for(i in seq_along(cpy)) {
-  ts.plot(cbind(dwt$dp[,i], dwt$dp.n[,i]), xlab="NA", col=1:2)
+par(mfrow = c(length(cpy), 1), mar = c(2, 3, 2, 1))
+for (i in seq_along(cpy)) {
+  ts.plot(cbind(dwt$dp[, i], dwt$dp.n[, i]), xlab = "NA", col = 1:2)
 }
 par(op)
 }

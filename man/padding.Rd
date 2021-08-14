@@ -19,8 +19,8 @@ Padding data to dyadic sample size
 }
 \examples{
 x <- rnorm(360)
-x1 <- padding(x, pad="per")
-x2 <- padding(x, pad="zero")
-x3 <- padding(x, pad="sym")
-ts.plot(cbind(x,x1,x2,x3), col=1:4)
+x1 <- padding(x, pad = "per")
+x2 <- padding(x, pad = "zero")
+x3 <- padding(x, pad = "sym")
+ts.plot(cbind(x, x1, x2, x3), col = 1:4)
 }

@@ -19,6 +19,6 @@ Generate predictor and response data from AR1 model.
 }
 \examples{
 # AR1 model from paper with 9 dummy variables
-data.ar1<-data.gen.ar1(500)
-plot.ts(cbind(data.ar1$x,data.ar1$dp))
+data.ar1 <- data.gen.ar1(500)
+plot.ts(cbind(data.ar1$x, data.ar1$dp))
 }

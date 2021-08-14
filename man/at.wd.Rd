@@ -24,20 +24,20 @@ a trous (AT) based additive decompostion using Daubechies family wavelet
 \examples{
 data(obs.mon)
 
-n <- nrow(obs.mon); v=1
-J <- floor(log(n/(2*v-1))/log(2)) #(Kaiser, 1994)
+n <- nrow(obs.mon)
+v <- 1
+J <- floor(log(n / (2 * v - 1)) / log(2)) # (Kaiser, 1994)
 
 names <- colnames(obs.mon)
 at.atm <- vector("list", ncol(obs.mon))
-for(i in 1:ncol(obs.mon)){
-  tmp <- as.numeric(scale(obs.mon[,i],scale=FALSE))
-  at.atm <- do.call(cbind, at.wd(tmp, wf="haar", J = J, boundary = "periodic"))
+for (i in seq_len(ncol(obs.mon))) {
+  tmp <- as.numeric(scale(obs.mon[, i], scale = FALSE))
+  at.atm <- do.call(cbind, at.wd(tmp, wf = "haar", J = J, boundary = "periodic"))
 
-  plot.ts(cbind(obs.mon[1:n,i],at.atm[1:n,1:9]), main=names[i])
-  print(sum(abs(scale(obs.mon[1:n,i],scale=FALSE)-rowSums(at.atm[1:n,]))))
-
+  plot.ts(cbind(obs.mon[1:n, i], at.atm[1:n, 1:9]), main = names[i])
+  print(sum(abs(scale(obs.mon[1:n, i], scale = FALSE) - rowSums(at.atm[1:n, ]))))
 }
 }
 \references{
-Nason, G. P. (1996). Wavelet shrinkage using cross‐validation. Journal of the Royal Statistical Society: Series B (Methodological), 58(2), 463-479.
+Nason, G. P. (1996). Wavelet shrinkage using cross-validation. Journal of the Royal Statistical Society: Series B (Methodological), 58(2), 463-479.
 }

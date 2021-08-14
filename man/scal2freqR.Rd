@@ -20,15 +20,13 @@ A vector of two numbers: frequency and period.
 Scale to frequency by R
 }
 \examples{
-delta=1/12 # monthly data
-scales=2^(1:7)
+delta <- 1 / 12 # monthly data
+scales <- 2^(1:7)
 
-for(wf in c("haar", "d4", "d6", "d8", "d16")[1:5]){
-
-  df1 <- scal2freqM(wf,scales,delta)
-  df2 <- scal2freqR(wf,scales,delta)
+for (wf in c("haar", "d4", "d6", "d8", "d16")[1:5]) {
+  df1 <- scal2freqM(wf, scales, delta)
+  df2 <- scal2freqR(wf, scales, delta)
 
   print(cbind(df1$frequency, df2$frequency))
-
 }
 }

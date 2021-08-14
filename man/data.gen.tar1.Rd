@@ -21,8 +21,8 @@ Generate predictor and response data from TAR1 model.
 }
 \examples{
 # TAR1 model from paper with total 9 dimensions
-data.tar1<-data.gen.tar1(500)
-plot.ts(cbind(data.tar1$x,data.tar1$dp))
+data.tar1 <- data.gen.tar1(500)
+plot.ts(cbind(data.tar1$x, data.tar1$dp))
 }
 \references{
 Sharma, A. (2000). Seasonal to interannual rainfall probabilistic forecasts for improved water supply management: Part 1—A strategy for system predictor identification. Journal of Hydrology, 239(1-4), 232-239.

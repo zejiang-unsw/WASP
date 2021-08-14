@@ -26,31 +26,33 @@ A plot with original time series and decomposed frequency components.
 Plot function: Plot origianl time series and decomposed frequency components
 }
 \examples{
-###synthetic example
-#frequency, sampled from a given range
-fd <- c(3,5,10,15,25,30,55,70,95)
-data.SW3 <- data.gen.SW(nobs=512,fp=c(15,25,30),fd=fd)
+### synthetic example
+# frequency, sampled from a given range
+fd <- c(3, 5, 10, 15, 25, 30, 55, 70, 95)
+data.SW3 <- data.gen.SW(nobs = 512, fp = c(15, 25, 30), fd = fd)
 
 x <- data.SW3$x
-xx <- padding(x,pad="zero")
-###wavelet transfrom
+xx <- padding(x, pad = "zero")
+### wavelet transfrom
 # wavelet family, extension mode and package
 wf <- "d4" # wavelet family D8 or db4
 boundary <- "periodic"
-pad <-  "zero"
-if(wf!="haar") v <- as.integer(as.numeric(substr(wf,2,3))/2) else v <- 1
+pad <- "zero"
+if (wf != "haar") v <- as.integer(as.numeric(substr(wf, 2, 3)) / 2) else v <- 1
 
-#Maximum decomposition level J
+# Maximum decomposition level J
 n <- length(x)
-J <- ceiling(log(n/(2*v-1))/log(2)) #(Kaiser, 1994)
+J <- ceiling(log(n / (2 * v - 1)) / log(2)) # (Kaiser, 1994)
 
-###decomposition
-x.mra <- waveslim::mra(xx,wf=wf, J=J, method="dwt", boundary="periodic")
-x.mra.m <- matrix(unlist(x.mra), ncol=J+1)
+### decomposition
+x.mra <- waveslim::mra(xx, wf = wf, J = J, method = "dwt", boundary = "periodic")
+x.mra.m <- matrix(unlist(x.mra), ncol = J + 1)
 
-print(sum(abs(x-rowSums(x.mra.m[1:n,]))))               #additive check
-var(x);sum(apply(x.mra.m[1:n,],2,var))                  #variance check
+print(sum(abs(x - rowSums(x.mra.m[1:n, ])))) # additive check
+var(x)
+sum(apply(x.mra.m[1:n, ], 2, var)) # variance check
 
-limits.x <- c(0,n); limits.y <- c(-3,3)
-mra.plot(x, x.mra.m, limits.x, limits.y, type="details")
+limits.x <- c(0, n)
+limits.y <- c(-3, 3)
+mra.plot(x, x.mra.m, limits.x, limits.y, type = "details")
 }

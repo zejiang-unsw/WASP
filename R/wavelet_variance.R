@@ -12,7 +12,7 @@
 non.bdy <- function (x, wf, method = c("dwt","modwt","mra"))
 {
   m <- wave.filter(wf)$length
-  for (j in 1:(length(x) - 1)) {
+  for (j in seq_len((length(x) - 1))) {
     if (method == "dwt")
       n <- ceiling((m - 2) * (1 - 1/2^j))
     else n <- (2^j - 1) * (m - 1)
@@ -58,7 +58,7 @@ wave.var <- function (x, type = "eta3", p = 0.025)
     }
     ci.eta3 <- function(x, y, p) {
         x.length <- unlist(lapply(x, FUN = function(v) sum(!is.na(v))))
-        eta3 <- pmax(x.length/2^(1:length(x)), 1)
+        eta3 <- pmax(x.length/2^(seq_len(length(x))), 1)
         return(data.frame(wavevar = y, lower = eta3 * y/qchisq(1 -
             p, eta3), upper = eta3 * y/qchisq(p, eta3)))
     }

@@ -36,43 +36,47 @@ A list of 8 elements: wf, J, boundary, x (data), dp (data), dp.n (variance trans
 Variance Transformation Operation - MODWT
 }
 \examples{
-###real-world example
+### real-world example
 data(Ind_AWAP.2.5)
 data(obs.mon)
 data(SPI.12)
-x <- window(SPI.12,start=c(1950,1),end=c(2009,12))
-dp <- window(obs.mon,start=c(1950,1),end=c(2009,12))
+x <- window(SPI.12, start = c(1950, 1), end = c(2009, 12))
+dp <- window(obs.mon, start = c(1950, 1), end = c(2009, 12))
 
-for(id in sample(Ind_AWAP.2.5,1)){
+for (id in sample(Ind_AWAP.2.5, 1)) {
+  data <- list(x = x[, id], dp = dp)
+  dwt <- modwt.vt(data, wf = "d4", J = 7, boundary = "periodic", cov.opt = "auto")
 
-  data <- list(x=x[,id],dp=dp)
-  dwt <- modwt.vt(data, wf="d4", J=7, boundary="periodic", cov.opt="auto")
-
-  par(mfrow=c(ncol(dp),1),pty="m",mar=c(1,4,1,2))
-  for(i in 1:ncol(dp))
-    ts.plot(dwt$dp[,i],dwt$dp.n[,i],xlab=NA,col=c("black","red"),lwd=c(2,1))
+  par(mfrow = c(ncol(dp), 1), pty = "m", mar = c(1, 4, 1, 2))
+  for (i in 1:ncol(dp)) {
+    ts.plot(dwt$dp[, i], dwt$dp.n[, i], xlab = NA, col = c("black", "red"), lwd = c(2, 1))
+  }
 }
-###synthetic example
-#frequency, sampled from a given range
-fd <- c(3,5,10,15,25,30,55,70,95)
+### synthetic example
+# frequency, sampled from a given range
+fd <- c(3, 5, 10, 15, 25, 30, 55, 70, 95)
 
-data.SW1 <- data.gen.SW(nobs=512,fp=25,fd=fd)
-dwt.SW1 <- modwt.vt(data.SW1, wf="d4", J=7, boundary="periodic", cov.opt="auto")
+data.SW1 <- data.gen.SW(nobs = 512, fp = 25, fd = fd)
+dwt.SW1 <- modwt.vt(data.SW1, wf = "d4", J = 7, boundary = "periodic", cov.opt = "auto")
 
-x.modwt <- waveslim::modwt(dwt.SW1$x, wf = "d4", n.levels = 7,  boundary = "periodic")
-dp.modwt <- waveslim::modwt(dwt.SW1$dp[,1], wf = "d4", n.levels = 7,  boundary = "periodic")
-dp.vt.modwt <- waveslim::modwt(dwt.SW1$dp.n[,1], wf = "d4", n.levels = 7, boundary = "periodic")
+x.modwt <- waveslim::modwt(dwt.SW1$x, wf = "d4", n.levels = 7, boundary = "periodic")
+dp.modwt <- waveslim::modwt(dwt.SW1$dp[, 1], wf = "d4", n.levels = 7, boundary = "periodic")
+dp.vt.modwt <- waveslim::modwt(dwt.SW1$dp.n[, 1], wf = "d4", n.levels = 7, boundary = "periodic")
 
-sum(sapply(dp.modwt,var)); var(dwt.SW1$dp[,1])
-sum(sapply(dp.vt.modwt,var)); var(dwt.SW1$dp.n[,1])
+sum(sapply(dp.modwt, var))
+var(dwt.SW1$dp[, 1])
+sum(sapply(dp.vt.modwt, var))
+var(dwt.SW1$dp.n[, 1])
 
-data <- rbind(sapply(dp.modwt,var)/sum(sapply(dp.modwt,var)),
-              sapply(dp.vt.modwt,var)/sum(sapply(dp.vt.modwt,var)))
+data <- rbind(
+  sapply(dp.modwt, var) / sum(sapply(dp.modwt, var)),
+  sapply(dp.vt.modwt, var) / sum(sapply(dp.vt.modwt, var))
+)
 
-par(mfrow=c(1,1))
-bar <- barplot(data, beside = TRUE, col=c("red","blue"))
-lines(x = bar[2,], y = sapply(x.modwt,var)/sum(sapply(x.modwt,var)))
-points(x = bar[2,], y = sapply(x.modwt,var)/sum(sapply(x.modwt,var)))
+par(mfrow = c(1, 1))
+bar <- barplot(data, beside = TRUE, col = c("red", "blue"))
+lines(x = bar[2, ], y = sapply(x.modwt, var) / sum(sapply(x.modwt, var)))
+points(x = bar[2, ], y = sapply(x.modwt, var) / sum(sapply(x.modwt, var)))
 }
 \references{
 Z Jiang, A Sharma, and F Johnson. WRR

@@ -39,33 +39,34 @@ Variance Transformation Operation - AT(a trous)
 data(rain.mon)
 data(obs.mon)
 
-##response SPI - calibration
+## response SPI - calibration
 # SPI.cal <- SPI.calc(window(rain.mon, start=c(1949,1), end=c(1979,12)),sc=12)
-SPI.cal <- SPEI::spi(window(rain.mon, start=c(1949,1), end=c(1979,12)),scale=12)$fitted
+SPI.cal <- SPEI::spi(window(rain.mon, start = c(1949, 1), end = c(1979, 12)), scale = 12)$fitted
 
 ## create paired response and predictors dataset for each station
 data.list <- list()
-for(id in 1:ncol(SPI.cal)){
-  x <- window(SPI.cal[,id], start=c(1950,1), end=c(1979,12))
-  dp <- window(obs.mon, start=c(1950,1), end=c(1979,12))
-  data.list[[id]] <- list(x=as.numeric(x), dp=matrix(dp, nrow=nrow(dp)))
+for (id in seq_len(ncol(SPI.cal))) {
+  x <- window(SPI.cal[, id], start = c(1950, 1), end = c(1979, 12))
+  dp <- window(obs.mon, start = c(1950, 1), end = c(1979, 12))
+  data.list[[id]] <- list(x = as.numeric(x), dp = matrix(dp, nrow = nrow(dp)))
 }
 
 ## variance transformation
-dwt.list<- lapply(data.list,
-function(x) at.vt(x, wf="d4", J=7, boundary="periodic", cov.opt="auto"))
+dwt.list <- lapply(
+  data.list,
+  function(x) at.vt(x, wf = "d4", J = 7, boundary = "periodic", cov.opt = "auto")
+)
 
 ## plot original and reconstrcuted predictors for each station
-for(i in 1:length(dwt.list)){
+for (i in seq_len(length(dwt.list))) {
   # extract data
   dwt <- dwt.list[[i]]
-  x <- dwt$x  			      # response
-  dp <- dwt$dp			      # original predictors
-  dp.n <- dwt$dp.n        # variance transformed predictors
+  x <- dwt$x # response
+  dp <- dwt$dp # original predictors
+  dp.n <- dwt$dp.n # variance transformed predictors
 
-  plot.ts(cbind(x,dp))
-  plot.ts(cbind(x,dp.n))
-
+  plot.ts(cbind(x, dp))
+  plot.ts(cbind(x, dp.n))
 }
 }
 \references{

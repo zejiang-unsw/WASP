@@ -35,7 +35,8 @@ data.gen.SW<-function(nobs=512,fp=25,fd,sd.x=0.1,sd.y=0.1)
 
   }
 
-  x <- rowSums(sapply(1:length(index), function(i) sin(2*pi*fd[index[i]]*t))) + rnorm(nobs,0,sd.y)
+  #x <- rowSums(sapply(seq_along(index), function(i) sin(2*pi*fd[index[i]]*t))) + rnorm(nobs,0,sd.y)
+  x <- rowSums(vapply(seq_along(index), function(i) sin(2*pi*fd[index[i]]*t), numeric(length(t)))) + rnorm(nobs,0,sd.y)
 
   data_generated<-list(x=x,
                        dp=dp,

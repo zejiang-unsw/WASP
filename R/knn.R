@@ -17,108 +17,116 @@
 #' @references Sharma, A. and O'Neill, R., 2002. A nonparametric approach for representing interannual dependence in monthly streamflow sequences. Water resources research, 38(7), pp.5-1.
 #' @examples
 #' \donttest{
-#' #AR9 model   x(i)=0.3*x(i-1)-0.6*x(i-4)-0.5*x(i-9)+eps
-#' data.ar9<-data.gen.ar9(500)
-#' x = data.ar9$x     #response
-#' py = data.ar9$dp   #possible predictors
-#' ans.ar9 = NPRED::stepwise.PIC(x,py) #identify the meaningful predictors and estimate partial weights
-#' z = py[,ans.ar9$cpy]    #predictor matrix
-#' pw = ans.ar9$wt         #partial weights
-#' zout = apply(z,2,mean)  #vector denoting where we want outputs, can be a matrix representing grid.
+#' # AR9 model   x(i)=0.3*x(i-1)-0.6*x(i-4)-0.5*x(i-9)+eps
+#' data.ar9 <- data.gen.ar9(500)
+#' x <- data.ar9$x # response
+#' py <- data.ar9$dp # possible predictors
 #'
-#' knn(x,z,zout,reg=TRUE,pw=pw) #knn regression estimate using partial weights.
+#' # identify the meaningful predictors and estimate partial weights
+#' ans.ar9 <- NPRED::stepwise.PIC(x, py)
+#' z <- py[, ans.ar9$cpy] # predictor matrix
+#' pw <- ans.ar9$wt # partial weights
 #'
-#' knn(x,z,zout,reg=FALSE,pw=pw) #alternatively, knn conditional bootstrap (100 realisations).
-#' #Mean of the conditional bootstrap estimate should be
-#' #approximately the same as the regression estimate.
+#' # vector denoting where we want outputs, can be a matrix representing grid.
+#' zout <- apply(z, 2, mean)
 #'
-#' zout <- ts(data.gen.ar9(500,ndim=length(ans.ar9$cpy))$dp) #new input
-#' xhat1=xhat2=x
-#' xhat1 <- knn(x,z,zout,k=5,reg=TRUE,extrap=FALSE) # without extrapolation
-#' xhat2 <- knn(x,z,zout,k=5,reg=TRUE,extrap=TRUE) # with extrapolation
+#' knn(x, z, zout, reg = TRUE, pw = pw) # knn regression estimate using partial weights.
 #'
-#' ts.plot(ts(x),ts(xhat1),ts(xhat2),col=c("black","red","blue"),ylim=c(-5,5), lwd=c(2,2,1))
+#' knn(x, z, zout, reg = FALSE, pw = pw) # alternatively, knn conditional bootstrap (100 realisations).
+#' # Mean of the conditional bootstrap estimate should be
+#' # approximately the same as the regression estimate.
+#'
+#' zout <- ts(data.gen.ar9(500, ndim = length(ans.ar9$cpy))$dp) # new input
+#' xhat1 <- xhat2 <- x
+#' xhat1 <- knn(x, z, zout, k = 5, reg = TRUE, extrap = FALSE) # without extrapolation
+#' xhat2 <- knn(x, z, zout, k = 5, reg = TRUE, extrap = TRUE) # with extrapolation
+#'
+#' ts.plot(ts(x), ts(xhat1), ts(xhat2), col = c("black", "red", "blue"),
+#' ylim = c(-5, 5), lwd = c(2, 2, 1))
 #' }
-knn <- function (x, z, zout, k = 0, pw, reg = T, nensemble = 100, tailcorrection = T,
-                 tailprob = 0.25, tailfac = 0.2, extrap = T)
-{
-  x = as.matrix(x)
-  n = nrow(x)
-  if (k == 0)
-    k = floor(0.5 + 1 * (sqrt(n)))
-  z = as.matrix(z)
-  nz = ncol(z)
-  zout = as.matrix(zout)
-  nczout = ncol(zout)
-  if (nz > 1)
-    if (nczout != nz)
-      zout = t(zout)
-  nzout = nrow(zout)
-  kern = 1/(1:k)/sum(1/(1:k))
-  kerncdf = cumsum(kern)
+knn <- function(x, z, zout, k = 0, pw, reg = TRUE, nensemble = 100, tailcorrection = TRUE,
+                tailprob = 0.25, tailfac = 0.2, extrap = TRUE) {
+  x <- as.matrix(x)
+  n <- nrow(x)
+  if (k == 0) {
+    k <- floor(0.5 + 1 * (sqrt(n)))
+  }
+  z <- as.matrix(z)
+  nz <- ncol(z)
+  zout <- as.matrix(zout)
+  nczout <- ncol(zout)
+  if (nz > 1) {
+    if (nczout != nz) {
+      zout <- t(zout)
+    }
+  }
+  nzout <- nrow(zout)
+  kern <- 1 / (1:k) / sum(1 / (1:k))
+  kerncdf <- cumsum(kern)
   if (tailcorrection) {
-    mink = ceiling(tailfac * k)
-    empcdf = rank(x)/(n + 1)
+    mink <- ceiling(tailfac * k)
+    empcdf <- rank(x) / (n + 1)
   }
   if (missing(pw)) {
-    pw = rep(1, nz)
+    pw <- rep(1, nz)
   }
-  if(extrap){
-    Sxz = var(x,z)
-    Scond = as.matrix(Sxz)
+  if (extrap) {
+    Sxz <- var(x, z)
+    Scond <- as.matrix(Sxz)
   }
   if (reg) {
-    xhat = rep(0, nzout)
+    xhat <- rep(0, nzout)
   } else {
-    xhat = matrix(0, nzout, nensemble)
-    randnum = array(runif(nzout * nensemble), c(nzout, nensemble,k))
-    randnum1 = sweep(randnum, 3, kerncdf)
-    randnum1[randnum1 < 0] = 1
+    xhat <- matrix(0, nzout, nensemble)
+    randnum <- array(runif(nzout * nensemble), c(nzout, nensemble, k))
+    randnum1 <- sweep(randnum, 3, kerncdf)
+    randnum1[randnum1 < 0] <- 1
   }
-  sd = sqrt(diag(var(z)))
+  sd <- sqrt(diag(var(z)))
   for (j in 1:nz) { # standardize
-    z[, j] = z[, j]/(sd[j]/pw[j])
-    zout[, j] = zout[, j]/(sd[j]/pw[j])
+    z[, j] <- z[, j] / (sd[j] / pw[j])
+    zout[, j] <- zout[, j] / (sd[j] / pw[j])
   }
   for (i in 1:nzout) {
-    z_out <- matrix(rep(zout[i, ], nrow(z)), nrow = nrow(z), byrow = "T")
-    dtmp = z_out - z
-    d = apply(dtmp * dtmp, 1, sum)
-    ord = order(d)[1:k]
+    z_out <- matrix(rep(zout[i, ], nrow(z)), nrow = nrow(z), byrow = TRUE)
+    dtmp <- z_out - z
+    d <- apply(dtmp * dtmp, 1, sum)
+    ord <- order(d)[1:k]
     if (tailcorrection) {
-      pvalue = empcdf[ord[1]]
-      if (pvalue > 0.5)
-        pvalue = 1 - pvalue
-      if (pvalue < tailprob) {
-        ktmp = ceiling(mink + (k - mink) * pvalue/tailprob)
-        oldkern = kern
-        oldkerncdf = kerncdf
-        kern = rep(0, k)
-        kern[1:ktmp] = 1/(1:ktmp)/sum(1/(1:ktmp))
-        kerncdf = cumsum(kern)
+      pvalue <- empcdf[ord[1]]
+      if (pvalue > 0.5) {
+        pvalue <- 1 - pvalue
       }
-    } else pvalue <- 0 #give some initial value
-    if (reg){
-      if(!extrap) xhat[i]=sum(x[ord] * kern) else xhat[i]=sum((x[ord]+dtmp[ord,]%*%t(Scond))*kern)
-
+      if (pvalue < tailprob) {
+        ktmp <- ceiling(mink + (k - mink) * pvalue / tailprob)
+        oldkern <- kern
+        oldkerncdf <- kerncdf
+        kern <- rep(0, k)
+        kern[1:ktmp] <- 1 / (1:ktmp) / sum(1 / (1:ktmp))
+        kerncdf <- cumsum(kern)
+      }
+    } else {
+      pvalue <- 0
+    } # give some initial value
+    if (reg) {
+      if (!extrap) xhat[i] <- sum(x[ord] * kern) else xhat[i] <- sum((x[ord] + dtmp[ord, ] %*% t(Scond)) * kern)
     }
     if (!reg) {
       if (tailcorrection) {
-        rand1 = sweep(randnum[i, , ], 2, kerncdf)
-        rand1[rand1 < 0] = 1
+        rand1 <- sweep(randnum[i, , ], 2, kerncdf)
+        rand1[rand1 < 0] <- 1
+      } else {
+        rand1 <- randnum1[i, , ]
       }
-      else {
-        rand1 = randnum1[i, , ]
-      }
-      ord2 = apply(-rand1, 1, order, na.last = F)
-      ord3 = ord2[k, ]
-      ord3 = ord3 + 1
-      ord3[ord3 == (k + 1)] = 1
-      xhat[i, ] = x[ord[ord3]]
+      ord2 <- apply(-rand1, 1, order, na.last = FALSE)
+      ord3 <- ord2[k, ]
+      ord3 <- ord3 + 1
+      ord3[ord3 == (k + 1)] <- 1
+      xhat[i, ] <- x[ord[ord3]]
     }
     if (tailcorrection & (pvalue < tailprob)) {
-      kern = oldkern
-      kerncdf = oldkerncdf
+      kern <- oldkern
+      kerncdf <- oldkerncdf
     }
   }
   return(xhat)
@@ -137,25 +145,24 @@ knn <- function (x, z, zout, k = 0, pw, reg = T, nensemble = 100, tailcorrection
 #'
 #' @references Lall, U., Sharma, A., 1996. A Nearest Neighbor Bootstrap For Resampling Hydrologic Time Series. Water Resources Research, 32(3): 679-693.
 #' @references Sharma, A., Mehrotra, R., 2014. An information theoretic alternative to model a natural system using observational information alone. Water Resources Research, 50(1): 650-660.
-knnregl1cv <- function (x, z, k = 0, pw)
-{
-  x = as.matrix(x)
-  n = nrow(x)
-  if (k == 0)
-    k = floor(0.5 + 3 * (sqrt(n)))
-  z = as.matrix(z)
-  nz = ncol(z)
-  sd = sqrt(diag(var(z)))
-  if (missing(pw)) {
-    pw = rep(1, nz)
+knnregl1cv <- function(x, z, k = 0, pw) {
+  x <- as.matrix(x)
+  n <- nrow(x)
+  if (k == 0) {
+    k <- floor(0.5 + 3 * (sqrt(n)))
   }
-  for (j in 1:nz) z[, j] = z[, j]/(sd[j]/pw[j])
-  d = as.matrix(dist(z))
-  ord1 = apply(d, 2, order)
-  ord = ord1[2:(k + 1), ]
-  kern = 1/(1:k)/sum(1/(1:k))
-  xhat = rep(0, n)
-  for (j in 1:k) xhat = xhat + x[ord[j, ]] * kern[j]
+  z <- as.matrix(z)
+  nz <- ncol(z)
+  sd <- sqrt(diag(var(z)))
+  if (missing(pw)) {
+    pw <- rep(1, nz)
+  }
+  for (j in 1:nz) z[, j] <- z[, j] / (sd[j] / pw[j])
+  d <- as.matrix(dist(z))
+  ord1 <- apply(d, 2, order)
+  ord <- ord1[2:(k + 1), ]
+  kern <- 1 / (1:k) / sum(1 / (1:k))
+  xhat <- rep(0, n)
+  for (j in 1:k) xhat <- xhat + x[ord[j, ]] * kern[j]
   return(xhat)
 }
-

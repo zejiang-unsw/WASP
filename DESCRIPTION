@@ -1,6 +1,6 @@
 Package: WASP
 Title: Wavelet System Prediction
-Version: 1.3.3
+Version: 1.4.0
 Author: Ze Jiang [aut, cre] (<https://orcid.org/0000-0002-3472-0829>),
         Ashish Sharma [aut] (<https://orcid.org/0000-0002-6758-0519>),
         Fiona Johnson [aut] (<https://orcid.org/0000-0001-5708-1807>)
@@ -27,6 +27,7 @@ Suggests:
     fracdiff,
     synthesis,
     kableExtra,
+    fitdistrplus,
     testthat
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr
