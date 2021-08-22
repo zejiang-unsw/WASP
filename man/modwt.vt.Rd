@@ -43,15 +43,17 @@ data(SPI.12)
 x <- window(SPI.12, start = c(1950, 1), end = c(2009, 12))
 dp <- window(obs.mon, start = c(1950, 1), end = c(2009, 12))
 
+op <- par(mfrow = c(ncol(dp), 1), pty = "m", mar = c(1, 4, 1, 2))
 for (id in sample(Ind_AWAP.2.5, 1)) {
   data <- list(x = x[, id], dp = dp)
   dwt <- modwt.vt(data, wf = "d4", J = 7, boundary = "periodic", cov.opt = "auto")
 
-  par(mfrow = c(ncol(dp), 1), pty = "m", mar = c(1, 4, 1, 2))
   for (i in 1:ncol(dp)) {
     ts.plot(dwt$dp[, i], dwt$dp.n[, i], xlab = NA, col = c("black", "red"), lwd = c(2, 1))
   }
 }
+par(op)
+
 ### synthetic example
 # frequency, sampled from a given range
 fd <- c(3, 5, 10, 15, 25, 30, 55, 70, 95)
@@ -73,11 +75,12 @@ data <- rbind(
   sapply(dp.vt.modwt, var) / sum(sapply(dp.vt.modwt, var))
 )
 
-par(mfrow = c(1, 1))
 bar <- barplot(data, beside = TRUE, col = c("red", "blue"))
 lines(x = bar[2, ], y = sapply(x.modwt, var) / sum(sapply(x.modwt, var)))
 points(x = bar[2, ], y = sapply(x.modwt, var) / sum(sapply(x.modwt, var)))
 }
 \references{
-Z Jiang, A Sharma, and F Johnson. WRR
+Jiang, Z., Sharma, A., & Johnson, F. (2020). Refining Predictor Spectral Representation Using Wavelet Theory for Improved Natural System Modeling. Water Resources Research, 56(3), e2019WR026962.
+
+Jiang, Z., Rashid, M. M., Johnson, F., & Sharma, A. (2020). A wavelet-based tool to modulate variance in predictors: an application to predicting drought anomalies. Environmental Modelling & Software, 135, 104907.
 }

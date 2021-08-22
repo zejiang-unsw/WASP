@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_functions.R
 \name{mra.plot}
 \alias{mra.plot}
-\title{Plot function: Plot origianl time series and decomposed frequency components}
+\title{Plot function: Plot original time series and decomposed frequency components}
 \usage{
 mra.plot(y, y.mra, limits.x, limits.y, type = c("details", "coefs"), ...)
 }
@@ -23,7 +23,7 @@ mra.plot(y, y.mra, limits.x, limits.y, type = c("details", "coefs"), ...)
 A plot with original time series and decomposed frequency components.
 }
 \description{
-Plot function: Plot origianl time series and decomposed frequency components
+Plot function: Plot original time series and decomposed frequency components
 }
 \examples{
 ### synthetic example

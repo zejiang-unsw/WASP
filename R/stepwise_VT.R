@@ -19,11 +19,12 @@
 #'
 #' @references Sharma, A., Mehrotra, R., 2014. An information theoretic alternative to model a natural system using observational information alone. Water Resources Research, 50(1): 650-660.
 #'
+#' Jiang, Z., Sharma, A., & Johnson, F. (2021). Variable transformations in the spectral domain – Implications for hydrologic forecasting. Journal of Hydrology, 126816.
+#'
 #' @examples
 #' ### Real-world example
 #' data("rain.mon")
 #' data("obs.mon")
-#' op <- par()
 #' mode <- switch(1,
 #'   "MRA",
 #'   "MODWT",
@@ -44,7 +45,7 @@
 #'
 #' ### plot transformed predictor before and after
 #' cpy <- dwt$cpy
-#' par(mfrow = c(length(cpy), 1), mar = c(2, 3, 2, 1))
+#' op <- par(mfrow = c(length(cpy), 1), mar = c(2, 3, 2, 1))
 #' for (i in seq_along(cpy)) {
 #'   ts.plot(cbind(dwt$dp[, i], dwt$dp.n[, i]), xlab = "NA", col = 1:2)
 #' }
@@ -204,11 +205,12 @@ stepwise.VT <- function(data, alpha = 0.1, nvarmax = 4, mode = c("MRA", "MODWT",
 #' dwt.val <- stepwise.VT.val(data = data.n, dwt = dwt, mode = mode)
 #'
 #' ### plot transformed predictor before and after
-#' par(mfrow = c(length(cpy), 1), mar = c(0, 3, 2, 1))
+#' op <- par(mfrow = c(length(cpy), 1), mar = c(0, 3, 2, 1))
 #' for (i in seq_along(cpy))
 #' {
 #'   ts.plot(cbind(dwt.val$dp[, i], dwt.val$dp.n[, i]), xlab = "NA", col = 1:2)
 #' }
+#' par(op)
 stepwise.VT.val <- function(data, J, dwt, mode = c("MRA", "MODWT", "AT"), detrend = FALSE) {
   # initialization
   x <- data$x

@@ -55,9 +55,10 @@ data.n <- list(x = x, dp = matrix(dp, ncol = ncol(dp)))
 dwt.val <- stepwise.VT.val(data = data.n, dwt = dwt, mode = mode)
 
 ### plot transformed predictor before and after
-par(mfrow = c(length(cpy), 1), mar = c(0, 3, 2, 1))
+op <- par(mfrow = c(length(cpy), 1), mar = c(0, 3, 2, 1))
 for (i in seq_along(cpy))
 {
   ts.plot(cbind(dwt.val$dp[, i], dwt.val$dp.n[, i]), xlab = "NA", col = 1:2)
 }
+par(op)
 }

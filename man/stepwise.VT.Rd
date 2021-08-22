@@ -54,7 +54,6 @@ Calculate stepwise high order VT in calibration
 ### Real-world example
 data("rain.mon")
 data("obs.mon")
-op <- par()
 mode <- switch(1,
   "MRA",
   "MODWT",
@@ -75,7 +74,7 @@ dwt <- stepwise.VT(data, mode = mode, wf = wf, flag = "biased")
 
 ### plot transformed predictor before and after
 cpy <- dwt$cpy
-par(mfrow = c(length(cpy), 1), mar = c(2, 3, 2, 1))
+op <- par(mfrow = c(length(cpy), 1), mar = c(2, 3, 2, 1))
 for (i in seq_along(cpy)) {
   ts.plot(cbind(dwt$dp[, i], dwt$dp.n[, i]), xlab = "NA", col = 1:2)
 }

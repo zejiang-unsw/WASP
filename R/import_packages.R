@@ -1,3 +1,3 @@
 #' @import stats
-#' @import grDevices graphics
+#' @import grDevices graphics sp
 NULL

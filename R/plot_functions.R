@@ -1,4 +1,4 @@
-#' Plot function: Plot origianl time series and decomposed frequency components
+#' Plot function: Plot original time series and decomposed frequency components
 #'
 #' @param y           Original time series (Y).
 #' @param y.mra       Decomposed frequency components (d1,d2,..,aJ).
@@ -41,6 +41,9 @@
 #' limits.y <- c(-3, 3)
 #' mra.plot(x, x.mra.m, limits.x, limits.y, type = "details")
 mra.plot <- function(y, y.mra, limits.x, limits.y, type = c("details", "coefs"), ...) {
+  oldpar <- par(no.readonly = TRUE)
+  on.exit(par(oldpar))
+
   if (type == "details") {
     ylab <- c("d", "a")
   } else {

@@ -37,7 +37,7 @@ mod <- knn(x, z, zout, k=5, pw=wt, extrap=T)
 ###plot
 start.cal <- c(1910,1); start.val <- c(1960,1)
 ndim = ncol(data.CI.ts); CI.names = colnames(data.CI.ts)
-par(mfcol=c(ndim+1,2),mar=c(2,4,2,2),mgp=c(1.5,0.5,0),
+op <- par(mfcol=c(ndim+1,2),mar=c(2,4,2,2),mgp=c(1.5,0.5,0),
     bg = "white",pty="m", cex.lab=1.5, ps=8)
 #----------------------------------------------
 #plot before and after vt - calibration
@@ -68,3 +68,4 @@ if(TRUE){
 
 }
 
+par(op)
