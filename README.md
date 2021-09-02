@@ -8,7 +8,7 @@ Dependencies:
   waveslim, stats, tidyr, ggplot2, sp
 
 Suggest:
-    zoo, fracdiff, readr,
+    zoo, readr,
     cowplot, SPEI, FNN, 
     NPRED, synthesis, fitdistrplus
 </pre>
