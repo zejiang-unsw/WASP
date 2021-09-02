@@ -4,7 +4,15 @@
 \alias{mra.plot}
 \title{Plot function: Plot original time series and decomposed frequency components}
 \usage{
-mra.plot(y, y.mra, limits.x, limits.y, type = c("details", "coefs"), ...)
+mra.plot(
+  y,
+  y.mra,
+  limits.x,
+  limits.y,
+  type = c("details", "coefs"),
+  ps = 12,
+  ...
+)
 }
 \arguments{
 \item{y}{Original time series (Y).}
@@ -15,9 +23,11 @@ mra.plot(y, y.mra, limits.x, limits.y, type = c("details", "coefs"), ...)
 
 \item{limits.y}{y limit for plot.}
 
-\item{type}{type of wavelet coefficients, details or approximations}
+\item{type}{type of wavelet coefficients, details or approximations.}
 
-\item{...}{arguments for plot()}
+\item{ps}{integer; the point size of text (but not symbols).}
+
+\item{...}{arguments for plot().}
 }
 \value{
 A plot with original time series and decomposed frequency components.

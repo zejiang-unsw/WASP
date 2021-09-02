@@ -4,8 +4,9 @@
 #' @param y.mra       Decomposed frequency components (d1,d2,..,aJ).
 #' @param limits.x    x limit for plot.
 #' @param limits.y    y limit for plot.
-#' @param type        type of wavelet coefficients, details or approximations
-#' @param ...         arguments for plot()
+#' @param type        type of wavelet coefficients, details or approximations.
+#' @param ps          integer; the point size of text (but not symbols).
+#' @param ...         arguments for plot().
 #'
 #' @return A plot with original time series and decomposed frequency components.
 #' @export
@@ -40,7 +41,7 @@
 #' limits.x <- c(0, n)
 #' limits.y <- c(-3, 3)
 #' mra.plot(x, x.mra.m, limits.x, limits.y, type = "details")
-mra.plot <- function(y, y.mra, limits.x, limits.y, type = c("details", "coefs"), ...) {
+mra.plot <- function(y, y.mra, limits.x, limits.y, type = c("details", "coefs"), ps=12,...) {
   oldpar <- par(no.readonly = TRUE)
   on.exit(par(oldpar))
 
@@ -52,12 +53,13 @@ mra.plot <- function(y, y.mra, limits.x, limits.y, type = c("details", "coefs"),
 
   J <- ncol(y.mra) - 1
   par(
-    mfcol = c(J + 2, 1), mar = c(0, 3, 0.2, 1), # margin of the plot
+    mfcol = c(J + 2, 1), mar = c(0, 3, 1, 1), # margin of the plot
     oma = c(2, 1, 1, 1), # move plot to the right and up
-    mgp = c(1, 1, 0), # move axis labels closer to axis
+    mgp = c(1, 0.6, 0), # move axis labels closer to axis
     bg = "transparent", pty = "m", # maximal plotting region
-    ps = 8
-  ) # text size
+    ps = ps # text size
+
+  )
 
   plot(y,
     type = "l", axes = FALSE, xlab = NA, xaxs = "i",
