@@ -40,7 +40,7 @@ vignettes/result/
 
 /tests/
 /data-raw/
-vignettes/WASP.Rmd
+CRAN-RELEASE
 vignettes/EMS2020_R1.Rmd
 vignettes/EMS2020_R1.pdf
 vignettes/EMS2020.Rmd

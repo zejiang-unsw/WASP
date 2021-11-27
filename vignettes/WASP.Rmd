@@ -1,0 +1,833 @@
+---
+title: "WASP： An R package for Wavelet System Prediction"
+author: 'Ze Jiang, Ashish Sharma, and Fiona Johnson'
+date: "`r format(Sys.time(), '%H:%M:%S %d %B, %Y')`"
+output: 
+#  rmarkdown::html_vignette: 
+  bookdown::html_vignette2: 
+    toc: true
+    number_sections: true
+vignette: >
+  %\VignetteIndexEntry{WASP: Wavelet System Prediction}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>", warning = FALSE, 
+  
+  out.width = "85%",
+  fig.align = "center", fig.pos = "h!"
+)
+options(rmarkdown.html_vignette.check_title = FALSE)
+library(rmarkdown)
+library(knitr)
+library(kableExtra)
+```
+
+```{r packages}
+library(WASP)
+library(ggplot2)
+
+library(FNN)
+library(synthesis)
+library(waveslim)
+library(cowplot)
+library(gridGraphics)
+```
+
+# DWT, MODWT and AT basic propertites
+
+```{r wavelet-transforms}
+# data generation
+x <- arima.sim(list(order = c(1, 0, 0), ar = 0.6), n = 512)
+# x <- as.numeric(scale(data.gen.Rossler(time = seq(0, 50, length.out = 512))$x, scale=F))
+
+# Daubechies wavelets
+for (wf in c("haar", "d4", "d8", "d16")) {
+  print(paste0("Wavelet filter: ", wf))
+  #----------------------------------------------------------------------------
+  # wavelet family, extension mode and package
+  # wf <- "haar" # wavelet family D8 or db4
+  boundary <- "periodic"
+  if (wf != "haar") v <- as.integer(readr::parse_number(wf) / 2) else v <- 1
+
+  # Maximum decomposition level J
+  n <- length(x)
+  J <- ceiling(log(n / (2 * v - 1)) / log(2)) - 1 # (Kaiser, 1994)
+
+  cov <- rnorm(J + 1, sd = 2)
+  Vr <- as.numeric(cov / norm(cov, type = "2") * sd(x))
+  #----------------------------------------------------------------------------
+  # DWT-MRA
+  print("-----------DWT-MRA-----------")
+  x.mra <- waveslim::mra(x, wf = wf, J = J, method = "dwt", boundary = boundary)
+  x.mra.m <- matrix(unlist(x.mra), ncol = J + 1)
+
+  x.n <- scale(x.mra.m) %*% Vr
+  var(x.n) - var(x)
+
+  message(paste0("Additive decompostion: ", isTRUE(all.equal(as.numeric(x), rowSums(x.mra.m)))))
+  message(paste0("Variance decompostion: ", isTRUE(all.equal(var(x), sum(apply(x.mra.m, 2, var))))))
+
+  #----------------------------------------------------------------------------
+  # MODWT
+  print("-----------MODWT-----------")
+  x.modwt <- waveslim::modwt(x, wf = wf, n.levels = J, boundary = boundary)
+  x.modwt.m <- matrix(unlist(x.modwt), ncol = J + 1)
+
+  x.n <- scale(x.modwt.m) %*% Vr
+  var(x.n) - var(x)
+
+  message(paste0("Additive decompostion: ", isTRUE(all.equal(as.numeric(x), rowSums(x.modwt.m)))))
+  message(paste0("Variance decompostion: ", isTRUE(all.equal(var(x), sum(apply(x.modwt.m, 2, var))))))
+
+  #----------------------------------------------------------------------------
+  # a trous
+  print("-----------AT-----------")
+  x.at <- at.wd(x, wf = wf, J = J, boundary = boundary)
+  x.at.m <- matrix(unlist(x.at), ncol = J + 1)
+
+  # x.mra.modwt <- waveslim::mra(x,wf=wf, J=J, method="modwt", boundary=boundary)
+  # x.mra.modwt <- matrix(unlist(x.mra.modwt), ncol=J+1)
+  #
+  # print(sum(abs(x.at.m-x.mra.modwt)))
+
+  message(paste0("Additive decompostion: ", isTRUE(all.equal(as.numeric(x), rowSums(x.at.m)))))
+  message(paste0("Variance decompostion: ", isTRUE(all.equal(var(x), sum(apply(x.at.m, 2, var))))))
+
+  if (isTRUE(all.equal(x.at.m, x.modwt.m))) {
+    message(paste0("AT and MODWT is equivalent using the", wf, "!"))
+  }
+}
+```
+
+## Summary of various properties for the three DWT methods
+
+```{r tab1}
+tab1 <- data.frame(
+  col1 = c("DWT-MRA", "MODWT", "AT"),
+  col2 = c("$\\checkmark$", "", "$\\checkmark$"),
+  col3 = c("$\\checkmark$", "$\\checkmark$", ""),
+  col4 = c("", "$\\checkmark$", "$\\checkmark$"),
+  col5 = c("$\\checkmark$", "", "")
+)
+
+colnames(tab1) <- c("Wavelet Method", "Additive decomposition", "Variance decomposition", "No dependence on future data", "Dyadic sample size")
+
+kable(tab1, caption = "Summary of various properties for the three DWT methods", booktabs = T, escape = F) %>%
+  kable_styling(latex_options = c("HOLD_position"), position = "center") %>%
+  column_spec(1, width = "6em") %>%
+  column_spec(2:5, width = "7em") %>%
+  footnote(general = "When Haar wavelet filter is used, MODWT and AT are equivalent and both of them preserves additive and variance decomposition.", footnote_as_chunk = T)
+```
+
+## Illustration of three types of DWT methods 
+
+```{r wavelet-decomposition, fig.show='hide'}
+p.list <- NULL
+wf.opts <- c("d16", "haar")
+for (k in seq_along(wf.opts)) {
+  # data generation
+  x <- arima.sim(list(order = c(1, 0, 0), ar = 0.6), n = 128)
+
+  #----------------------------------------------------------------------------
+  # wavelet family, extension mode and package
+  wf <- wf.opts[k] # wavelet family D8 or db4
+  boundary <- "periodic"
+  if (wf != "haar") v <- as.integer(readr::parse_number(wf) / 2) else v <- 1
+
+  # Maximum decomposition level J
+  n <- length(x)
+  J <- ceiling(log(n / (2 * v - 1)) / log(2)) - 1 # (Kaiser, 1994)
+
+  limits.x <- c(0, n)
+  limits.y <- c(-3, 3)
+  #----------------------------------------------------------------------------
+  # DWT-MRA
+  x.mra <- waveslim::mra(x, wf = wf, J = J, method = "dwt", boundary = boundary)
+  x.mra.m <- matrix(unlist(x.mra), ncol = J + 1)
+
+  p1 <- mra.plot(x, x.mra.m, limits.x, limits.y,
+    ylab = "X", col = "red", type = "details",
+    main = paste0("DWT-MRA", "(", wf, ")"), ps = 12
+  )
+  # p1 <- recordPlot()
+
+  #----------------------------------------------------------------------------
+  # MODWT
+  x.modwt <- waveslim::modwt(x, wf = wf, n.levels = J, boundary = boundary)
+  x.modwt.m <- matrix(unlist(x.modwt), ncol = J + 1)
+
+  p2 <- mra.plot(x, x.modwt.m, limits.x, limits.y,
+    ylab = "X", col = "red", type = "coefs",
+    main = paste0("MODWT", "(", wf, ")"), ps = 12
+  )
+
+  #----------------------------------------------------------------------------
+  # a trous
+  x.at <- at.wd(x, wf = wf, J = J, boundary = boundary)
+  x.at.m <- matrix(unlist(x.at), ncol = J + 1)
+
+  p3 <- mra.plot(x, x.at.m, limits.x, limits.y,
+    ylab = "X", col = "red", type = "coefs",
+    main = paste0("AT", "(", wf, ")"), ps = 12
+  )
+
+  p.list[[k]] <- list(p1, p2, p3)
+}
+```
+
+###  Daubechies 16 wavelet
+
+```{r figa, fig.cap='Illustration of three types of DWT methods', fig.width=9, fig.height=7}
+#----------------------------------------------------------------------------
+# plot and save
+cowplot::plot_grid(
+  plotlist = p.list[[1]], ncol = 3, labels = c("(a)", "(b)", "(c)"),
+  label_size = 12
+)
+```
+
+### Haar wavelet filter
+
+```{r figb, fig.cap='Illustration of three types of DWT methods', fig.width=9, fig.height=7}
+#----------------------------------------------------------------------------
+# plot and save
+cowplot::plot_grid(
+  plotlist = p.list[[2]], ncol = 3, labels = c("(a)", "(b)", "(c)"),
+  label_size = 12
+)
+```
+
+## Wavelet transform: decompostion level 
+
+```{r wt-decomposition-level}
+sample <- seq(100, by = 200, length.out = 5)
+v <- 2 # vanishing moment
+tmp <- NULL
+for (n in sample) {
+  J1 <- floor(log(n / (2 * v - 1)) / log(2))
+  J # (Kaiser, 1994)
+  J2 <- floor(log2(n / (2 * v - 1) - 1))
+  J # Cornish, C. R., Bretherton, C. S., & Percival, D. B. (2006)
+  J3 <- floor(log10(n))
+  J # (Nourani et al., 2008)
+
+  tmp <- cbind(tmp, c(J1, J2, J3))
+}
+
+tab <- tmp
+colnames(tab) <- sample
+rownames(tab) <- paste0("Method", 1:3)
+
+kable(tab,
+  caption = "Decompostion level with varying sample size",
+  booktabs = T, align = "c", digits = 3
+) %>%
+  kable_styling("striped", position = "center", full_width = FALSE) # %>%
+# collapse_rows(columns = 1:2, valign = "middle")
+```
+
+# Variance transformation
+
+## Optimal preditive accuracy (RMSE)
+
+```{r optimal-variance-transformation, warning=TRUE}
+if (TRUE) {
+  ### Synthetic example
+  # data generation
+  set.seed(2020)
+  sample <- 512
+  # frequency, sampled from a given range
+  fd <- c(3, 5, 10, 15, 25, 30, 55, 70, 95)
+  # data <- WASP::data.gen.SW(nobs=sample,fp=25,fd=fd)
+  data <- WASP::data.gen.SW(nobs = sample, fp = c(15, 25, 30), fd = fd)
+
+  # ts = data.gen.Rossler(time = seq(0, 50, length.out = sample))
+  # data <- list(x=ts$z, dp=cbind(ts$x, ts$y))
+} else {
+  ### Real-world example
+  data("obs.mon")
+  data("rain.mon")
+
+  if (1) { # SPI12 as response
+    SPI.12 <- SPEI::spi(rain.mon[, 5], scale = 12)$fitted
+    x <- window(SPI.12, start = c(1950, 1), end = c(2009, 12))
+    dp <- window(obs.mon, start = c(1950, 1), end = c(2009, 12))
+  } else { # rainfall as response
+    x <- window(rain.mon[, 5], start = c(1950, 1), end = c(2009, 12))
+    dp <- window(obs.mon, start = c(1950, 1), end = c(2009, 12))
+  }
+  data <- list(x = x, dp = dp)
+  sample <- length(x)
+}
+
+# plot.ts(cbind(data$x,data$dp))
+
+tab.list <- list()
+mode.opts <- c("MRA", "MODWT", "AT")
+for (mode in mode.opts) {
+  print(mode)
+
+  # cov.opt <- switch(2,"auto","pos","neg")
+  if (mode == "MRA") {
+    method <- switch(1,
+      "dwt",
+      "modwt"
+    )
+  }
+
+  # wavelet family, extension mode and package
+  # wf <- switch(mode, "MRA"="haar", "MODWT"="haar", "AT"="haar")
+  wf <- "haar"
+  pad <- "zero"
+  boundary <- "periodic"
+  if (wf != "haar") v <- as.integer(readr::parse_number(wf) / 2) else v <- 1
+
+  # Maximum decomposition level J
+  n <- sample
+  J <- ceiling(log(n / (2 * v - 1)) / log(2)) - 1 # (Kaiser, 1994)
+
+  tab <- NULL
+  for (cov.opt in c("auto", "pos", "neg")) {
+    # variance transform - calibration
+    if (mode == "MRA") {
+      dwt <- dwt.vt(data, wf, J, method, pad, boundary, cov.opt)
+    } else if (mode == "MODWT") {
+      dwt <- modwt.vt(data, wf, J, boundary, cov.opt)
+    } else {
+      dwt <- at.vt(data, wf, J, boundary, cov.opt)
+    }
+
+    # optimal prediction accuracy
+    opti.rmse <- NULL
+    dp.RMSE <- NULL
+    dp.n.RMSE <- NULL
+    S <- dwt$S
+    ndim <- ncol(S)
+    for (i in 1:ndim) {
+      x <- dwt$x
+      dp <- dwt$dp[, i]
+      dp.n <- dwt$dp.n[, i]
+
+      # ts.plot(cbind(dp,dp.n), col=1:2)
+
+      dp.RMSE <- c(dp.RMSE, sqrt(mean(lm(x ~ dp)$residuals^2)))
+      dp.n.RMSE <- c(dp.n.RMSE, sqrt(mean(lm(x ~ dp.n)$residuals^2)))
+
+      # small difference due to the reconstruction
+      opti.rmse <- c(opti.rmse, sqrt((n - 1) / n * (var(x) - sum(S[, i]^2) * var(dp) / var(dp.n))))
+      # opti.rmse <- c(opti.rmse, sqrt((n-1)/n*(var(x)-sum(S[,i]^2))))
+    }
+
+    tab <- rbind(tab, data.frame(cov.opt, var=1:ndim, dp.RMSE, dp.n.RMSE, opti.rmse))
+  }
+
+  colnames(tab) <- c("Sign of covariance", "Variable", "Std", "VT", "Optimal")
+  tab.list[[length(tab.list) + 1]] <- tab
+}
+
+# print(tab.list)
+
+kable(tab.list[[1]], caption = "Optimal RMSE using DWT-based VT",
+      booktabs = T, align = "c", digits = 3) %>%
+kable_styling("striped", position = "center", full_width = FALSE)  %>%
+collapse_rows(columns = 1, valign = "middle")
+```
+
+```{r optimal-variance-transformation1, warning=TRUE}
+kable(tab.list[[2]], caption = "Optimal RMSE using MODWT/AT-based VT",
+      booktabs = T, align = "c", digits = 3) %>%
+kable_styling("striped", position = "center", full_width = FALSE)  %>%
+collapse_rows(columns = 1, valign = "middle")
+```
+
+## Transformed predictor variables
+
+```{r variance-transform, fig.keep='last', fig.cap='Orignal and VT predictors. (a): DWT-MRA (b): MODWT/AT', fig.width=9, fig.height=6}
+#-------------------------------------------------------------------
+if (TRUE) {
+  set.seed(2020)
+  ### synthetic example - Rossler
+  sample <- 10000
+  s <- 0.1
+  ts.list <- list()
+  for (i in seq_along(s)) {
+    ts.r <- data.gen.Rossler(a = 0.2, b = 0.2, w = 5.7, start = c(-2, -10, 0.2), time = seq(0, 50, length.out = sample))
+
+    # add noise
+    ts.r$x <- ts(ts.r$x + rnorm(n = sample, mean = 0, sd = s[i]))
+    ts.r$y <- ts(ts.r$y + rnorm(n = sample, mean = 0, sd = s[i]))
+    ts.r$z <- ts(ts.r$z + rnorm(n = sample, mean = 0, sd = s[i]))
+
+    ts.list[[i]] <- ts.r
+  }
+
+  data.list <- lapply(ts.list, function(ts) list(x = ts$z, dp = cbind(ts$x, ts$y)))
+
+  lab.names <- c("x", "y")
+  ylim <- c(-55, 55)
+} else {
+
+  ### Real-world example
+  data("obs.mon")
+  data("rain.mon")
+
+  SPI.12 <- SPEI::spi(rain.mon[, 5], scale = 12)$fitted
+  x <- window(SPI.12, start = c(1950, 1), end = c(2009, 12))
+  dp <- window(obs.mon, start = c(1950, 1), end = c(2009, 12))
+
+  data.list <- list(list(x = x, dp = dp))
+  sample <- length(x)
+
+  lab.names <- colnames(obs.mon)
+  ylim <- NULL
+}
+
+#-------------------------------------------------------------------
+p.list <- list()
+dp.list <- list()
+if (wf != "haar") mode.opts <- c("MRA", "MODWT", "AT")[1:3] else mode.opts <- c("MRA", "MODWT","AT")[1:2]
+for (mode in mode.opts) {
+  cov.opt <- switch(1,
+    "auto",
+    "pos",
+    "neg"
+  )
+  flag <- switch(1,
+    "biased",
+    "unbiased"
+  )
+  if (mode == "MRA") {
+    method <- switch(1,
+      "dwt",
+      "modwt"
+    )
+  }
+
+  # wavelet family, extension mode and package
+  # wf <- switch(mode, "MRA"="haar", "MODWT"="haar", "AT"="haar")
+  wf <- "d16"
+  pad <- "zero"
+  boundary <- "periodic"
+  if (wf != "haar") v <- as.integer(readr::parse_number(wf) / 2) else v <- 1
+
+  # Maximum decomposition level J
+  n <- sample
+  J <- ceiling(log(n / (2 * v - 1)) / log(2)) - 1 # (Kaiser, 1994)
+  # J <- floor(log(n/(2*v-1))/log(2))
+
+  # variance transfrom - calibration
+  if (mode == "MRA") {
+    dwt.list <- lapply(data.list, function(x) dwt.vt(x, wf, J, method, pad, boundary, cov.opt, flag))
+  } else if (mode == "MODWT") {
+    dwt.list <- lapply(data.list, function(x) modwt.vt(x, wf, J, boundary, cov.opt, flag))
+  } else {
+    dwt.list <- lapply(data.list, function(x) at.vt(x, wf, J, boundary, cov.opt, flag))
+  }
+
+  for (j in 1:length(dwt.list)) {
+    dwt <- dwt.list[[j]]
+
+    par(
+      mfrow = c(ncol(dwt$dp), 1), mar = c(0, 2.5, 2, 1),
+      oma = c(2, 1, 0, 0), # move plot to the right and up
+      mgp = c(1.5, 0.5, 0), # move axis labels closer to axis
+      pty = "m", bg = "transparent",
+      ps = 12
+    )
+
+    # plot(dwt$x, type="l", xlab=NA, ylab="SPI12", col="red")
+    # plot(dwt$x, type="l", xlab=NA, ylab="Rain", col="red")
+    for (i in 1:ncol(dwt$dp)) {
+      ts.plot(cbind(dwt$dp[, i], dwt$dp.n[, i]),
+        xlab = NA, ylab = paste0(lab.names[i]),
+        xlim = c(0, n), ylim = ylim,
+        col = c("black", "blue"), lwd = c(1, 2)
+      )
+    }
+
+    p.list[[length(p.list) + 1]] <- recordPlot()
+
+    dp.list[[length(dp.list) + 1]] <- dwt$dp.n
+  }
+}
+
+#----------------------------------------------------------------------------
+# plot and save
+fig <- cowplot::plot_grid(plotlist = p.list, nrow = 1, labels = c("(a)", "(b)", "(c)"))
+fig
+```
+
+# Stepwise variance transfromation
+
+```{r svt, fig.keep='last', fig.cap='Orignal and SVT predictors. (a): DWT-MRA (b): MODWT/AT', fig.width=9, fig.height=6}
+#-------------------------------------------------------------------
+### Real-world example
+data("obs.mon")
+data("rain.mon")
+op <- par()
+station.id <- 5
+lab.names <- colnames(obs.mon)[c(1, 3, 4, 5, 7)]
+
+if (TRUE) { # SPI12 as response
+  SPI.12 <- SPEI::spi(rain.mon, scale = 12)$fitted
+  x <- window(SPI.12, start = c(1950, 1), end = c(2009, 12))
+  dp <- window(obs.mon[, lab.names], start = c(1950, 1), end = c(2009, 12))
+} else { # rainfall as response
+  x <- window(rain.mon, start = c(1950, 1), end = c(2009, 12))
+  dp <- window(obs.mon[, lab.names], start = c(1950, 1), end = c(2009, 12))
+}
+
+data.list <- lapply(station.id, function(id) list(x = x[, id], dp = dp))
+
+
+ylim <- data.frame(
+  GPH = c(700, 900), TDP700 = c(5, 25), TDP500 = c(5, 25), EPT = c(300, 330),
+  UWND = c(-5, 25), VWND = c(-5, 10), MSLP = c(-1, 1)
+)[c(1, 3, 4, 5, 7)]
+
+#-------------------------------------------------------------------
+p.list <- list()
+RMSE <- NULL
+mode.opts <- c("MRA", "MODWT", "AT")[1:2]
+for (mode in mode.opts) {
+  cov.opt <- switch(1,
+    "auto",
+    "pos",
+    "neg"
+  )
+  if (mode == "MRA") {
+    method <- switch(1,
+      "dwt",
+      "modwt"
+    )
+  }
+
+  # wavelet family, extension mode and package
+  wf <- switch(mode,
+    "MRA" = "d4",
+    "MODWT" = "haar",
+    "AT" = "haar"
+  )
+  pad <- "zero"
+  boundary <- "periodic"
+  if (wf != "haar") v <- as.integer(readr::parse_number(wf) / 2) else v <- 1
+
+  # Maximum decomposition level J
+  n <- nrow(x)
+  J <- ceiling(log(n / (2 * v - 1)) / log(2)) - 1 # (Kaiser, 1994)
+
+  # high order variance transformation
+  dwt.list <- lapply(data.list, function(data) stepwise.VT(data, mode = mode, wf = wf, J=J))
+
+  for (j in seq_len(length(dwt.list))) {
+    dwt <- dwt.list[[j]]
+    cpy <- dwt$cpy
+
+    MSE <- NULL
+    for (i in seq_len(length(cpy))) {
+      m1 <- sqrt(FNN::knn.reg(train = dwt$dp[, 1:i], y = dwt$x)$PRESS / n)
+      m2 <- sqrt(FNN::knn.reg(train = dwt$dp.n[, 1:i], y = dwt$x)$PRESS / n)
+
+      MSE <- rbind(MSE, c(m1, m2))
+    }
+
+    RMSE <- cbind(RMSE, MSE)
+
+    par(
+      mfrow = c(length(cpy), 1), mar = c(0, 4, 2, 1),
+      oma = c(2, 1, 0, 0), # move plot to the right and up
+      mgp = c(1.5, 0.5, 0), # move axis labels closer to axis
+      pty = "m", bg = "transparent",
+      ps = 8
+    )
+
+    # plot(dwt$x, type="l", xlab=NA, ylab="SPI12", ylim=c(-3,3),col="red")
+    # plot(dwt$x, type="l", xlab=NA, ylab="Rain", col="red")
+    for (i in seq_len(length(cpy))) {
+      ts.plot(dwt$dp[, i], dwt$dp.n[, i],
+        xlab = NA, ylab = paste0(lab.names[cpy[i]]), # ylim=ylim[,i],
+        col = c("black", "blue"), lwd = c(1, 2)
+      )
+    }
+
+    p.list[[length(p.list) + 1]] <- recordPlot()
+  }
+}
+par(op)
+#-------------------------------------------------------------------
+# plot and save
+cowplot::plot_grid(plotlist = p.list, nrow = 1, labels = c("(a)", "(b)", "(c)"))
+
+
+
+#-------------------------------------------------------------------
+# RMSE when more predictors are included
+tab1 <- round(RMSE, 3)
+tab1 <- cbind(1:nrow(tab1), tab1)
+colnames(tab1) <- c("No. of Predictors", rep(c("Original", "Transformed"), length(mode.opts)))
+
+kable(tab1, caption = "Comparison of prediction accuracy using Std and SVT", booktabs = T) %>%
+  kable_styling(latex_options = c("HOLD_position"), position = "center", full_width = FALSE)  %>%
+  #  add_header_above(c(" " = 1, "DWT-MRA" = 2, "MODWT" = 2, "AT" = 2))
+  add_header_above(c(" " = 1, "DWT-MRA" = 2, "MODWT/AT" = 2))
+```
+
+<!-- # Comparison with traditional wavelet-based methods -->
+
+```{r comp, eval=FALSE, include=FALSE}
+#-------------------------------------------------------------------
+sample <-  100000
+sample.cal <- sample/2
+k <- ceiling(sqrt(sample/2))
+
+s=0.1
+#s=c(0.1,0.5,1) # scaling factor for noise level
+set.seed(2020)
+
+###synthetic example - Rossler
+ts.list <- list()
+for(i in seq_along(s)){
+  ts.r <- data.gen.Rossler(a = 0.2, b = 0.2, w = 5.7, start = c(-2, -10, 0.2), time = seq(0, 50, length.out = sample))
+  
+  #add noise
+  ts.r$x <- ts(ts.r$x + rnorm(n = sample, mean=0, sd=s[i]))
+  ts.r$y <- ts(ts.r$y + rnorm(n = sample, mean=0, sd=s[i]))
+  ts.r$z <- ts(ts.r$z + rnorm(n = sample, mean=0, sd=s[i]))
+  
+  ts.list[[i]]<- ts.r
+}
+
+#-------------------------------------------------------------------
+tab3<-NULL
+mode.opts <- c("MRA", "MODWT","a trous")[1:2]
+for(mode in mode.opts){
+  ### wavelet method selection
+  #mode <- switch(3,"MRA", "MODWT","a trous")
+  cov.opt <- switch(1,"auto","pos","neg")
+  if(mode=="MRA") method <- switch(1,"dwt","modwt")
+
+  # wavelet family, extension mode and package
+  wf <- "haar" # wavelet family D8 or db4
+  pad <-  "zero"
+  boundary <- "periodic"
+  if(wf!="haar") v <- as.integer(as.numeric(substr(wf,2,3))/2) else v <- 1
+  
+
+  ###proposed method----------------------------------------------------------
+  #--------------------------------------------------
+  #calibration dataset
+  data.list <- lapply(ts.list, function(ts) list(x=ts$z[1:sample.cal], dp=cbind(ts$x[1:sample.cal],ts$y[1:sample.cal])))
+  
+  n <- sample.cal
+  J <- ceiling(log(n/(2*v-1))/log(2)) - 1
+  #if(wf=="haar"&&mode=="MODWT") J = J-1 #since modwt no need a dyadic number size
+  print(paste0("Calibration: Decomposition Levels J= ",J))
+  
+  #variance transfrom
+  if(mode=="MRA"){
+    dwt.list<- lapply(data.list, function(x) dwt.vt(x, wf, J, method, pad, boundary, cov.opt))
+  } else if(mode=="MODWT") {
+    dwt.list<- lapply(data.list, function(x) modwt.vt(x, wf, J, boundary, cov.opt))
+  } else {
+    dwt.list<- lapply(data.list, function(x) at.vt(x, wf, J, boundary, cov.opt))
+  }
+  
+  #--------------------------------------------------
+  # calibration
+  df <- NULL;data.RMSE<-NULL;dwt.RMSE<-NULL
+  sd.cal<-NULL; cor.cal<-NULL
+  for(i in 1:length(dwt.list)){
+  
+    dwt <- dwt.list[[i]]
+    dp <- dwt$dp; dp.n <- dwt$dp.n; x <- dwt$x
+  
+    m1 <- FNN::knn.reg(dp, y=x, k=k)$pred
+    m2 <- FNN::knn.reg(dp.n, y=x, k=k)$pred
+  
+    data.RMSE <-c(data.RMSE, round(sqrt(mean((x-m1)^2)),3))
+    dwt.RMSE <- c(dwt.RMSE, round(sqrt(mean((x-m2)^2)),3))
+  
+    sd.cal <- cbind(sd.cal, as.vector(c(sd(x),sd(m1),sd(m2))))
+    cor.cal <-cbind(cor.cal, cor(cbind(x,m1,m2))[,1])
+  
+    df1 <- data.frame(Group=1, s=s[i], No=1:sample.cal,Pred=m1, Obs=x)
+    df2 <- data.frame(Group=2, s=s[i], No=1:sample.cal,Pred=m2, Obs=x)
+  
+    df <- rbind(df, rbind(df1,df2))
+  
+  }
+  #summary(df)
+  #print(rbind(data.RMSE,dwt.RMSE))
+  
+  t1 <- rbind(data.RMSE,dwt.RMSE)
+  sd.cal;cor.cal
+  
+  #--------------------------------------------------
+  #validataion dataset
+  data.list.val <- lapply(ts.list, function(ts) list(x=ts$z[(sample.cal+1):sample], dp=cbind(ts$x[(sample.cal+1):sample], ts$y[(sample.cal+1):sample])))
+  
+  sample.val <- sample-sample.cal
+  n <- sample.val
+  J <- ceiling(log(n/(2*v-1))/log(2)) - 1
+  #if(wf=="haar"&&mode=="MODWT") J = J-1 #since modwt no need a dyadic number size
+  print(paste0("Validation: Decomposition Levels J= ",J))
+  
+  #--------------------------------------------------
+  #variance transform
+  if(mode=="MRA"){
+    dwt.list.val<- lapply(1:length(data.list.val), function(i) dwt.vt.val(data.list.val[[i]], J, dwt.list[[i]]))
+  } else if(mode=="MODWT"){
+    dwt.list.val<- lapply(1:length(data.list.val), function(i) modwt.vt.val(data.list.val[[i]], J, dwt.list[[i]]))
+  } else {
+    dwt.list.val<- lapply(1:length(data.list.val), function(i) at.vt.val(data.list.val[[i]], J, dwt.list[[i]]))
+  }
+  
+  #--------------------------------------------------
+  # validation
+  df.val <- NULL;data.RMSE <-NULL;dwt.RMSE<-NULL
+  sd.val<-NULL; cor.val<-NULL
+  for(i in 1:length(dwt.list.val)){
+  
+    dwt <- dwt.list[[i]]
+    dp <- dwt$dp; dp.n <- dwt$dp.n; x.train <- dwt$x
+  
+    dwt <- dwt.list.val[[i]]
+    dp.v <- dwt$dp; dp.n.v <- dwt$dp.n; x <- dwt$x
+  
+    m1 <- FNN::knn.reg(train=dp, test=dp.v, y=x.train, k=k)$pred
+    m2 <- FNN::knn.reg(train=dp.n, test=dp.n.v, y=x.train, k=k)$pred
+  
+    data.RMSE <-c(data.RMSE, round(sqrt(mean((m1-x)^2)),3))
+    dwt.RMSE <- c(dwt.RMSE, round(sqrt(mean((m2-x)^2)),3))
+  
+    sd.val <- cbind(sd.val, as.vector(c(sd(x),sd(m1),sd(m2))))
+    cor.val <- cbind(cor.val, cor(cbind(x,m1,m2))[,1])
+  
+    df1 <- data.frame(Group=1, s=s[i], No=1:sample.val,Pred=m1, Obs=x)
+    df2 <- data.frame(Group=2, s=s[i], No=1:sample.val,Pred=m2, Obs=x)
+  
+    df.val <- rbind(df.val, rbind(df1,df2))
+  
+  }
+  
+  #summary(df.val)
+  #print(rbind(data.RMSE,dwt.RMSE))
+  
+  t2 <- rbind(data.RMSE,dwt.RMSE)
+  sd.val;cor.val
+  
+  ###standard method----------------------------------------------------------
+  # form new response and predictors dataset - calibration
+  data.list <- list()
+  for(i in 1:length(ts.list)){
+    #i <- 1
+    x <- ts.list[[i]]$x[1:sample.cal]
+    y <- ts.list[[i]]$y[1:sample.cal]
+    z <- ts.list[[i]]$z[1:sample.cal]
+    
+    xx <- padding(x, pad); yy <- padding(y, pad)
+    n <- length(x)
+    
+    J <- floor(log10(n)) # (Nourani et al., 2008)
+    print(paste0("Direct wavelet approach: Decomposition Levels J= ",J))
+
+    if(mode=="MRA"){
+    mra.x <- matrix(unlist(lapply(mra(xx,wf,J,method,boundary), function(z) z[1:n])), ncol=J+1, byrow=FALSE)
+    mra.y <- matrix(unlist(lapply(mra(yy,wf,J,method,boundary), function(z) z[1:n])), ncol=J+1, byrow=FALSE)
+    } else if(mode=="MODWT"){
+    mra.x <- matrix(unlist(lapply(modwt(x,wf,J,boundary), function(z) z)), ncol=J+1, byrow=FALSE)
+    mra.y <- matrix(unlist(lapply(modwt(y,wf,J,boundary), function(z) z)), ncol=J+1, byrow=FALSE)      
+    } else {
+    mra.x <- matrix(unlist(at.wd(x,wf,J,boundary)), ncol=J+1)
+    mra.y <- matrix(unlist(at.wd(y,wf,J,boundary)), ncol=J+1)
+    }
+    
+    data.list[[i]] <- list(x=as.numeric(z), dp=cbind(mra.x, mra.y))
+  }
+  
+  #----------------------------------------------------
+  #calibration
+  df <- NULL;data.RMSE<-NULL
+  for(i in 1:length(data.list)){
+    dwt <- data.list[[i]]
+    x <- dwt$x; dp <- dwt$dp
+    
+    m <- FNN::knn.reg(train=dp, y=x, k=k)$pred
+    data.RMSE <-c(data.RMSE, round(sqrt(mean((m-x)^2)),3))
+    df <- data.frame(Group=1, s=s[i], No=1:sample.cal,Pred=m, Obs=x)
+  }
+  
+  #----------------------------------------------------
+  # form new response and predictors dataset -  validation
+  data.list.val <- list()
+  for(i in 1:length(ts.list)){
+    #i <- 1
+    x <- ts.list[[i]]$x[(sample.cal+1):sample]
+    y <- ts.list[[i]]$y[(sample.cal+1):sample]
+    z <- ts.list[[i]]$z[(sample.cal+1):sample]
+    
+    xx <- padding(x, pad); yy <- padding(y, pad)
+    n <- length(x)
+    
+    J <- floor(log10(n)) # (Nourani et al., 2008)
+    
+    if(mode=="MRA"){
+    mra.x <- matrix(unlist(lapply(mra(xx,wf,J,method,boundary), function(z) z[1:n])), ncol=J+1, byrow=FALSE)
+    mra.y <- matrix(unlist(lapply(mra(yy,wf,J,method,boundary), function(z) z[1:n])), ncol=J+1, byrow=FALSE)
+    } else if(mode=="MODWT"){
+    mra.x <- matrix(unlist(lapply(modwt(x,wf,J,boundary), function(z) z)), ncol=J+1, byrow=FALSE)
+    mra.y <- matrix(unlist(lapply(modwt(y,wf,J,boundary), function(z) z)), ncol=J+1, byrow=FALSE)      
+    } else {
+    mra.x <- matrix(unlist(at.wd(x,wf,J,boundary)), ncol=J+1)
+    mra.y <- matrix(unlist(at.wd(y,wf,J,boundary)), ncol=J+1)
+    }
+
+    data.list.val[[i]] <- list(x=as.numeric(z), dp=cbind(mra.x, mra.y))
+  }
+  
+  #----------------------------------------------------
+  #validation
+  sample.val <- sample-sample.cal
+  df.val <- NULL;dwt.RMSE<-NULL
+  for(i in 1:length(data.list.val)){
+    dwt <- data.list[[i]]
+    x.train <- dwt$x; dp <- dwt$dp
+    
+    dwt <- data.list.val[[i]]
+    x <- dwt$x; dp.v <- dwt$dp
+    
+    m <- FNN::knn.reg(train=dp, test=dp.v, y=x.train, k=k)$pred
+    dwt.RMSE <-c(dwt.RMSE, round(sqrt(mean((m-x)^2)),3))
+    df.val <- data.frame(Group=1, s=s[i], No=1:sample.val,Pred=m, Obs=x)
+  }
+  
+  t3 <- rbind(data.RMSE,dwt.RMSE)
+  
+  #----------------------------------------------------
+  #comparison
+  df.RMSE <- rbind(rbind(t1,t2),t3)
+  rownames(df.RMSE) <- NULL
+  df.RMSE.n <- data.frame(Method=mode,
+    Group=c("Calibration", "Calibration", "Validation", "Validation", 
+            "Calibration", "Validation"),
+    Model = c("Original", "VT", "Original", "VT", "Wavelet-decomposed components", 
+              "Wavelet-decomposed components"),df.RMSE)%>%
+    tidyr::gather(S,Value,4:(3+length(s)))%>% tidyr::spread(Group, Value)
+  
+  tab3 <- rbind(tab3,df.RMSE.n[order(df.RMSE.n$S),])
+
+}
+
+#----------------------------------------------------
+kable(tab3[,-3], caption= "Comparison of three methods using original predictor, 
+      wavelet-decomposed components, and variance-transformed predictor", booktabs = T)%>%
+kable_styling("striped", position = "center", full_width = FALSE) %>% 
+collapse_rows(columns = 1, valign = "middle")
+```
