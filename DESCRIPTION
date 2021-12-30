@@ -1,12 +1,16 @@
 Package: WASP
 Title: Wavelet System Prediction
-Version: 1.4.1
+Version: 1.4.1.9000
 Authors@R: 
     c(person(given = "Ze",
            family = "Jiang",
            role = c("aut", "cre"),
            email = "ze.jiang@unsw.edu.au",
            comment = c(ORCID = "0000-0002-3472-0829")),
+      person(given = "Md. Mamunur",
+           family = "Rashid",
+           role = c("aut"),
+           comment = c(ORCID = "0000-0002-0315-9055")),
       person(given = "Ashish",
            family = "Sharma",
            role = c("aut"),
@@ -16,6 +20,7 @@ Authors@R:
            role = c("aut"),
            comment = c(ORCID = "0000-0001-5708-1807")))
 Author: Ze Jiang [aut, cre] (<https://orcid.org/0000-0002-3472-0829>),
+        Md. Mamunur Rashid [aut] (<https://orcid.org/0000-0002-0315-9055>),
         Ashish Sharma [aut] (<https://orcid.org/0000-0002-6758-0519>),
         Fiona Johnson [aut] (<https://orcid.org/0000-0001-5708-1807>)
 Maintainer: Ze Jiang <ze.jiang@unsw.edu.au>
