@@ -1,6 +1,6 @@
 Package: WASP
 Title: Wavelet System Prediction
-Version: 1.4.1.9000
+Version: 1.4.2
 Authors@R: 
     c(person(given = "Ze",
            family = "Jiang",
@@ -47,5 +47,5 @@ Suggests:
     kableExtra,
     fitdistrplus,
     testthat
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 VignetteBuilder: knitr

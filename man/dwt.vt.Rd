@@ -11,7 +11,7 @@ dwt.vt(
   method,
   pad,
   boundary,
-  cov.opt = c("auto", "pos", "neg"),
+  cov.opt = "auto",
   flag = "biased",
   detrend = FALSE
 )

@@ -9,7 +9,7 @@ modwt.vt(
   wf,
   J,
   boundary,
-  cov.opt = c("auto", "pos", "neg"),
+  cov.opt = "auto",
   flag = "biased",
   detrend = FALSE
 )
@@ -78,6 +78,7 @@ data <- rbind(
 bar <- barplot(data, beside = TRUE, col = c("red", "blue"))
 lines(x = bar[2, ], y = sapply(x.modwt, var) / sum(sapply(x.modwt, var)))
 points(x = bar[2, ], y = sapply(x.modwt, var) / sum(sapply(x.modwt, var)))
+
 }
 \references{
 Jiang, Z., Sharma, A., & Johnson, F. (2020). Refining Predictor Spectral Representation Using Wavelet Theory for Improved Natural System Modeling. Water Resources Research, 56(3), e2019WR026962.

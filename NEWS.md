@@ -1,6 +1,7 @@
-# WASP (development version)
+# WASP 1.4.2
 * Include Authors@R
 * Update README.md and WASP.Rmd
+* Update cov.opt = 'auto'
 
 # WASP 1.4.1
 * Update vignettes

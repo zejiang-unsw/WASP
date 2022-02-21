@@ -31,7 +31,7 @@ scal2freqM <- function(wf, scale, delta) {
       d16 = 0.6667,
       d18 = 0.7059,
       d20 = 0.6842,
-      warning("Only daubechies wavelet family is available for now!")
+      print("Only daubechies wavelet family is available for now!")
     )
   }
 

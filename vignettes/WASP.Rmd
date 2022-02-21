@@ -1,6 +1,6 @@
 ---
-title: "WASP： An R package for Wavelet System Prediction"
-author: 'Ze Jiang, Ashish Sharma, and Fiona Johnson'
+title: "WASP: An R package for Wavelet System Prediction"
+author: 'Ze Jiang, Md. Mamunur Rashid, Ashish Sharma, and Fiona Johnson'
 date: "`r format(Sys.time(), '%H:%M:%S %d %B, %Y')`"
 output: 
 #  rmarkdown::html_vignette: 
@@ -23,6 +23,7 @@ knitr::opts_chunk$set(
   out.width = "85%",
   fig.align = "center", fig.pos = "h!"
 )
+options(rmarkdown.html_vignette.check_title = FALSE)
 library(rmarkdown)
 library(knitr)
 library(kableExtra)

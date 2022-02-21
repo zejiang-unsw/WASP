@@ -48,7 +48,7 @@
 #'   plot.ts(cbind(x, dp))
 #'   plot.ts(cbind(x, dp.n))
 #' }
-dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt = c("auto", "pos", "neg"),
+dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt = "auto",
                    flag = "biased", detrend = FALSE) {
   # initialization
   x <- data$x
@@ -80,7 +80,8 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt = c("auto", "pos"
     V <- as.numeric(apply(B, 2, sd))
 
     dif <- sum(abs(Bn %*% V - dp.c))
-    if (dif > 10^-10) warning(paste0("Difference between Reconstructed and original:", dif))
+    if (dif > 10^-10) print(paste0("Difference between reconstructed and
+                                   original series: ", dif))
 
     # variance transformation
     cov <- cov(x, Bn[seq_len(length(x)), ])
@@ -129,7 +130,8 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt = c("auto", "pos"
     }
 
     dif.var <- abs(var(dp[, i]) - var(dp.n[, i])) / var(dp[, i])
-    if (dif.var > 0.15) warning(paste0("Variance difference between Transformed and original(percentage):", dif.var * 100))
+    if (dif.var > 0.15) print(paste0("Variance difference between transformed
+                        and original series by percentage: ", dif.var * 100))
   }
 
   dwt <- list(
@@ -243,7 +245,8 @@ dwt.vt.val <- function(data, J, dwt, detrend = FALSE) {
     V <- as.numeric(apply(B, 2, sd))
 
     dif <- sum(abs(Bn %*% V - dp.c))
-    if (dif > 10^-10) warning(paste0("Difference between Reconstructed and original:", dif))
+    if (dif > 10^-10) print(paste0("Difference between reconstructed
+                                   and original series: ", dif))
 
     # in case different J
     cov <- rep(0, J + 1)
@@ -264,7 +267,8 @@ dwt.vt.val <- function(data, J, dwt, detrend = FALSE) {
 
 
     # dif.var <- abs(var(dp[,i])-var(dp.n[,i]))/var(dp[,i])
-    # if(dif.var>0.15) warning(paste0("Variance difference between Transformed and original(percentage):",dif.var*100))
+    # if (dif.var > 0.15) print(paste0("Variance difference between transformed
+    #                     and original series by percentage: ", dif.var * 100))
   }
 
   dwt <- list(

@@ -9,7 +9,7 @@ at.vt(
   wf,
   J,
   boundary,
-  cov.opt = c("auto", "pos", "neg"),
+  cov.opt = "auto",
   flag = "biased",
   detrend = FALSE
 )
