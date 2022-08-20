@@ -31,7 +31,7 @@ Depends: R (>= 3.6.0)
 URL: https://github.com/zejiang-unsw/WASP#readme
 BugReports: https://github.com/zejiang-unsw/WASP/issues
 Imports: 
-    waveslim, stats, tidyr, ggplot2, sp
+    waveslim, stats, tidyr, ggplot2, sp, rlang (>= 1.0.0)
 Suggests: 
     zoo,
     FNN,
@@ -47,5 +47,5 @@ Suggests:
     kableExtra,
     fitdistrplus,
     testthat
-RoxygenNote: 7.1.2
+RoxygenNote: 7.2.1
 VignetteBuilder: knitr
