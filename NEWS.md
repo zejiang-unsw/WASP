@@ -1,3 +1,7 @@
+# WASP 1.4.3
+* Imports: rlang (>= 1.0.0)
+* RoxygenNote: 7.2.1
+
 # WASP 1.4.2
 * Include Authors@R
 * Update README.md and WASP.Rmd
