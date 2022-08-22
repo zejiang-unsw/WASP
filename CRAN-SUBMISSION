@@ -1,3 +1,27 @@
-Version: 1.4.2
-Date: 2022-02-21 14:04:46 UTC
-SHA: 8d581cf42e3202d8fe8f1e914d02b07aa44c2f0a
+Version: 1.4.3
+Date: 2022-08-22 01:29:17 UTC
+SHA: fatal: detected dubious ownership in repository at 'F:/OneDrive - UNSW/Academic/software/WASP'
+
+Version: 1.4.3
+Date: 2022-08-22 01:29:17 UTC
+SHA: To add an exception for this directory, call:
+
+Version: 1.4.3
+Date: 2022-08-22 01:29:17 UTC
+SHA:
+
+Version: 1.4.3
+Date: 2022-08-22 01:29:17 UTC
+SHA: git config --global --add safe.directory 'F:/OneDrive - UNSW/Academic/software/WASP'
+
+Version: 1.4.3
+Date: 2022-08-22 01:29:17 UTC
+SHA:
+
+Version: 1.4.3
+Date: 2022-08-22 01:29:17 UTC
+SHA: Set the environment variable GIT_TEST_DEBUG_UNSAFE_DIRECTORIES=true and run
+
+Version: 1.4.3
+Date: 2022-08-22 01:29:17 UTC
+SHA: again for more information.

@@ -46,6 +46,7 @@ Suggests:
     synthesis,
     kableExtra,
     fitdistrplus,
+    devtools,
     testthat
 RoxygenNote: 7.2.1
 VignetteBuilder: knitr

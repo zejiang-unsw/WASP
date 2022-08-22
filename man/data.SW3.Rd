@@ -3,11 +3,13 @@
 \docType{data}
 \name{data.SW3}
 \alias{data.SW3}
-\title{Sample data: Sinewave model 3 (SW3): \deqn{ x_{t}= \sum_{i=1}^3 sin(2pi*f_{i}*t)+eps}}
+\title{Sample data: Sinewave model 3 (SW3)}
 \usage{
 data(data.SW3)
 }
 \description{
 A dataset containing 3 lists: a vector of response (x), a matrix of 9 potential predictors (dp) with each column containing one potential predictor, and a vector of true predictor numbers.
+The Sinewave model 3 (SW3) is defined as:
+\deqn{x_{t}= \sum_{i=1}^3 sin(2pi*f_{i}*t)+eps}
 }
 \keyword{datasets}
