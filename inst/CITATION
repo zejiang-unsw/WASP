@@ -1,0 +1,59 @@
+citHeader("To cite WASP in publications use:")
+
+citEntry(entry = "Article",
+         title        = "Refining Predictor Spectral Representation Using Wavelet Theory for Improved Natural System Modeling",
+         author       = personList(as.person("Ze Jiang"),
+                                   as.person("Ashish Sharma"),
+                                   as.person("Fiona Johnson")),
+         journal      = "Water Resources Research",
+         year         = "2020",
+         volume       = "56",
+         number       = "3",
+         pages        = "e2019WR026962",
+         doi          = "10.1029/2019WR026962",
+
+         textVersion  = paste("Jiang, Z., Sharma, A., & Johnson, F. (2020).",
+                              "Refining Predictor Spectral Representation Using Wavelet Theory for Improved Natural System Modeling.",
+                              "Water Resources Research, 56(3), e2019WR026962. ",
+                              "<doi:10.1029/2019WR026962>.")
+)
+
+citEntry(entry = "Article",
+         title        = "A wavelet-based tool to modulate variance in predictors: an application to predicting drought anomalies",
+         author       = personList(as.person("Ze Jiang"),
+                                   as.person("Md. Mamunur Rashid"),
+                                   as.person("Fiona Johnson"),
+                                   as.person("Ashish Sharma")),
+         journal      = "Environmental Modelling & Software",
+         year         = "2020",
+         volume       = "135",
+         number       = "",
+         pages        = "104907",
+         doi          = "10.1016/j.envsoft.2020.104907",
+
+         textVersion  = paste("Jiang, Z., Rashid, M. M., Johnson, F., & Sharma, A. (2020).",
+                              "A wavelet-based tool to modulate variance in predictors: an application to predicting drought anomalies.",
+                              "Environmental Modelling & Software, 135, 104907. ",
+                              "<doi:10.1016/j.envsoft.2020.104907>.")
+)
+
+citEntry(entry = "Article",
+         title        = "Variable transformations in the spectral domain – Implications for hydrologic forecasting",
+         author       = personList(as.person("Ze Jiang"),
+                                   as.person("Ashish Sharma"),
+                                   as.person("Fiona Johnson")),
+         journal      = "Journal of Hydrology",
+         year         = "2021",
+         volume       = "603",
+         number       = "",
+         pages        = "126816",
+         doi          = "10.1016/J.JHYDROL.2021.126816",
+
+         textVersion  = paste("Jiang, Z., Sharma, A., & Johnson, F. (2021).",
+                              "Variable transformations in the spectral domain – Implications for hydrologic forecasting.",
+                              "Journal of Hydrology, 603, 126816. ",
+                              "<doi:10.1016/J.JHYDROL.2021.126816>.")
+)
+
+
+citFooter("Additional information: https://github.com/zejiang-unsw/WASP#readme")
