@@ -6,15 +6,14 @@
 #' @param boundary  Character string specifying the boundary condition. If boundary=="periodic" the default, then the vector you decompose is assumed to be periodic on its defined interval, if boundary=="reflection", the vector beyond its boundaries is assumed to be a symmetric reflection of itself.
 #' @param cov.opt   Options of Covariance matrix sign. Use "pos", "neg", or "auto".
 #' @param flag      Biased or Unbiased variance transformation, c("biased","unbiased").
-#' @param detrend   Detrend the input time series or just center, default (F)
+#' @param detrend   Detrend the input time series or just center, default (F).
 #'
 #' @return A list of 8 elements: wf, J, boundary, x (data), dp (data), dp.n (variance transformed dp), and S (covariance matrix).
 #' @import waveslim
 #' @export
 #'
 #' @references Jiang, Z., Sharma, A., & Johnson, F. (2020). Refining Predictor Spectral Representation Using Wavelet Theory for Improved Natural System Modeling. Water Resources Research, 56(3), e2019WR026962.
-#'
-#' Jiang, Z., Sharma, A., & Johnson, F. (2021). Variable transformations in the spectral domain – Implications for hydrologic forecasting. Journal of Hydrology, 126816.
+#' @references Jiang, Z., Sharma, A., & Johnson, F. (2021). Variable transformations in the spectral domain – Implications for hydrologic forecasting. Journal of Hydrology, 126816.
 #'
 #' @examples
 #' data(rain.mon)
@@ -79,8 +78,7 @@ at.vt <- function(data, wf, J, boundary, cov.opt = "auto",
     V <- as.numeric(apply(B, 2, sd))
 
     dif <- sum(abs(Bn %*% V - dp.c))
-    if (dif > 10^-10) print(paste0("Difference between reconstructed and
-                                   original series: ", dif))
+    if (dif > 10^-10) print(paste0("Difference between reconstructed and original series: ", dif))
 
     # variance transformation
     cov <- cov(x, Bn[seq_len(length(x)), ])
@@ -146,10 +144,11 @@ at.vt <- function(data, wf, J, boundary, cov.opt = "auto",
 #' @param data		  A list of response x and dependent variables dp.
 #' @param J      	  Specifies the depth of the decomposition. This must be a number less than or equal to log(length(x),2).
 #' @param dwt       A class of "at" data. Output from at.vt().
-#' @param detrend   Detrend the input time series or just center, default (F)
+#' @param detrend   Detrend the input time series or just center, default (F).
 #'
 #' @return A list of 8 elements: wf, J, boundary, x (data), dp (data), dp.n (variance transformed dp), and S (covariance matrix).
 #' @export
+#'
 #' @references Jiang, Z., Sharma, A., & Johnson, F. (2020). Refining Predictor Spectral Representation Using Wavelet Theory for Improved Natural System Modeling. Water Resources Research, 56(3), e2019WR026962. doi:10.1029/2019wr026962
 #'
 #' @examples
@@ -234,8 +233,7 @@ at.vt.val <- function(data, J, dwt, detrend = FALSE) {
     V <- as.numeric(apply(B, 2, sd))
 
     dif <- sum(abs(Bn %*% V - dp.c))
-    if (dif > 10^-10) print(paste0("Difference between reconstructed and
-                                   original series: ", dif))
+    if (dif > 10^-10) print(paste0("Difference between reconstructed and original series: ", dif))
 
     # in case different J
     cov <- rep(0, J + 1)

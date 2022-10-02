@@ -27,7 +27,7 @@ at.vt(
 
 \item{flag}{Biased or Unbiased variance transformation, c("biased","unbiased").}
 
-\item{detrend}{Detrend the input time series or just center, default (F)}
+\item{detrend}{Detrend the input time series or just center, default (F).}
 }
 \value{
 A list of 8 elements: wf, J, boundary, x (data), dp (data), dp.n (variance transformed dp), and S (covariance matrix).

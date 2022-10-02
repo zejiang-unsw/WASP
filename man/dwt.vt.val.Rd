@@ -13,7 +13,7 @@ dwt.vt.val(data, J, dwt, detrend = FALSE)
 
 \item{dwt}{A class of "dwt" data. Output from dwt.vt().}
 
-\item{detrend}{Detrend the input time series or just center, default (F)}
+\item{detrend}{Detrend the input time series or just center, default (F).}
 }
 \value{
 A list of 8 elements: wf, method, boundary, pad, x (data), dp (data), dp.n (variance trasnformed dp), and S (covariance matrix).

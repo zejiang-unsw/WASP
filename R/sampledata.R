@@ -68,8 +68,10 @@ NULL
 #'@usage data(SPI.12)
 NULL
 
-#'@title Sample data: Sinewave model 1 (SW1):\deqn{ x_{t}= sin(2pi*f*t)+eps}
+#'@title Sample data: Sinewave model 1 (SW1)
 #'@description A dataset containing 3 lists: a vector of response (x), a matrix of 9 potential predictors (dp) with each column containing one potential predictor, and a vector of true predictor numbers.
+#'The Sinewave model 1 (SW1) is defined as:
+#'\deqn{x_{t}= sin(2pi*f*t)+eps}
 #'
 #'@docType data
 #'@keywords datasets
@@ -77,8 +79,10 @@ NULL
 #'@usage data(data.SW1)
 NULL
 
-#'@title Sample data: Sinewave model 3 (SW3): \deqn{ x_{t}= \sum_{i=1}^3 sin(2pi*f_{i}*t)+eps}
+#'@title Sample data: Sinewave model 3 (SW3)
 #'@description A dataset containing 3 lists: a vector of response (x), a matrix of 9 potential predictors (dp) with each column containing one potential predictor, and a vector of true predictor numbers.
+#'The Sinewave model 3 (SW3) is defined as:
+#'\deqn{x_{t}= \sum_{i=1}^3 sin(2pi*f_{i}*t)+eps}
 #'
 #'@docType data
 #'@keywords datasets

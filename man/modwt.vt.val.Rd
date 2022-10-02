@@ -13,7 +13,7 @@ modwt.vt.val(data, J, dwt, detrend = FALSE)
 
 \item{dwt}{A class of "modwt" data. Output from modwt.vt().}
 
-\item{detrend}{Detrend the input time series or just center, default (F)}
+\item{detrend}{Detrend the input time series or just center, default (F).}
 }
 \value{
 A list of 8 elements: wf, J, boundary, x (data), dp (data), dp.n (variance transformed dp), and S (covariance matrix).
@@ -73,5 +73,5 @@ for (i in seq_along(dwt.list.val)) {
 }
 }
 \references{
-Z Jiang, A Sharma, and F Johnson. WRR
+Jiang, Z., Sharma, A., & Johnson, F. (2020). Refining Predictor Spectral Representation Using Wavelet Theory for Improved Natural System Modeling. Water Resources Research, 56(3), e2019WR026962. doi:10.1029/2019wr026962
 }

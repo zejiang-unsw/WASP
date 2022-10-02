@@ -6,15 +6,14 @@
 #' @param boundary  Character string specifying the boundary condition. If boundary=="periodic" the default, then the vector you decompose is assumed to be periodic on its defined interval, if boundary=="reflection", the vector beyond its boundaries is assumed to be a symmetric reflection of itself.
 #' @param cov.opt   Options of Covariance matrix sign. Use "pos", "neg", or "auto".
 #' @param flag      Biased or Unbiased variance transformation, c("biased","unbiased").
-#' @param detrend   Detrend the input time series or just center, default (F)
+#' @param detrend   Detrend the input time series or just center, default (F).
 #'
 #' @return A list of 8 elements: wf, J, boundary, x (data), dp (data), dp.n (variance transformed dp), and S (covariance matrix).
 #' @import waveslim
 #' @export
 #'
 #' @references Jiang, Z., Sharma, A., & Johnson, F. (2020). Refining Predictor Spectral Representation Using Wavelet Theory for Improved Natural System Modeling. Water Resources Research, 56(3), e2019WR026962.
-#'
-#' Jiang, Z., Rashid, M. M., Johnson, F., & Sharma, A. (2020). A wavelet-based tool to modulate variance in predictors: an application to predicting drought anomalies. Environmental Modelling & Software, 135, 104907.
+#' @references Jiang, Z., Rashid, M. M., Johnson, F., & Sharma, A. (2020). A wavelet-based tool to modulate variance in predictors: an application to predicting drought anomalies. Environmental Modelling & Software, 135, 104907.
 #'
 #' @examples
 #' ### real-world example
@@ -90,9 +89,9 @@ modwt.vt <- function(data, wf, J, boundary, cov.opt = "auto",
     Bn <- scale(B)[1:n, ]
     V <- as.numeric(apply(B, 2, sd))
 
-    dif <- sum(abs(imodwt(modwt.dp[[i]]) - dp.c))
-    if (dif > 10^-10) print(paste0("Difference between reconstructed and
-                                   original series: ", dif))
+    # dif <- sum(abs(imodwt(modwt.dp[[i]]) - dp.c)) # this is equivalent to MODWT-MRA
+    dif <- sum(abs(Bn %*% V - dp.c))
+    if (dif > 10^-10) print(paste0("Difference between reconstructed and original series: ", dif))
 
     # variance transformation
     cov <- cov(x, Bn[seq_along(x), ])
@@ -159,11 +158,12 @@ modwt.vt <- function(data, wf, J, boundary, cov.opt = "auto",
 #' @param data		  A list of response x and dependent variables dp.
 #' @param J      	  Specifies the depth of the decomposition. This must be a number less than or equal to log(length(x),2).
 #' @param dwt       A class of "modwt" data. Output from modwt.vt().
-#' @param detrend   Detrend the input time series or just center, default (F)
+#' @param detrend   Detrend the input time series or just center, default (F).
 #'
-#' @return          A list of 8 elements: wf, J, boundary, x (data), dp (data), dp.n (variance transformed dp), and S (covariance matrix).
+#' @return A list of 8 elements: wf, J, boundary, x (data), dp (data), dp.n (variance transformed dp), and S (covariance matrix).
 #' @export
-#' @references Z Jiang, A Sharma, and F Johnson. WRR
+#'
+#' @references Jiang, Z., Sharma, A., & Johnson, F. (2020). Refining Predictor Spectral Representation Using Wavelet Theory for Improved Natural System Modeling. Water Resources Research, 56(3), e2019WR026962. doi:10.1029/2019wr026962
 #'
 #' @examples
 #' data(rain.mon)
@@ -245,9 +245,9 @@ modwt.vt.val <- function(data, J, dwt, detrend = FALSE) {
     Bn <- scale(B)
     V <- as.numeric(apply(B, 2, sd))
 
-    dif <- sum(abs(imodwt(modwt.dp[[i]]) - dp.c))
-    if (dif > 10^-10) print(paste0("Difference between reconstructed and
-                                   original series: ", dif))
+    # dif <- sum(abs(imodwt(modwt.dp[[i]]) - dp.c)) # this is equivalent to MODWT-MRA
+    dif <- sum(abs(Bn %*% V - dp.c))
+    if (dif > 10^-10) print(paste0("Difference between reconstructed and original series: ", dif))
 
     # in case different J
     cov <- rep(0, J + 1)
