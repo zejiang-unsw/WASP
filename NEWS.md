@@ -1,3 +1,7 @@
+# WASP (development version)
+* Update padding with zoo and ts objects
+* RoxygenNote: 7.2.3
+
 # WASP 1.4.3
 * Imports: rlang (>= 1.0.0)
 * RoxygenNote: 7.2.1

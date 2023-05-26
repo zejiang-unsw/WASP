@@ -300,6 +300,9 @@ dwt.vt.val <- function(data, J, dwt, detrend = FALSE) {
 #' x3 <- padding(x, pad = "sym")
 #' ts.plot(cbind(x, x1, x2, x3), col = 1:4)
 padding <- function(x, pad = c("per", "zero", "sym")) {
+  x0 <- x
+  x <- as.numeric(x)
+
   n <- length(x)
   N <- 2^(ceiling(log(n, 2)))
   if (pad == "per") {
@@ -309,4 +312,9 @@ padding <- function(x, pad = c("per", "zero", "sym")) {
   } else {
     xx <- c(x, rev(x))[1:N]
   }
+
+  if(class(x0)=="zoo") xx <- zoo(xx,index(x0)[1]+0:(N-1))
+  if(class(x0)=="ts") xx <- ts(xx,freq=frequency(x0), start=start(x0))
+
+  return(xx)
 }
