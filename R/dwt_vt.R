@@ -313,8 +313,8 @@ padding <- function(x, pad = c("per", "zero", "sym")) {
     xx <- c(x, rev(x))[1:N]
   }
 
-  if(class(x0)=="zoo") xx <- zoo(xx,index(x0)[1]+0:(N-1))
-  if(class(x0)=="ts") xx <- ts(xx,freq=frequency(x0), start=start(x0))
+  if(class(x0)[1] =="zoo") xx <- zoo(xx,index(x0)[1]+0:(N-1))
+  if(class(x0)[1]=="ts") xx <- ts(xx,freq=frequency(x0), start=start(x0))
 
   return(xx)
 }
