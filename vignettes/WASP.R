@@ -328,7 +328,7 @@ if (TRUE) {
   data.list <- lapply(ts.list, function(ts) list(x = ts$z, dp = cbind(ts$x, ts$y)))
 
   lab.names <- c("x", "y")
-  ylim <- c(-55, 55)
+  xlim<- c(0,n);ylim <- c(-55, 55)
 } else {
 
   ### Real-world example
@@ -343,7 +343,7 @@ if (TRUE) {
   sample <- length(x)
 
   lab.names <- colnames(obs.mon)
-  ylim <- NULL
+  xlim<- NULL;ylim <- NULL
 }
 
 #-------------------------------------------------------------------
@@ -379,7 +379,7 @@ for (mode in mode.opts) {
   J <- ceiling(log(n / (2 * v - 1)) / log(2)) - 1 # (Kaiser, 1994)
   # J <- floor(log(n/(2*v-1))/log(2))
 
-  # variance transfrom - calibration
+  # variance transform - calibration
   if (mode == "MRA") {
     dwt.list <- lapply(data.list, function(x) dwt.vt(x, wf, J, method, pad, boundary, cov.opt, flag))
   } else if (mode == "MODWT") {
@@ -404,7 +404,7 @@ for (mode in mode.opts) {
     for (i in 1:ncol(dwt$dp)) {
       ts.plot(cbind(dwt$dp[, i], dwt$dp.n[, i]),
         xlab = NA, ylab = paste0(lab.names[i]),
-        xlim = c(0, n), ylim = ylim,
+        xlim = xlim, ylim = ylim,
         col = c("black", "blue"), lwd = c(1, 2)
       )
     }
@@ -581,7 +581,7 @@ kable(tab1, caption = "Comparison of prediction accuracy using Std and SVT", boo
 #    #if(wf=="haar"&&mode=="MODWT") J = J-1 #since modwt no need a dyadic number size
 #    print(paste0("Calibration: Decomposition Levels J= ",J))
 #  
-#    #variance transfrom
+#    #variance transform
 #    if(mode=="MRA"){
 #      dwt.list<- lapply(data.list, function(x) dwt.vt(x, wf, J, method, pad, boundary, cov.opt))
 #    } else if(mode=="MODWT") {

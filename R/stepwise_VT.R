@@ -361,26 +361,26 @@ pmi.calc <- function(X, Y) {
   return(sum(calc) / N)
 }
 #-------------------------------------------------------------------------------
-# Calculate PIC
-#
-# @param X       A vector of response.
-# @param Y       A matrix of new predictors.
-# @param Z       A matrix of pre-existing predictors that could be NULL if no prior predictors exist.
-# @param mode    A mode of variance transfomration, i.e., MRA, MODWT, or AT
-# @param J       The maximum decomposition level
-# @param wf      Wavelet family
-# @param method  Either "dwt" or "modwt" of MRA.
-# @param pad      The method used for extend data to dyadic size. Use "per", "zero", or "sym".
-# @param boundary Character string specifying the boundary condition. If boundary=="periodic" the default, then the vector you decompose is assumed to be periodic on its defined interval, if boundary=="reflection", the vector beyond its boundaries is assumed to be a symmetric reflection of itself.
-# @param cov.opt Options of Covariance matrix sign. Use "pos", "neg", or "auto".
-# @param flag    Biased or Unbiased variance transformation.
-# @param detrend Detrend the input time series or just center, default (F).
-#
-# @return A list of 2 elements: the partial mutual information (pmi), and partial informational correlation (pic).
-# @export
-#
-# @references Sharma, A., Mehrotra, R., 2014. An information theoretic alternative to model a natural system using observational information alone. Water Resources Research, 50(1): 650-660.
-# @references Galelli S., Humphrey G.B., Maier H.R., Castelletti A., Dandy G.C. and Gibbs M.S. (2014) An evaluation framework for input variable selection algorithms for environmental data-driven models, Environmental Modelling and Software, 62, 33-51, DOI: 10.1016/j.envsoft.2014.08.015.
+#' Calculate PIC
+#'
+#' @param X       A vector of response.
+#' @param Y       A matrix of new predictors.
+#' @param Z       A matrix of pre-existing predictors that could be NULL if no prior predictors exist.
+#' @param mode    A mode of variance transfomration, i.e., MRA, MODWT, or AT
+#' @param J       The maximum decomposition level
+#' @param wf      Wavelet family
+#' @param method  Either "dwt" or "modwt" of MRA.
+#' @param pad      The method used for extend data to dyadic size. Use "per", "zero", or "sym".
+#' @param boundary Character string specifying the boundary condition. If boundary=="periodic" the default, then the vector you decompose is assumed to be periodic on its defined interval, if boundary=="reflection", the vector beyond its boundaries is assumed to be a symmetric reflection of itself.
+#' @param cov.opt Options of Covariance matrix sign. Use "pos", "neg", or "auto".
+#' @param flag    Biased or Unbiased variance transformation.
+#' @param detrend Detrend the input time series or just center, default (F).
+#'
+#' @return A list of 2 elements: the partial mutual information (pmi), and partial informational correlation (pic).
+#' @export
+#'
+#' @references Sharma, A., Mehrotra, R., 2014. An information theoretic alternative to model a natural system using observational information alone. Water Resources Research, 50(1): 650-660.
+#' @references Galelli S., Humphrey G.B., Maier H.R., Castelletti A., Dandy G.C. and Gibbs M.S. (2014) An evaluation framework for input variable selection algorithms for environmental data-driven models, Environmental Modelling and Software, 62, 33-51, DOI: 10.1016/j.envsoft.2014.08.015.
 
 pic.calc <- function(X, Y, Z, mode, wf, J, method = "dwt", pad = "zero",
                      boundary = "periodic", cov.opt = "auto", flag = "biased", detrend = F) {
