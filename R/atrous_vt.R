@@ -60,6 +60,7 @@ at.vt <- function(data, wf, J, boundary, cov.opt = "auto",
   n <- nrow(dp)
   S <- matrix(nrow = J + 1, ncol = ndim)
   dp.n <- matrix(nrow = n, ncol = ndim)
+  Wn.list <- vector('list', NCOL(dp))
 
   for (i in 1:ndim) {
     # center or detrend
@@ -75,6 +76,7 @@ at.vt <- function(data, wf, J, boundary, cov.opt = "auto",
     B <- matrix(unlist(at.dp), ncol = J + 1, byrow = FALSE)
 
     Bn <- scale(B)
+    Wn.list[[i]] <- Bn
     V <- as.numeric(apply(B, 2, sd))
 
     dif <- sum(abs(Bn %*% V - dp.c))
@@ -132,7 +134,8 @@ at.vt <- function(data, wf, J, boundary, cov.opt = "auto",
     x = x,
     dp = dp,
     dp.n = dp.n,
-    S = S
+    S = S,
+    Wn = Wn.list
   )
   class(dwt) <- "at"
 

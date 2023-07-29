@@ -72,6 +72,7 @@ modwt.vt <- function(data, wf, J, boundary, cov.opt = "auto",
   S <- matrix(nrow = J + 1, ncol = ndim)
   dp.n <- matrix(nrow = n, ncol = ndim)
   modwt.dp <- vector("list", ndim)
+  Wn.list <- vector('list', NCOL(dp))
 
   for (i in 1:ndim) {
     # center or detrend
@@ -87,6 +88,7 @@ modwt.vt <- function(data, wf, J, boundary, cov.opt = "auto",
     B <- matrix(unlist(modwt.dp[[i]]), ncol = J + 1, byrow = FALSE)
 
     Bn <- scale(B)[1:n, ]
+    Wn.list[[i]] <- Bn
     V <- as.numeric(apply(B, 2, sd))
 
     # dif <- sum(abs(imodwt(modwt.dp[[i]]) - dp.c)) # this is equivalent to MODWT-MRA
@@ -145,7 +147,8 @@ modwt.vt <- function(data, wf, J, boundary, cov.opt = "auto",
     x = x,
     dp = dp,
     dp.n = dp.n,
-    S = S
+    S = S,
+    Wn = Wn.list
   )
   class(dwt) <- "modwt"
 
