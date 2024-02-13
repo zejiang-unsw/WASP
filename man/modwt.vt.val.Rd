@@ -4,7 +4,7 @@
 \alias{modwt.vt.val}
 \title{Variance Transformation Operation for Validation}
 \usage{
-modwt.vt.val(data, J, dwt, detrend = FALSE)
+modwt.vt.val(data, J, dwt, detrend = FALSE, backward = FALSE, verbose = TRUE)
 }
 \arguments{
 \item{data}{A list of response x and dependent variables dp.}
@@ -14,6 +14,10 @@ modwt.vt.val(data, J, dwt, detrend = FALSE)
 \item{dwt}{A class of "modwt" data. Output from modwt.vt().}
 
 \item{detrend}{Detrend the input time series or just center, default (F).}
+
+\item{backward}{Detrend the input time series or just center, default (F).}
+
+\item{verbose}{A logical indicating if some “progress report” should be given.}
 }
 \value{
 A list of 8 elements: wf, J, boundary, x (data), dp (data), dp.n (variance transformed dp), and S (covariance matrix).
