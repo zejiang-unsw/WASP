@@ -7,6 +7,8 @@
 #' @param cov.opt   Options of Covariance matrix sign. Use "pos", "neg", or "auto".
 #' @param flag      Biased or Unbiased variance transformation, c("biased","unbiased").
 #' @param detrend   Detrend the input time series or just center, default (F).
+#' @param backward  Detrend the input time series or just center, default (F).
+#' @param verbose	  A logical indicating if some “progress report” should be given.
 #'
 #' @return A list of 8 elements: wf, J, boundary, x (data), dp (data), dp.n (variance transformed dp), and S (covariance matrix).
 #' @import waveslim
@@ -60,13 +62,19 @@
 #' points(x = bar[2, ], y = sapply(x.modwt, var) / sum(sapply(x.modwt, var)))
 #'
 modwt.vt <- function(data, wf, J, boundary, cov.opt = "auto",
-                     flag = "biased", detrend = FALSE) {
+                     flag = "biased", detrend = FALSE, backward=FALSE, verbose=TRUE) {
   # initialization
   x <- data$x
   dp <- as.matrix(data$dp)
   mu.dp <- apply(dp, 2, mean)
-
-  # variance transform
+  
+  # reverse data to normal timeline
+  if(backward) {
+    x <- rev(x)
+    dp <- apply(dp, 2, rev)
+  }
+  
+  # output 
   ndim <- ncol(dp)
   n <- nrow(dp)
   S <- matrix(nrow = J + 1, ncol = ndim)
@@ -91,9 +99,11 @@ modwt.vt <- function(data, wf, J, boundary, cov.opt = "auto",
     Wn.list[[i]] <- Bn
     V <- as.numeric(apply(B, 2, sd))
 
-    # dif <- sum(abs(imodwt(modwt.dp[[i]]) - dp.c)) # this is equivalent to MODWT-MRA
-    dif <- sum(abs(Bn %*% V - dp.c))
-    if (dif > 10^-10) print(paste0("Difference between reconstructed and original series: ", dif))
+	if(verbose){
+		# dif <- sum(abs(imodwt(modwt.dp[[i]]) - dp.c)) # this is equivalent to MODWT-MRA
+		dif <- sum(abs(Bn %*% V - dp.c))
+		if (dif > 10^-10) print(paste0("Difference between reconstructed and original series: ", dif))
+	}
 
     # variance transformation
     cov <- cov(x, Bn[seq_along(x), ])
@@ -140,6 +150,13 @@ modwt.vt <- function(data, wf, J, boundary, cov.opt = "auto",
     #                  and original series by percentage: ", dif.var*100))
   }
 
+  # reverse data to normal timeline
+  if(backward) {
+    x <- rev(x)
+    dp <- apply(dp, 2, rev)
+    dp.n <- apply(dp.n, 2, rev)
+  }
+  
   dwt <- list(
     wavelet = wf,
     J = J,
@@ -162,6 +179,8 @@ modwt.vt <- function(data, wf, J, boundary, cov.opt = "auto",
 #' @param J      	  Specifies the depth of the decomposition. This must be a number less than or equal to log(length(x),2).
 #' @param dwt       A class of "modwt" data. Output from modwt.vt().
 #' @param detrend   Detrend the input time series or just center, default (F).
+#' @param backward  Detrend the input time series or just center, default (F).
+#' @param verbose	  A logical indicating if some “progress report” should be given.
 #'
 #' @return A list of 8 elements: wf, J, boundary, x (data), dp (data), dp.n (variance transformed dp), and S (covariance matrix).
 #' @export
@@ -218,7 +237,7 @@ modwt.vt <- function(data, wf, J, boundary, cov.opt = "auto",
 #'   plot.ts(cbind(x, dp))
 #'   plot.ts(cbind(x, dp.n))
 #' }
-modwt.vt.val <- function(data, J, dwt, detrend = FALSE) {
+modwt.vt.val <- function(data, J, dwt, detrend = FALSE, backward=FALSE, verbose=TRUE) {
 
   # initialization
   x <- data$x
@@ -226,8 +245,14 @@ modwt.vt.val <- function(data, J, dwt, detrend = FALSE) {
   wf <- dwt$wavelet
   boundary <- dwt$boundary
   mu.dp <- apply(dp, 2, mean)
-
-  # variance transform
+  
+  # reverse data
+  if(backward) {
+    x <- rev(x)
+    dp <- apply(dp, 2, rev)
+  }
+  
+  # output
   ndim <- ncol(dp)
   n <- nrow(dp)
   dp.n <- matrix(nrow = n, ncol = ndim)
@@ -248,9 +273,11 @@ modwt.vt.val <- function(data, J, dwt, detrend = FALSE) {
     Bn <- scale(B)
     V <- as.numeric(apply(B, 2, sd))
 
-    # dif <- sum(abs(imodwt(modwt.dp[[i]]) - dp.c)) # this is equivalent to MODWT-MRA
-    dif <- sum(abs(Bn %*% V - dp.c))
-    if (dif > 10^-10) print(paste0("Difference between reconstructed and original series: ", dif))
+	if(verbose){
+		# dif <- sum(abs(imodwt(modwt.dp[[i]]) - dp.c)) # this is equivalent to MODWT-MRA
+		dif <- sum(abs(Bn %*% V - dp.c))
+		if (dif > 10^-10) print(paste0("Difference between reconstructed and original series: ", dif))
+	}
 
     # in case different J
     cov <- rep(0, J + 1)
@@ -274,6 +301,13 @@ modwt.vt.val <- function(data, J, dwt, detrend = FALSE) {
     #                     and original series by percentage: ", dif.var * 100))
   }
 
+  # reverse data to normal timeline
+  if(backward) {
+    x <- rev(x)
+    dp <- apply(dp, 2, rev)
+    dp.n <- apply(dp.n, 2, rev)
+  }
+  
   dwt <- list(
     wavelet = wf,
     J = J,

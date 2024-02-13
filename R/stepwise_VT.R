@@ -446,4 +446,5 @@ pw.calc <- function(x, z, cpyPIC) {
     for (i in seq_len(ncol(Z))) wt[i] <- calc.scaleSTDratio(x, Z[, i], Z[, -i]) * cpyPIC[i]
   }
   return(list(pw = wt))
+  #return(list(pw = wt / sum(wt)))
 }

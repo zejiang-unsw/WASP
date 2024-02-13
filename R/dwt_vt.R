@@ -9,6 +9,8 @@
 #' @param cov.opt   Options of Covariance matrix sign. Use "pos", "neg", or "auto".
 #' @param flag      Biased or Unbiased variance transformation, c("biased","unbiased").
 #' @param detrend   Detrend the input time series or just center, default (F).
+#' @param backward  Detrend the input time series or just center, default (F).
+#' @param verbose	  A logical indicating if some “progress report” should be given.
 #'
 #' @return A list of 8 elements: wf, method, boundary, pad, x (data), dp (data), dp.n (variance trasnformed dp), and S (covariance matrix).
 #' @import waveslim
@@ -49,13 +51,19 @@
 #'   plot.ts(cbind(x, dp.n))
 #' }
 dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt = "auto",
-                   flag = "biased", detrend = FALSE) {
+                   flag = "biased", detrend = FALSE, backward=FALSE, verbose=TRUE) {
   # initialization
   x <- data$x
   dp <- as.matrix(data$dp)
   mu.dp <- apply(dp, 2, mean)
+  
+  # reverse data
+  if(backward) {
+    x <- rev(x)
+    dp <- apply(dp, 2, rev)
+  }
 
-  # variance transform
+  # output
   ndim <- ncol(dp)
   n <- nrow(dp)
   S <- matrix(nrow = J + 1, ncol = ndim)
@@ -81,8 +89,10 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt = "auto",
     Wn.list[[i]] <- Bn
     V <- as.numeric(apply(B, 2, sd))
 
-    dif <- sum(abs(Bn %*% V - dp.c))
-    if (dif > 10^-10) print(paste0("Difference between reconstructed and original series: ", dif))
+	if(verbose){
+		dif <- sum(abs(Bn %*% V - dp.c))
+		if (dif > 10^-10) print(paste0("Difference between reconstructed and original series: ", dif))
+	}
 
     # variance transformation
     cov <- cov(x, Bn[seq_len(length(x)), ])
@@ -130,9 +140,18 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt = "auto",
       }
     }
 
-    dif.var <- abs(var(dp[, i]) - var(dp.n[, i])) / var(dp[, i])
-    if (dif.var > 0.15) print(paste0("Variance difference between transformed ",
-                        "and original series by percentage: ", dif.var * 100))
+    if(verbose){
+		dif.var <- abs(var(dp[, i]) - var(dp.n[, i])) / var(dp[, i])
+		if (dif.var > 0.15) print(paste0("Variance difference between transformed ",
+							"and original series by percentage: ", dif.var * 100))
+	}
+  }
+  
+  # reverse data to normal timeline
+  if(backward) {
+    x <- rev(x)
+    dp <- apply(dp, 2, rev)
+    dp.n <- apply(dp.n, 2, rev)
   }
 
   dwt <- list(
@@ -157,6 +176,8 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt = "auto",
 #' @param J      	  Specifies the depth of the decomposition. This must be a number less than or equal to log(length(x),2).
 #' @param dwt       A class of "dwt" data. Output from dwt.vt().
 #' @param detrend   Detrend the input time series or just center, default (F).
+#' @param backward  Detrend the input time series or just center, default (F).
+#' @param verbose	  A logical indicating if some “progress report” should be given.
 #'
 #' @return A list of 8 elements: wf, method, boundary, pad, x (data), dp (data), dp.n (variance trasnformed dp), and S (covariance matrix).
 #' @export
@@ -213,7 +234,7 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt = "auto",
 #'   plot.ts(cbind(x, dp))
 #'   plot.ts(cbind(x, dp.n))
 #' }
-dwt.vt.val <- function(data, J, dwt, detrend = FALSE) {
+dwt.vt.val <- function(data, J, dwt, detrend = FALSE, backward=FALSE, verbose=TRUE) {
 
   # initialization
   x <- data$x
@@ -223,8 +244,14 @@ dwt.vt.val <- function(data, J, dwt, detrend = FALSE) {
   boundary <- dwt$boundary
   pad <- dwt$pad
   mu.dp <- apply(dp, 2, mean)
+  
+  # reverse data
+  if(backward) {
+    x <- rev(x)
+    dp <- apply(dp, 2, rev)
+  }
 
-  # variance transfrom
+  # output
   ndim <- ncol(dp)
   n <- nrow(dp)
   dp.n <- matrix(nrow = n, ncol = ndim)
@@ -247,8 +274,10 @@ dwt.vt.val <- function(data, J, dwt, detrend = FALSE) {
     Bn <- scale(B)
     V <- as.numeric(apply(B, 2, sd))
 
-    dif <- sum(abs(Bn %*% V - dp.c))
-    if (dif > 10^-10) print(paste0("Difference between reconstructed and original series: ", dif))
+	if(verbose){
+		dif <- sum(abs(Bn %*% V - dp.c))
+		if (dif > 10^-10) print(paste0("Difference between reconstructed and original series: ", dif))
+	}
 
     # in case different J
     cov <- rep(0, J + 1)
@@ -273,6 +302,13 @@ dwt.vt.val <- function(data, J, dwt, detrend = FALSE) {
     #                     and original series by percentage: ", dif.var * 100))
   }
 
+  # reverse data to normal timeline
+  if(backward) {
+    x <- rev(x)
+    dp <- apply(dp, 2, rev)
+    dp.n <- apply(dp.n, 2, rev)
+  }
+  
   dwt <- list(
     wavelet = wf,
     method = method,
