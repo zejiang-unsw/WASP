@@ -56,7 +56,7 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt = "auto",
   x <- data$x
   dp <- as.matrix(data$dp)
   mu.dp <- apply(dp, 2, mean)
-  
+
   # reverse data
   if(backward) {
     x <- rev(x)
@@ -146,7 +146,7 @@ dwt.vt <- function(data, wf, J, method, pad, boundary, cov.opt = "auto",
 							"and original series by percentage: ", dif.var * 100))
 	}
   }
-  
+
   # reverse data to normal timeline
   if(backward) {
     x <- rev(x)
@@ -244,7 +244,7 @@ dwt.vt.val <- function(data, J, dwt, detrend = FALSE, backward=FALSE, verbose=TR
   boundary <- dwt$boundary
   pad <- dwt$pad
   mu.dp <- apply(dp, 2, mean)
-  
+
   # reverse data
   if(backward) {
     x <- rev(x)
@@ -308,7 +308,7 @@ dwt.vt.val <- function(data, J, dwt, detrend = FALSE, backward=FALSE, verbose=TR
     dp <- apply(dp, 2, rev)
     dp.n <- apply(dp.n, 2, rev)
   }
-  
+
   dwt <- list(
     wavelet = wf,
     method = method,
@@ -330,6 +330,7 @@ dwt.vt.val <- function(data, J, dwt, detrend = FALSE, backward=FALSE, verbose=TR
 #' @param pad   Method for padding, including periodic, zero and symetric padding.
 #'
 #' @return      A dyadic length (power of 2) vector or time series.
+#' @import zoo
 #' @export
 #'
 #' @examples
@@ -353,7 +354,7 @@ padding <- function(x, pad = c("per", "zero", "sym")) {
   }
 
   if(class(x0)[1] =="zoo") xx <- zoo(xx,index(x0)[1]+0:(N-1))
-  if(class(x0)[1]=="ts") xx <- ts(xx,freq=frequency(x0), start=start(x0))
+  if(class(x0)[1]=="ts") xx <- ts(xx,frequency=frequency(x0), start=start(x0))
 
   return(xx)
 }

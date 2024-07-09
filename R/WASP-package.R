@@ -1,4 +1,3 @@
-
 #' WASP: WAvelet System Prediction
 #'
 #' The package WASP (variance transformation) is used for system modelling and prediction.
@@ -32,7 +31,6 @@
 #' data.gen.ar1, data.gen.ar4, data.gen.ar9, data.gen.tar1, data.gen.tar2.
 #'
 #'
-#' @docType package
+#' _PACKAGE
 #' @name WASP-package
 NULL
-

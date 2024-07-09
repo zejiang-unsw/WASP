@@ -1,6 +1,6 @@
 Package: WASP
 Title: Wavelet System Prediction
-Version: 1.4.3.9000
+Version: 1.4.4
 Authors@R: 
     c(person(given = "Ze",
            family = "Jiang",
@@ -31,9 +31,8 @@ Depends: R (>= 3.6.0)
 URL: https://github.com/zejiang-unsw/WASP#readme
 BugReports: https://github.com/zejiang-unsw/WASP/issues
 Imports: 
-    waveslim, stats, tidyr, ggplot2, sp, rlang (>= 1.0.0)
+    waveslim, stats, tidyr, ggplot2, sp, zoo
 Suggests: 
-    zoo,
     FNN,
     readr,
     knitr,
@@ -42,11 +41,10 @@ Suggests:
     bookdown,
     rmarkdown,
     SPEI,
-    NPRED,
     synthesis,
     kableExtra,
     fitdistrplus,
     devtools,
     testthat
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 VignetteBuilder: knitr

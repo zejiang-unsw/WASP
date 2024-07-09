@@ -52,23 +52,9 @@ Modified k-nearest neighbour conditional bootstrap or regression function estima
 # AR9 model   x(i)=0.3*x(i-1)-0.6*x(i-4)-0.5*x(i-9)+eps
 data.ar9 <- data.gen.ar9(500)
 x <- data.ar9$x # response
-py <- data.ar9$dp # possible predictors
+z <- data.ar9$dp # possible predictors
 
-# identify the meaningful predictors and estimate partial weights
-ans.ar9 <- NPRED::stepwise.PIC(x, py)
-z <- py[, ans.ar9$cpy] # predictor matrix
-pw <- ans.ar9$wt # partial weights
-
-# vector denoting where we want outputs, can be a matrix representing grid.
-zout <- apply(z, 2, mean)
-
-knn(x, z, zout, reg = TRUE, pw = pw) # knn regression estimate using partial weights.
-
-knn(x, z, zout, reg = FALSE, pw = pw) # alternatively, knn conditional bootstrap (100 realisations).
-# Mean of the conditional bootstrap estimate should be
-# approximately the same as the regression estimate.
-
-zout <- ts(data.gen.ar9(500, ndim = length(ans.ar9$cpy))$dp) # new input
+zout <- ts(data.gen.ar9(500, ndim = ncol(z)$dp) # new input
 xhat1 <- xhat2 <- x
 xhat1 <- knn(x, z, zout, k = 5, reg = TRUE, extrap = FALSE) # without extrapolation
 xhat2 <- knn(x, z, zout, k = 5, reg = TRUE, extrap = TRUE) # with extrapolation
