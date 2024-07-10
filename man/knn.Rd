@@ -54,7 +54,8 @@ data.ar9 <- data.gen.ar9(500)
 x <- data.ar9$x # response
 z <- data.ar9$dp # possible predictors
 
-zout <- ts(data.gen.ar9(500, ndim = ncol(z)$dp) # new input
+zout <- ts(data.gen.ar9(500, ndim = ncol(z))$dp) # new input
+
 xhat1 <- xhat2 <- x
 xhat1 <- knn(x, z, zout, k = 5, reg = TRUE, extrap = FALSE) # without extrapolation
 xhat2 <- knn(x, z, zout, k = 5, reg = TRUE, extrap = TRUE) # with extrapolation

@@ -48,3 +48,4 @@ vignettes/code/EMS2020_stepwiseVT.R
 vignettes/*.m
 vignettes/*.txt
 vignettes/*.xlsx
+.DS_Store
