@@ -1,8 +1,8 @@
 citHeader("To cite WASP in publications use:")
 
-citEntry(entry = "Article",
+bibentry(bibtype = "Article",
          title        = "Refining Predictor Spectral Representation Using Wavelet Theory for Improved Natural System Modeling",
-         author       = personList(as.person("Ze Jiang"),
+         author       = c(as.person("Ze Jiang"),
                                    as.person("Ashish Sharma"),
                                    as.person("Fiona Johnson")),
          journal      = "Water Resources Research",
@@ -18,9 +18,9 @@ citEntry(entry = "Article",
                               "<doi:10.1029/2019WR026962>.")
 )
 
-citEntry(entry = "Article",
+bibentry(bibtype = "Article",
          title        = "A wavelet-based tool to modulate variance in predictors: an application to predicting drought anomalies",
-         author       = personList(as.person("Ze Jiang"),
+         author       = c(as.person("Ze Jiang"),
                                    as.person("Md. Mamunur Rashid"),
                                    as.person("Fiona Johnson"),
                                    as.person("Ashish Sharma")),
@@ -37,9 +37,9 @@ citEntry(entry = "Article",
                               "<doi:10.1016/j.envsoft.2020.104907>.")
 )
 
-citEntry(entry = "Article",
+bibentry(bibtype = "Article",
          title        = "Variable transformations in the spectral domain – Implications for hydrologic forecasting",
-         author       = personList(as.person("Ze Jiang"),
+         author       = c(as.person("Ze Jiang"),
                                    as.person("Ashish Sharma"),
                                    as.person("Fiona Johnson")),
          journal      = "Journal of Hydrology",
