@@ -17,6 +17,7 @@ library(ggplot2)
 
 if(!require(SPEI)) devtools::install_github('sbegueria/SPEI@v1.7.1') # use 1.7.1
 require(SPEI)
+require(readr)
 library(FNN)
 library(synthesis)
 library(waveslim)
