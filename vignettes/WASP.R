@@ -17,7 +17,8 @@ library(ggplot2)
 
 if(!require(SPEI)) devtools::install_github('sbegueria/SPEI@v1.7.1') # use 1.7.1
 require(SPEI)
-require(readr)
+library(readr)
+library(dplyr)
 library(FNN)
 library(synthesis)
 library(waveslim)
@@ -36,7 +37,7 @@ for (wf in c("haar", "d4", "d8", "d16")) {
   # wavelet family, extension mode and package
   # wf <- "haar" # wavelet family D8 or db4
   boundary <- "periodic"
-  if (wf != "haar") v <- as.integer(readr::parse_number(wf) / 2) else v <- 1
+  if (wf != "haar") v <- as.integer(parse_number(wf) / 2) else v <- 1
 
   # Maximum decomposition level J
   n <- length(x)
@@ -115,7 +116,7 @@ for (k in seq_along(wf.opts)) {
   # wavelet family, extension mode and package
   wf <- wf.opts[k] # wavelet family D8 or db4
   boundary <- "periodic"
-  if (wf != "haar") v <- as.integer(readr::parse_number(wf) / 2) else v <- 1
+  if (wf != "haar") v <- as.integer(parse_number(wf) / 2) else v <- 1
 
   # Maximum decomposition level J
   n <- length(x)
@@ -217,8 +218,9 @@ if (TRUE) {
   data("obs.mon")
   data("rain.mon")
 
-  if (1) { # SPI12 as response
-    SPI.12 <- SPEI::spi(rain.mon[, 5], scale = 12)$fitted
+  if (TRUE) { # SPI12 as response
+	#SPI.12 <- SPEI::spi(rain.mon[, 5], scale = 12)$fitted
+	SPI.12 <- SPI.calc(window(rain.mon[, 5], start=c(1949,1), end=c(2009,12)),sc=12)
     x <- window(SPI.12, start = c(1950, 1), end = c(2009, 12))
     dp <- window(obs.mon, start = c(1950, 1), end = c(2009, 12))
   } else { # rainfall as response
@@ -249,7 +251,7 @@ for (mode in mode.opts) {
   wf <- "haar"
   pad <- "zero"
   boundary <- "periodic"
-  if (wf != "haar") v <- as.integer(readr::parse_number(wf) / 2) else v <- 1
+  if (wf != "haar") v <- as.integer(parse_number(wf) / 2) else v <- 1
 
   # Maximum decomposition level J
   n <- sample
@@ -336,7 +338,8 @@ if (TRUE) {
   data("obs.mon")
   data("rain.mon")
 
-  SPI.12 <- SPEI::spi(rain.mon[, 5], scale = 12)$fitted
+  #SPI.12 <- SPEI::spi(rain.mon[, 5], scale = 12)$fitted
+  SPI.12 <- SPI.calc(window(rain.mon[, 5], start=c(1949,1), end=c(2009,12)),sc=12)
   x <- window(SPI.12, start = c(1950, 1), end = c(2009, 12))
   dp <- window(obs.mon, start = c(1950, 1), end = c(2009, 12))
 
@@ -373,7 +376,7 @@ for (mode in mode.opts) {
   wf <- "d16"
   pad <- "zero"
   boundary <- "periodic"
-  if (wf != "haar") v <- as.integer(readr::parse_number(wf) / 2) else v <- 1
+  if (wf != "haar") v <- as.integer(parse_number(wf) / 2) else v <- 1
 
   # Maximum decomposition level J
   n <- sample
@@ -431,7 +434,8 @@ station.id <- 5
 lab.names <- colnames(obs.mon)[c(1, 3, 4, 5, 7)]
 
 if (TRUE) { # SPI12 as response
-  SPI.12 <- SPEI::spi(rain.mon, scale = 12)$fitted
+  #SPI.12 <- SPEI::spi(rain.mon, scale = 12)$fitted
+  SPI.12 <- SPI.calc(window(rain.mon, start=c(1949,1), end=c(2009,12)),sc=12)
   x <- window(SPI.12, start = c(1950, 1), end = c(2009, 12))
   dp <- window(obs.mon[, lab.names], start = c(1950, 1), end = c(2009, 12))
 } else { # rainfall as response
@@ -472,7 +476,7 @@ for (mode in mode.opts) {
   )
   pad <- "zero"
   boundary <- "periodic"
-  if (wf != "haar") v <- as.integer(readr::parse_number(wf) / 2) else v <- 1
+  if (wf != "haar") v <- as.integer(parse_number(wf) / 2) else v <- 1
 
   # Maximum decomposition level J
   n <- nrow(x)
@@ -493,7 +497,7 @@ for (mode in mode.opts) {
       MSE <- rbind(MSE, c(m1, m2))
     }
 
-    RMSE <- cbind(RMSE, MSE)
+    RMSE <- rbind(RMSE, data.frame(mode, MSE))
 
     par(
       mfrow = c(length(cpy), 1), mar = c(0, 4, 2, 1),
@@ -520,18 +524,23 @@ par(op)
 # plot and save
 cowplot::plot_grid(plotlist = p.list, nrow = 1, labels = c("(a)", "(b)", "(c)"))
 
-
-
 #-------------------------------------------------------------------
 # RMSE when more predictors are included
-tab1 <- round(RMSE, 3)
-tab1 <- cbind(1:nrow(tab1), tab1)
-colnames(tab1) <- c("No. of Predictors", rep(c("Original", "Transformed"), length(mode.opts)))
-
-kable(tab1, caption = "Comparison of prediction accuracy using Std and SVT", booktabs = T) %>%
+#tab1 <- round(RMSE, 3)
+#tab1 <- cbind(1:nrow(tab1), tab1)
+#colnames(tab1) <- c("No. of Predictors", rep(c("Original", "Transformed"), length(mode.opts)))
+# kable(tab1, caption = "Comparison of prediction accuracy using Std and SVT", booktabs = T) %>%
+#   kable_styling(latex_options = c("HOLD_position"), position = "center", full_width = FALSE)  %>%
+#   #  add_header_above(c(" " = 1, "DWT-MRA" = 2, "MODWT" = 2, "AT" = 2))
+#   add_header_above(c(" " = 1, "DWT-MRA" = 2, "MODWT/AT" = 2))
+tab <- RMSE %>% group_by(mode) %>% mutate(id = row_number())
+tab1 <- tab[,c(1,4,2,3)]
+colnames(tab1) <- c("Method","No. of Predictors","Original","Transformed")
+kable(tab1, caption = "Comparison of prediction accuracy using Std and SVT", booktabs = T, 
+      digits = 3) %>%
   kable_styling(latex_options = c("HOLD_position"), position = "center", full_width = FALSE)  %>%
-  #  add_header_above(c(" " = 1, "DWT-MRA" = 2, "MODWT" = 2, "AT" = 2))
-  add_header_above(c(" " = 1, "DWT-MRA" = 2, "MODWT/AT" = 2))
+  collapse_rows(columns = 1)
+
 
 ## ----comp, eval=FALSE, include=FALSE------------------------------------------
 #  #-------------------------------------------------------------------
