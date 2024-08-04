@@ -68,7 +68,7 @@ scal2freqR <- function(wf, scale, delta) {
   if (wf %in% c("haar", "d4", "d6", "d8", "d16")) {
     wavelet <- wavelet.filter(wf, "HLLLLL")
     n <- length(wavelet)
-    xmax <- ifelse(wf != "haar", as.integer(readr::parse_number(wf)) - 1, 1)
+    xmax <- ifelse(wf != "haar", as.integer(parse_number(wf)) - 1, 1)
     xmin <- 0
     xval <- seq(xmin, xmax, length.out = n)
 

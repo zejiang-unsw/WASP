@@ -32,7 +32,8 @@
 #' )
 #' wf <- "d4"
 #' station.id <- 5 # station to investigate
-#' SPI.12 <- SPEI::spi(rain.mon, scale = 12)$fitted
+#' #SPI.12 <- SPEI::spi(rain.mon, scale = 12)$fitted
+#' SPI.12 <- SPI.calc(window(rain.mon, start=c(1949,1), end=c(2009,12)),sc=12)
 #' lab.names <- colnames(obs.mon)
 #' # plot.ts(SPI.12[,1:10])
 #'
@@ -184,7 +185,8 @@ stepwise.VT <- function(data, alpha = 0.1, nvarmax = 4, mode = c("MRA", "MODWT",
 #' )
 #' wf <- "d4"
 #' station.id <- 5 # station to investigate
-#' SPI.12 <- SPEI::spi(rain.mon, scale = 12)$fitted
+#' #SPI.12 <- SPEI::spi(rain.mon, scale = 12)$fitted
+#' SPI.12 <- SPI.calc(window(rain.mon, start=c(1949,1), end=c(2009,12)),sc=12)
 #' lab.names <- colnames(obs.mon)
 #' # plot.ts(SPI.12[,1:10])
 #'
@@ -224,7 +226,7 @@ stepwise.VT.val <- function(data, J, dwt, mode = c("MRA", "MODWT", "AT"), detren
     pad <- dwt$pad
   }
 
-  if (wf != "haar") v <- as.integer(readr::parse_number(wf) / 2) else v <- 1
+  if (wf != "haar") v <- as.integer(parse_number(wf) / 2) else v <- 1
   # Maximum decomposition level J
   n <- length(x)
   # if(wf=="haar") J <- ceiling(log(n/(2*v-1))/log(2))-1 else J <- ceiling(log(n/(2*v-1))/log(2))#(Kaiser, 1994)
@@ -386,7 +388,7 @@ pic.calc <- function(X, Y, Z, mode, wf, J, method = "dwt", pad = "zero",
                      boundary = "periodic", cov.opt = "auto", flag = "biased", detrend = F) {
   Y <- as.matrix(Y)
 
-  if (wf != "haar") v <- as.integer(readr::parse_number(wf) / 2) else v <- 1
+  if (wf != "haar") v <- as.integer(parse_number(wf) / 2) else v <- 1
   # Maximum decomposition level J
   n <- length(X)
   # if(wf=="haar") J <- ceiling(log(n/(2*v-1))/log(2))-1 else J <- ceiling(log(n/(2*v-1))/log(2))#(Kaiser, 1994)
