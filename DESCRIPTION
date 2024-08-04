@@ -31,17 +31,18 @@ Depends: R (>= 3.6.0)
 URL: https://github.com/zejiang-unsw/WASP#readme
 BugReports: https://github.com/zejiang-unsw/WASP/issues
 Imports: 
-    waveslim, stats, tidyr, readr, ggplot2, sp, zoo, SPEI
+    waveslim, stats, tidyr, readr, ggplot2, sp, zoo, fitdistrplus
 Suggests: 
     FNN,
+    SPEI, 
     knitr,
+    dplyr, 
     cowplot,
     gridGraphics, 
     bookdown,
     rmarkdown,
     synthesis,
     kableExtra,
-    fitdistrplus,
     devtools,
     testthat
 RoxygenNote: 7.3.2

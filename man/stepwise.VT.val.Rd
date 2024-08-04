@@ -34,7 +34,8 @@ mode <- switch(1,
 )
 wf <- "d4"
 station.id <- 5 # station to investigate
-SPI.12 <- SPEI::spi(rain.mon, scale = 12)$fitted
+#SPI.12 <- SPEI::spi(rain.mon, scale = 12)$fitted
+SPI.12 <- SPI.calc(window(rain.mon, start=c(1949,1), end=c(2009,12)),sc=12)
 lab.names <- colnames(obs.mon)
 # plot.ts(SPI.12[,1:10])
 

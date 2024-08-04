@@ -4,18 +4,18 @@
 #' @param sc		        The accumulation period in months. Commonly 6, 12, 24, 36, and 48 months.
 #' @param method        A character string coding for the fitting method: "mle" for 'maximum likelihood estimation', "mme" for 'moment matching estimation', "qme" for 'quantile matching estimation' and "mge" for 'maximum goodness-of-fit estimation'.
 #'
-#' @return A matrix of time sereis.
+#' @return A matrix of time series.
 #' @export
 #'
 #' @examples
 #' data(rain.mon)
-#' data(SPI.12)
+#'
 #' ## compute SPI
 #' SPI <- SPI.calc(window(rain.mon, start = c(1949, 1), end = c(2009, 12)), sc = 12)
 #'
-#' ## compare with sample data set SPI.12
+#' ## plot
 #' par(mfrow = c(3, 5))
-#' for (i in seq_len(ncol(SPI))) plot(SPI[, i], SPI.12[, i])
+#' for (i in seq_len(ncol(SPI))) plot(SPI[, i])
 SPI.calc <- function(prec.zoo, sc = 24, method = "mle") {
   ### spi calculation
 
@@ -61,6 +61,7 @@ SPI.calc <- function(prec.zoo, sc = 24, method = "mle") {
   spi <- qnorm(gammavals)
 
   ### create ts spi
-  spi.ts <- ts(rbind(matrix(NA, nrow = sc - 1, ncol = ncol(prec.zoo)), spi), start = start(prec.zoo), end = end(prec.zoo), freq = 12)
+  spi.ts <- ts(rbind(matrix(NA, nrow = sc - 1, ncol = ncol(prec.zoo)), spi),
+               start = start(prec.zoo), end = end(prec.zoo), frequency = 12)
   return(spi.ts)
 }
